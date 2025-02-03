@@ -1,15 +1,14 @@
+# Ignore IDE files
+.idea/
 *.iml
-.gradle
+
+# Ignore build files
+/build/
+.gradle/
+captures/
+
+# Ignore local properties
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Ignore sensitive Firebase config (optional)
+google-services.json
