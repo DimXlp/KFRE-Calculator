@@ -5,6 +5,16 @@
     app:startDestination="@id/inputFragment">
 
     <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.dimxlp.kfrecalculator.ui.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_inputFragment"
+            app:destination="@id/inputFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/inputFragment"
         android:name="com.dimxlp.kfrecalculator.ui.InputFragment"
         android:label="Input"
