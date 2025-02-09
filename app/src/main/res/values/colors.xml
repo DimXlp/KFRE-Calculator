@@ -1,11 +1,11 @@
 <resources>
     <!-- Primary Colors -->
-    <color name="colorPrimary">#00274D</color>
-    <color name="colorPrimaryVariant">#A8DFF7</color>
+    <color name="colorPrimary">#00172D</color>
+    <color name="colorPrimaryVariant">#5DE3FE</color>
     <color name="colorOnPrimary">#FFFFFF</color>
 
     <!-- Secondary Colors -->
-    <color name="colorSecondary">#34C759</color>
+    <color name="colorSecondary">#3CE1AE</color>
     <color name="colorOnSecondary">#FFFFFF</color>
 
     <!-- Background Colors -->
@@ -17,6 +17,11 @@
     <color name="textSecondary">#6D6D6D</color>
 
     <!-- Accent Colors -->
-    <color name="colorAccentLight">#A8DFF7</color>
-    <color name="colorAccentDark">#34A853</color>
+    <color name="colorAccentLight">#8CFFD1</color>
+    <color name="colorAccentDark">#0BBB7D</color>
+
+    <!-- Gradient Colors -->
+    <color name="colorGradientLight">#527FAD</color>
+    <color name="colorGradientCenter">#04233F</color>
+    <color name="colorGradientDark">#00172D</color>
 </resources>
