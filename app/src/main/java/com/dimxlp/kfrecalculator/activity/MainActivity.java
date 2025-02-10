@@ -19,13 +19,13 @@ public class MainActivity extends AppCompatActivity {
         Button btnSignup = findViewById(R.id.btnSignup);
         Button btnCalculator = findViewById(R.id.btnCalculator);
 
-//        btnLogin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
 //
 //        btnSignup.setOnClickListener(new View.OnClickListener() {
 //            @Override
