@@ -22,4 +22,19 @@
         <item name="android:textColor">@color/colorOnSecondary</item>
         <item name="cornerRadius">24dp</item>
     </style>
+
+    <style name="FloatingHintAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorSecondary</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
+    </style>
+
+    <style name="CustomTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/colorSecondary</item>
+<!--        <item name="boxStrokeColorFocused">@color/colorSecondary</item>-->
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="hintTextColor">@color/colorSecondary</item>
+    </style>
+
 </resources>
