@@ -31,7 +31,6 @@
 
     <style name="CustomTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/colorSecondary</item>
-<!--        <item name="boxStrokeColorFocused">@color/colorSecondary</item>-->
         <item name="boxStrokeWidth">2dp</item>
         <item name="boxStrokeWidthFocused">2dp</item>
         <item name="hintTextColor">@color/colorSecondary</item>
