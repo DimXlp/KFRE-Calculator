@@ -26,14 +26,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//
-//        btnSignup.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, SignupActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+
+        btnSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CreateAccountActivity.class);
+                startActivity(intent);
+            }
+        });
 //
 //        btnCalculator.setOnClickListener(new View.OnClickListener() {
 //            @Override

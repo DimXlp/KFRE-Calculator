@@ -38,13 +38,13 @@ public class LoginActivity extends AppCompatActivity {
                 // TODO: Implement forgot password functionality
             }
         });
-//
-//        txtSignup.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+
+        txtSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, CreateAccountActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
