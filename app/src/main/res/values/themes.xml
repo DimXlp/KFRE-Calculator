@@ -30,10 +30,10 @@
     </style>
 
     <style name="CustomTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/colorSecondary</item>
-        <item name="boxStrokeWidth">2dp</item>
-        <item name="boxStrokeWidthFocused">2dp</item>
-        <item name="hintTextColor">@color/colorSecondary</item>
+        <item name="boxStrokeColor">@color/textinput_border_color</item>
+        <item name="hintTextColor">@color/textinput_hint_color</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
     </style>
 
 </resources>
