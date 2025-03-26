@@ -61,6 +61,19 @@ public class ProfileActivity extends AppCompatActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerRole.setAdapter(adapter);
+        spinnerRole.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                checkEnableSave();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                checkEnableSave();
+            }
+        });
+
+        loadUserInfo();
 
         // Enable Save button only if required fields are filled
         TextWatcher inputWatcher = new TextWatcher() {
@@ -86,6 +99,40 @@ public class ProfileActivity extends AppCompatActivity {
         Log.d(TAG, "ProfileActivity initialized for: " + currentUser.getEmail());
     }
 
+    private void loadUserInfo() {
+        String uid = currentUser.getUid();
+
+        db.collection("Users").document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String firstName = documentSnapshot.getString("firstName");
+                        String lastName = documentSnapshot.getString("lastName");
+                        String role = documentSnapshot.getString("role");
+
+                        if (firstName != null) inputFirstName.setText(firstName);
+                        if (lastName != null) inputLastName.setText(lastName);
+
+                        if (role != null) {
+                            ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) spinnerRole.getAdapter();
+                            int position = adapter.getPosition(role);
+                            if (position >= 0) spinnerRole.setSelection(position);
+                        }
+
+                        Log.d(TAG, "User info loaded into profile form");
+                    } else {
+                        Log.d(TAG, "No user document found to pre-fill profile");
+                    }
+
+                    checkEnableSave();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error loading user info: " + e.getMessage());
+                    Toast.makeText(this, "Could not load profile info", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
     private void checkEnableSave() {
         String firstName = inputFirstName.getText().toString().trim();
         String lastName = inputLastName.getText().toString().trim();
@@ -95,37 +142,38 @@ public class ProfileActivity extends AppCompatActivity {
         boolean enable = !firstName.isEmpty() && !lastName.isEmpty() && validRoleSelected;
 
         btnSaveProfile.setEnabled(enable);
+
+        Log.d(TAG, "Save enabled: " + btnSaveProfile.isEnabled());
     }
 
     private void saveProfile() {
+        Log.d(TAG, "Button clicked");
         String uid = currentUser.getUid();
         String firstName = inputFirstName.getText().toString().trim();
         String lastName = inputLastName.getText().toString().trim();
         String role = spinnerRole.getSelectedItem().toString();
-        String email = currentUser.getEmail();
 
-        Map<String, Object> profile = new HashMap<>();
-        profile.put("firstName", firstName);
-        profile.put("lastName", lastName);
-        profile.put("fullName", firstName + " " + lastName);
-        profile.put("email", email);
-        profile.put("role", role);
-        profile.put("profileCompleted", true);
-        profile.put("updatedAt", System.currentTimeMillis());
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("firstName", firstName);
+        updates.put("lastName", lastName);
+        updates.put("fullName", firstName + " " + lastName);
+        updates.put("role", role);
+        updates.put("profileCompleted", true);
+        updates.put("updatedAt", System.currentTimeMillis());
 
         db.collection("Users").document(uid)
-                .set(profile)
+                .update(updates)
                 .addOnSuccessListener(unused -> {
-                    Log.d(TAG, "User profile saved");
-                    Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "User profile updated");
+                    Toast.makeText(this, "Profile updated!", Toast.LENGTH_SHORT).show();
 
                     // TODO: Redirect to DashboardActivity or HomeActivity
                     // startActivity(new Intent(ProfileActivity.this, DashboardActivity.class));
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error saving profile: " + e.getMessage());
-                    Toast.makeText(this, "Error saving profile", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error updating profile: " + e.getMessage());
+                    Toast.makeText(this, "Error updating profile", Toast.LENGTH_SHORT).show();
                 });
     }
 }
