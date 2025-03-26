@@ -29,6 +29,10 @@
         <activity
             android:name=".activity.CreateAccountActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

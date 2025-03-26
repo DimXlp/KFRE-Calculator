@@ -94,15 +94,15 @@ public class CreateAccountActivity extends AppCompatActivity {
                         Log.d(TAG, "Account creation successful for: " + user.getUid());
 
                         // Send email verification
-                        user.sendEmailVerification()
-                                .addOnCompleteListener(task1 -> {
-                                    if (task1.isSuccessful()) {
-                                        Log.d(TAG, "Verification email sent.");
-                                        Toast.makeText(CreateAccountActivity.this, "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Log.e(TAG, "Failed to send verification email: " + task1.getException().getMessage());
-                                    }
-                                });
+//                        user.sendEmailVerification()
+//                                .addOnCompleteListener(task1 -> {
+//                                    if (task1.isSuccessful()) {
+//                                        Log.d(TAG, "Verification email sent.");
+//                                        Toast.makeText(CreateAccountActivity.this, "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show();
+//                                    } else {
+//                                        Log.e(TAG, "Failed to send verification email: " + task1.getException().getMessage());
+//                                    }
+//                                });
 
                         // Save user data to Firestore
                         saveUserToDatabase(user.getUid(), firstName, lastName, email);
