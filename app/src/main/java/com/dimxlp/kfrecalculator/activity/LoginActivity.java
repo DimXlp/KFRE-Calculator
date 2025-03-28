@@ -101,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (profileCompleted != null && profileCompleted) {
                             Log.d(TAG, "Profile is completed. Redirecting to Dashboard.");
-//                            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                         } else {
                             Log.d(TAG, "Profile incomplete. Redirecting to Profile setup.");
                             startActivity(new Intent(LoginActivity.this, ProfileActivity.class));

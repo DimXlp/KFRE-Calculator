@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="12dp">
+
+    <TextView
+        android:id="@+id/recentPatientName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="John Doe"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/recentPatientAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Age: 65"
+        android:textSize="14sp"
+        android:textColor="@color/textSecondary" />
+
+    <TextView
+        android:id="@+id/recentPatientLast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last Assessment: 22 Mar"
+        android:textSize="14sp"
+        android:textColor="@color/textSecondary" />
+
+    <TextView
+        android:id="@+id/recentPatientRisk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Risk: ⚠ High"
+        android:textSize="14sp"
+        android:textColor="@color/textSecondary" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="#EEEEEE" />
+
+</LinearLayout>

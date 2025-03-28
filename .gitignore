@@ -12,3 +12,5 @@ captures/
 
 # Ignore sensitive Firebase config (optional)
 google-services.json
+
+**/.DS_Store

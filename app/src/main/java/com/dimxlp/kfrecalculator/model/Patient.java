@@ -1,5 +1,7 @@
 package com.dimxlp.kfrecalculator.model;
 
+import com.dimxlp.kfrecalculator.enumeration.Risk;
+
 import java.util.Map;
 
 public class Patient {
@@ -15,10 +17,11 @@ public class Patient {
     private String generalHistoryNote;
     private long createdAt;
     private long lastUpdated;
+    private Risk risk;
 
     public Patient() {}
 
-    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, long createdAt, long lastUpdated) {
+    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, long createdAt, long lastUpdated, Risk risk) {
         this.patientId = patientId;
         this.userId = userId;
         this.firstName = firstName;
@@ -31,6 +34,14 @@ public class Patient {
         this.generalHistoryNote = generalHistoryNote;
         this.createdAt = createdAt;
         this.lastUpdated = lastUpdated;
+        this.risk = risk;
+    }
+
+    public Patient(String fullName, String birthDate, long lastUpdated, Risk risk) {
+        this.fullName = fullName;
+        this.birthDate = birthDate;
+        this.lastUpdated = lastUpdated;
+        this.risk = risk;
     }
 
     public String getPatientId() {
@@ -127,5 +138,13 @@ public class Patient {
 
     public void setLastUpdated(long lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public Risk getRisk() {
+        return risk;
+    }
+
+    public void setRisk(Risk risk) {
+        this.risk = risk;
     }
 }
