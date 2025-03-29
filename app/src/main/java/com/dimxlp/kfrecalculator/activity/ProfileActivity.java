@@ -1,5 +1,6 @@
 package com.dimxlp.kfrecalculator.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -167,8 +168,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Log.d(TAG, "User profile updated");
                     Toast.makeText(this, "Profile updated!", Toast.LENGTH_SHORT).show();
 
-                    // TODO: Redirect to DashboardActivity or HomeActivity
-                    // startActivity(new Intent(ProfileActivity.this, DashboardActivity.class));
+                    startActivity(new Intent(ProfileActivity.this, DashboardActivity.class));
                     finish();
                 })
                 .addOnFailureListener(e -> {

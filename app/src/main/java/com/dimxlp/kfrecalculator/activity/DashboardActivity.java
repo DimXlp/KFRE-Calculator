@@ -1,6 +1,5 @@
 package com.dimxlp.kfrecalculator.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -26,7 +25,7 @@ import java.util.List;
 public class DashboardActivity extends AppCompatActivity {
 
     private static final String TAG = "RAFI|Dashboard";
-    private TextView tvDoctorName;
+    private TextView userRole, userName;
     private LinearLayout addPatientAction, quickCalcAction, viewAllAction, exportDataAction;
     private RecyclerView recentRecView;
     private FirebaseUser currentUser;
@@ -42,7 +41,8 @@ public class DashboardActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // UI references
-        tvDoctorName = findViewById(R.id.dashboardDoctorName);
+        userRole = findViewById(R.id.dashboardRole);
+        userName = findViewById(R.id.dashboardUserName);
         addPatientAction = findViewById(R.id.dashboardAddPatientAction);
         quickCalcAction = findViewById(R.id.dashboardQuickCalcAction);
         viewAllAction = findViewById(R.id.dashboardViewAllAction);
@@ -62,8 +62,11 @@ public class DashboardActivity extends AppCompatActivity {
             db.collection("Users").document(uid).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("firstName");
-                            tvDoctorName.setText(name != null ? name : "Doctor");
+                            String role = documentSnapshot.getString("role");
+                            userRole.setText("Doctor".equals(role) ? "Dr. " : "");
+
+                            String name = documentSnapshot.getString("lastName");
+                            userName.setText(name != null ? name : "");
                         }
                     })
                     .addOnFailureListener(e -> Log.e(TAG, "Failed to load user data", e));

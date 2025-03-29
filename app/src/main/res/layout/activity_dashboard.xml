@@ -65,10 +65,19 @@
                 android:textColor="@color/colorOnPrimary" />
 
             <TextView
-                android:id="@+id/dashboardDoctorName"
+                android:id="@+id/dashboardRole"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dr. Xlp!"
+                android:text="Dr. "
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorOnPrimary" />
+
+            <TextView
+                android:id="@+id/dashboardUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xlp"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/colorOnPrimary" />
