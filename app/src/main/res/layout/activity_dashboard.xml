@@ -429,6 +429,70 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Risk Distribution Pie Chart (Doctor) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/dashboardRiskPieChartDoctorCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Risk Distribution"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:paddingBottom="8dp" />
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChartRiskDistribution"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- KFRE Risk Over Time Chart (Individual) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/dashboardRiskLineChartIndividualCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="KFRE Risk Over Time"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:paddingBottom="8dp" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/lineChartRiskOverTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <!-- Quick Actions Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"

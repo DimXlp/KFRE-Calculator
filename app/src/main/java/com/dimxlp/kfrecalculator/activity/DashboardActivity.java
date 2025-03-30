@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,8 +24,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -54,6 +69,11 @@ public class DashboardActivity extends AppCompatActivity {
     // Actions
     private LinearLayout addPatientBtn, addCalcBtn, quickCalcBtn, viewAllPatientsBtn,
             viewAllCalcsBtn, exportBtn;
+
+    // Charts
+    private CardView pieChartDoctorCard, lineChartIndividualCard;
+    private PieChart pieChartDoctor;
+    private LineChart lineChartIndividual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +120,11 @@ public class DashboardActivity extends AppCompatActivity {
         quickCalculationDivider = findViewById(R.id.dashboardQuickCalculationDivider);
         viewAllPatientsDivider = findViewById(R.id.dashboardViewAllPatientsDivider);
         viewAllCalculationsDivider = findViewById(R.id.dashboardViewAllCalculationsDivider);
+
+        pieChartDoctorCard = findViewById(R.id.dashboardRiskPieChartDoctorCard);
+        lineChartIndividualCard = findViewById(R.id.dashboardRiskLineChartIndividualCard);
+        pieChartDoctor = findViewById(R.id.pieChartRiskDistribution);
+        lineChartIndividual = findViewById(R.id.lineChartRiskOverTime);
     }
 
     private void setupListeners() {
@@ -154,9 +179,94 @@ public class DashboardActivity extends AppCompatActivity {
                         userName.setText(lastName != null ? lastName : "");
 
                         setVisibilityBasedOnRole(role);
+                        setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
                     }
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to load user info", e));
+    }
+
+    private void setupCharts(List<Patient> patients, List<Calculation> calculations, String role) {
+        if ("doctor".equalsIgnoreCase(role)) {
+            setupDoctorPieChart(patients);
+        } else {
+            setupIndividualLineChart(calculations);
+        }
+    }
+
+    private void setupDoctorPieChart(List<Patient> patients) {
+        int low = 0, medium = 0, high = 0;
+        for (Patient p : patients) {
+            switch (p.getRisk()) {
+                case LOW: low++; break;
+                case MEDIUM: medium++; break;
+                case HIGH: high++; break;
+            }
+        }
+
+        List<PieEntry> entries = new ArrayList<>();
+        if (low > 0) entries.add(new PieEntry(low, "Low"));
+        if (medium > 0) entries.add(new PieEntry(medium, "Medium"));
+        if (high > 0) entries.add(new PieEntry(high, "High"));
+
+        PieDataSet dataSet = new PieDataSet(entries, "Risk Distribution");
+
+        List<Integer> pieColors = Arrays.asList(
+                ContextCompat.getColor(getApplicationContext(), R.color.colorAccentDark),
+                ContextCompat.getColor(this, R.color.colorMediumRisk),
+                ContextCompat.getColor(this, R.color.colorHighRisk)
+        );
+        dataSet.setColors(pieColors);
+        PieData pieData = new PieData(dataSet);
+
+        pieChartDoctor.setData(pieData);
+        pieChartDoctor.setUsePercentValues(true);
+        pieChartDoctor.setEntryLabelTextSize(12f);
+        pieChartDoctor.setCenterText("% Patients");
+        pieChartDoctor.setCenterTextSize(16f);
+        pieChartDoctor.getDescription().setEnabled(false);
+        pieChartDoctor.invalidate();
+    }
+
+    private void setupIndividualLineChart(List<Calculation> calculations) {
+        List<Entry> twoYearEntries = IntStream.range(0, calculations.size())
+                .mapToObj(i -> new Entry(i, (float) calculations.get(i).getRisk2Yr()))
+                .collect(Collectors.toList());
+
+        LineDataSet twoYearDataSet = new LineDataSet(twoYearEntries, "2-Year KFRE Risk");
+        int twoYearLineColor = ContextCompat.getColor(getApplicationContext(), R.color.colorSecondary);
+        twoYearDataSet.setColors(twoYearLineColor);
+        twoYearDataSet.setValueTextSize(10f);
+        twoYearDataSet.setLineWidth(2f);
+        twoYearDataSet.setCircleRadius(4f);
+        twoYearDataSet.setCircleColor(twoYearLineColor);
+
+        List<Entry> fiveYearEntries = IntStream.range(0, calculations.size())
+                .mapToObj(i -> new Entry(i, (float) calculations.get(i).getRisk5Yr()))
+                .collect(Collectors.toList());
+
+        LineDataSet fiveYearDataSet = new LineDataSet(fiveYearEntries, "5-Year KFRE Risk");
+        int fiveYearLineColor = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryVariant);
+        fiveYearDataSet.setColors(fiveYearLineColor);
+        fiveYearDataSet.setValueTextSize(10f);
+        fiveYearDataSet.setLineWidth(2f);
+        fiveYearDataSet.setCircleRadius(4f);
+        fiveYearDataSet.setCircleColor(fiveYearLineColor);
+
+        LineData lineData = new LineData(twoYearDataSet, fiveYearDataSet);
+        lineChartIndividual.setData(lineData);
+        lineChartIndividual.setDrawGridBackground(false);
+
+        Description description = new Description();
+        description.setText("Time (Newest → Oldest)");
+        lineChartIndividual.setDescription(description);
+
+        XAxis xAxis = lineChartIndividual.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setDrawGridLines(false);
+
+        lineChartIndividual.getAxisRight().setEnabled(false);
+        lineChartIndividual.invalidate();
     }
 
     private void setVisibilityBasedOnRole(String role) {
@@ -179,6 +289,9 @@ public class DashboardActivity extends AppCompatActivity {
         quickCalculationDivider.setVisibility(quickCalcBtn.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
         viewAllPatientsDivider.setVisibility(viewAllPatientsBtn.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
         viewAllCalculationsDivider.setVisibility(viewAllCalcsBtn.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
+        pieChartDoctorCard.setVisibility(isDoctor ? View.VISIBLE : View.GONE);
+        lineChartIndividualCard.setVisibility(isDoctor ? View.GONE : View.VISIBLE);
     }
 
     private void setupRecyclerViews() {

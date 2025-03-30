@@ -24,4 +24,8 @@
     <color name="colorGradientLight">#527FAD</color>
     <color name="colorGradientCenter">#04233F</color>
     <color name="colorGradientDark">#00172D</color>
+
+    <!-- Chart Colors -->
+    <color name="colorHighRisk">#E23947</color>
+    <color name="colorMediumRisk">#FFA534</color>
 </resources>
