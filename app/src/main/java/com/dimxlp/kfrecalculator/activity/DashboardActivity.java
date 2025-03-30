@@ -38,6 +38,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -176,9 +177,18 @@ public class DashboardActivity extends AppCompatActivity {
                     if (doc.exists()) {
                         String role = doc.getString("role");
                         String lastName = doc.getString("lastName");
+                        String firstName = doc.getString("firstName");
 
                         userRole.setText("doctor".equalsIgnoreCase(role) ? "Dr. " : "");
-                        userName.setText(lastName != null ? lastName : "");
+                        userName.setText("doctor".equalsIgnoreCase(role) ?
+                                Objects.requireNonNullElse(lastName, "") :
+                                Objects.requireNonNullElse(firstName, ""));
+
+                        if ("doctor".equalsIgnoreCase(role)) {
+                            userName.setText(Objects.requireNonNullElse(lastName, ""));
+                        } else {
+                            userName.setText(Objects.requireNonNullElse(firstName, ""));
+                        }
 
                         setVisibilityBasedOnRole(role);
 
