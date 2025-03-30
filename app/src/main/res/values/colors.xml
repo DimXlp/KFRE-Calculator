@@ -25,6 +25,13 @@
     <color name="colorGradientCenter">#04233F</color>
     <color name="colorGradientDark">#00172D</color>
 
+    <!-- Quick Stats Colors -->
+    <color name="colorTotal">#335DE3FE</color>
+    <color name="colorHighRiskStat">#338A1D1D</color>
+    <color name="colorMediumRiskStat">#80FFA534</color>
+    <color name="colorLowRiskStat">#803CE1AE</color>
+    <color name="colorRecentLast">#336D6D6D</color>
+
     <!-- Chart Colors -->
     <color name="colorHighRisk">#E23947</color>
     <color name="colorMediumRisk">#FFA534</color>

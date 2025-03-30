@@ -59,7 +59,8 @@ public class DashboardActivity extends AppCompatActivity {
 
     // Individual Stats
     private CardView individualStatsCard, individualRecentCard;
-    private TextView totalIndividual, highRiskIndividual, recentIndividual;
+    private ImageView individualRiskImage;
+    private TextView totalIndividual, riskIndividual, lastCalculationIndividual;
     private RecyclerView recentCalculationsRecView;
 
     // Dividers
@@ -103,9 +104,10 @@ public class DashboardActivity extends AppCompatActivity {
 
         individualStatsCard = findViewById(R.id.dashboardQuickStatsIndividualCard);
         individualRecentCard = findViewById(R.id.dashboardRecentCalcsIndividualCard);
+        individualRiskImage = findViewById(R.id.dashboardRiskImageIndividual);
         totalIndividual = findViewById(R.id.dashboardTotalStatIndividual);
-        highRiskIndividual = findViewById(R.id.dashboardRiskStatIndividual);
-        recentIndividual = findViewById(R.id.dashboardRecentStatIndividual);
+        riskIndividual = findViewById(R.id.dashboardRiskStatIndividual);
+        lastCalculationIndividual = findViewById(R.id.dashboardLastCalculationIndividual);
         recentCalculationsRecView = findViewById(R.id.dashboardRecentCalcsRecView);
 
         addPatientBtn = findViewById(R.id.dashboardAddPatientAction);
@@ -179,11 +181,62 @@ public class DashboardActivity extends AppCompatActivity {
                         userName.setText(lastName != null ? lastName : "");
 
                         setVisibilityBasedOnRole(role);
+
+                        if ("doctor".equalsIgnoreCase(role)) {
+                            setupDoctorQuickStats(generateDummyRecentPatients());
+                        } else {
+                            setupIndividualQuickStats(generateDummyCalculations());
+                        }
+
                         setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
                     }
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to load user info", e));
     }
+
+    private void setupDoctorQuickStats(List<Patient> patients) {
+        long now = System.currentTimeMillis();
+        long oneMonthAgo = now - (30L * 24 * 60 * 60 * 1000);
+
+        long total = patients.size();
+        long highRisk = patients.stream().filter(p -> p.getRisk() == Risk.HIGH).count();
+        long recent = patients.stream().filter(p -> p.getCreatedAt() >= oneMonthAgo).count();
+
+        totalDoctor.setText(String.valueOf(total));
+        highRiskDoctor.setText(String.valueOf(highRisk));
+        recentDoctor.setText(String.valueOf(recent));
+    }
+
+    private void setupIndividualQuickStats(List<Calculation> calculations) {
+        long now = System.currentTimeMillis();
+
+        long totalCalcs = calculations.size();
+
+        String lastCalc = totalCalcs > 0
+                ? android.text.format.DateFormat.format("dd MMM yyyy", calculations.get(0).getCreatedAt()).toString()
+                : "-";
+
+        String riskLabel = "-";
+        if (totalCalcs > 0) {
+            double lastRisk = calculations.get(0).getRisk2Yr();
+            if (lastRisk < 5) riskLabel = "Low";
+            else if (lastRisk < 15) riskLabel = "Medium";
+            else riskLabel = "High";
+        }
+
+        totalIndividual.setText(String.valueOf(totalCalcs));
+        lastCalculationIndividual.setText(lastCalc);
+        riskIndividual.setText(riskLabel);
+
+        if (Risk.MEDIUM.getRisk().equals(riskIndividual.getText())) {
+            individualRiskImage.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorMediumRiskStat));
+            individualRiskImage.setImageResource(R.drawable.ic_medium);
+        } else if (Risk.LOW.getRisk().equals(riskIndividual.getText())) {
+            individualRiskImage.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorLowRiskStat));
+            individualRiskImage.setImageResource(R.drawable.ic_tick);
+        }
+    }
+
 
     private void setupCharts(List<Patient> patients, List<Calculation> calculations, String role) {
         if ("doctor".equalsIgnoreCase(role)) {
@@ -326,7 +379,7 @@ public class DashboardActivity extends AppCompatActivity {
         calculations.add(new Calculation(
                 "calc1", null, null, 67, "Male",
                 45.0, 300.0,
-                12.0, 24.0,
+                14.0, 24.0,
                 now, now,
                 "Stable condition"
         ));

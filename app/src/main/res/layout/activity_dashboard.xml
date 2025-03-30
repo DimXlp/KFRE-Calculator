@@ -166,8 +166,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/ic_total"
-                                android:backgroundTint="#33527FAD"
-                                android:background="@color/colorGradientDark" />
+                                android:background="@color/colorTotal" />
 
                             <TextView
                                 android:layout_height="wrap_content"
@@ -204,8 +203,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/ic_risk"
-                                android:backgroundTint="#33830B20"
-                                android:background="#8A1D1D" />
+                                android:background="@color/colorHighRiskStat" />
 
                             <TextView
                                 android:layout_height="wrap_content"
@@ -242,8 +240,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/ic_recent"
-                                android:backgroundTint="#333CE1AE"
-                                android:background="#4CAF50" />
+                                android:background="@color/colorRecentLast"/>
 
                             <TextView
                                 android:layout_height="wrap_content"
@@ -327,8 +324,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/ic_calculator"
-                                android:backgroundTint="#33527FAD"
-                                android:background="@color/colorGradientDark" />
+                                android:background="@color/colorTotal" />
 
                             <TextView
                                 android:layout_height="wrap_content"
@@ -362,11 +358,11 @@
                             android:gravity="center">
 
                             <ImageView
+                                android:id="@+id/dashboardRiskImageIndividual"
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/ic_risk"
-                                android:backgroundTint="#33830B20"
-                                android:background="#8A1D1D" />
+                                android:background="@color/colorHighRiskStat" />
 
                             <TextView
                                 android:layout_height="wrap_content"
@@ -403,8 +399,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/ic_recent"
-                                android:backgroundTint="#333CE1AE"
-                                android:background="#4CAF50" />
+                                android:background="@color/colorRecentLast" />
 
                             <TextView
                                 android:layout_height="wrap_content"
@@ -417,7 +412,7 @@
                             <TextView
                                 android:layout_height="wrap_content"
                                 android:layout_width="wrap_content"
-                                android:id="@+id/dashboardRecentStatIndividual"
+                                android:id="@+id/dashboardLastCalculationIndividual"
                                 android:text="13 Sep 2025"
                                 android:textStyle="bold"
                                 android:textSize="18sp"
