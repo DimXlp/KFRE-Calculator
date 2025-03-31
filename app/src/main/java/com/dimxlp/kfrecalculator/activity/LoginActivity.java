@@ -104,11 +104,11 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                         } else {
                             Log.d(TAG, "Profile incomplete. Redirecting to Profile setup.");
-                            startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
+                            startActivity(new Intent(LoginActivity.this, CreateProfileActivity.class));
                         }
                     } else {
                         Log.d(TAG, "No user document found. Redirecting to Profile setup.");
-                        startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
+                        startActivity(new Intent(LoginActivity.this, CreateProfileActivity.class));
                     }
                     finish();
                 })

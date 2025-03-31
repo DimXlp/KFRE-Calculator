@@ -31,7 +31,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".activity.ProfileActivity"
+            android:name=".activity.CreateProfileActivity"
             android:exported="false" />
 
         <activity

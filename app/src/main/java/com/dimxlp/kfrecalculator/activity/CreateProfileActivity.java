@@ -14,16 +14,20 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.enumeration.Role;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class ProfileActivity extends AppCompatActivity {
+public class CreateProfileActivity extends AppCompatActivity {
 
-    private static final String TAG = "RAFI|ProfileActivity";
+    private static final String TAG = "RAFI|CreateProfileActivity";
 
     private EditText inputFirstName, inputLastName;
     private Spinner spinnerRole;
@@ -35,7 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_create_profile);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -48,18 +52,17 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         // Initialize views
-        inputFirstName = findViewById(R.id.inputFirstName);
-        inputLastName = findViewById(R.id.inputLastName);
-        spinnerRole = findViewById(R.id.spinnerRole);
-        btnSaveProfile = findViewById(R.id.btnSaveProfile);
-        btnUploadPicture = findViewById(R.id.btnUploadPicture);
+        inputFirstName = findViewById(R.id.createProfileFirstNameInput);
+        inputLastName = findViewById(R.id.createProfileLastNameInput);
+        spinnerRole = findViewById(R.id.createProfileRoleSpinner);
+        btnSaveProfile = findViewById(R.id.createProfileSaveBtn);
+        btnUploadPicture = findViewById(R.id.createProfileUploadPicBtn);
 
         // Setup role spinner
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.roles_array,
-                android.R.layout.simple_spinner_item
-        );
+        List<String> roles = Arrays.stream(Role.values())
+                .map(Role::toString)
+                .collect(Collectors.toList());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, roles);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerRole.setAdapter(adapter);
         spinnerRole.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
@@ -109,14 +112,14 @@ public class ProfileActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         String firstName = documentSnapshot.getString("firstName");
                         String lastName = documentSnapshot.getString("lastName");
-                        String role = documentSnapshot.getString("role");
+                        Role role = Role.fromString(documentSnapshot.getString("role"));
 
                         if (firstName != null) inputFirstName.setText(firstName);
                         if (lastName != null) inputLastName.setText(lastName);
 
                         if (role != null) {
                             ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) spinnerRole.getAdapter();
-                            int position = adapter.getPosition(role);
+                            int position = adapter.getPosition(role.toString());
                             if (position >= 0) spinnerRole.setSelection(position);
                         }
 
@@ -152,13 +155,13 @@ public class ProfileActivity extends AppCompatActivity {
         String uid = currentUser.getUid();
         String firstName = inputFirstName.getText().toString().trim();
         String lastName = inputLastName.getText().toString().trim();
-        String role = spinnerRole.getSelectedItem().toString();
+        Role role = Role.fromString(spinnerRole.getSelectedItem().toString());
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("firstName", firstName);
         updates.put("lastName", lastName);
         updates.put("fullName", firstName + " " + lastName);
-        updates.put("role", role);
+        updates.put("role", role.toString());
         updates.put("profileCompleted", true);
         updates.put("updatedAt", System.currentTimeMillis());
 
@@ -168,7 +171,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Log.d(TAG, "User profile updated");
                     Toast.makeText(this, "Profile updated!", Toast.LENGTH_SHORT).show();
 
-                    startActivity(new Intent(ProfileActivity.this, DashboardActivity.class));
+                    startActivity(new Intent(CreateProfileActivity.this, DashboardActivity.class));
                     finish();
                 })
                 .addOnFailureListener(e -> {

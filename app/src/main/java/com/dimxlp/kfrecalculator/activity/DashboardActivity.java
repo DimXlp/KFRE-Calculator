@@ -19,6 +19,7 @@ import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.adapter.RecentCalculationAdapter;
 import com.dimxlp.kfrecalculator.adapter.RecentPatientAdapter;
 import com.dimxlp.kfrecalculator.enumeration.Risk;
+import com.dimxlp.kfrecalculator.enumeration.Role;
 import com.dimxlp.kfrecalculator.model.Calculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -207,30 +208,29 @@ public class DashboardActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        String role = doc.getString("role");
+                        Role role = Role.fromString(doc.getString("role"));
                         String lastName = doc.getString("lastName");
                         String firstName = doc.getString("firstName");
 
-                        userRole.setText("doctor".equalsIgnoreCase(role) ? "Dr. " : "");
-                        userName.setText("doctor".equalsIgnoreCase(role) ?
+                        userRole.setText(role == Role.DOCTOR ? "Dr. " : "");
+                        userName.setText(role == Role.DOCTOR ?
                                 Objects.requireNonNullElse(lastName, "") :
                                 Objects.requireNonNullElse(firstName, ""));
 
-                        if ("doctor".equalsIgnoreCase(role)) {
+                        if (role == Role.DOCTOR) {
                             userName.setText(Objects.requireNonNullElse(lastName, ""));
                         } else {
                             userName.setText(Objects.requireNonNullElse(firstName, ""));
                         }
 
                         setVisibilityBasedOnRole(role);
+                        setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
 
-                        if ("doctor".equalsIgnoreCase(role)) {
+                        if (role == Role.DOCTOR) {
                             setupDoctorQuickStats(generateDummyRecentPatients());
                         } else {
                             setupIndividualQuickStats(generateDummyCalculations());
                         }
-
-                        setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
                     }
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to load user info", e));
@@ -280,8 +280,8 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
 
-    private void setupCharts(List<Patient> patients, List<Calculation> calculations, String role) {
-        if ("doctor".equalsIgnoreCase(role)) {
+    private void setupCharts(List<Patient> patients, List<Calculation> calculations, Role role) {
+        if (role == Role.DOCTOR) {
             setupDoctorPieChart(patients);
         } else {
             setupIndividualLineChart(calculations);
@@ -368,8 +368,8 @@ public class DashboardActivity extends AppCompatActivity {
         lineChartIndividual.invalidate();
     }
 
-    private void setVisibilityBasedOnRole(String role) {
-        boolean isDoctor = "doctor".equalsIgnoreCase(role);
+    private void setVisibilityBasedOnRole(Role role) {
+        boolean isDoctor = role == Role.DOCTOR;
 
         doctorStatsCard.setVisibility(isDoctor ? View.VISIBLE : View.GONE);
         doctorRecentCard.setVisibility(isDoctor ? View.VISIBLE : View.GONE);

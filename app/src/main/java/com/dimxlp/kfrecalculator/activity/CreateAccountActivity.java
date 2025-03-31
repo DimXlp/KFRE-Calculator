@@ -8,11 +8,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dimxlp.kfrecalculator.R;
-import com.dimxlp.kfrecalculator.activity.LoginActivity;
+import com.dimxlp.kfrecalculator.enumeration.Role;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,8 +37,8 @@ public class CreateAccountActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        inputFirstName = findViewById(R.id.inputFirstName);
-        inputLastName = findViewById(R.id.inputLastName);
+        inputFirstName = findViewById(R.id.createProfileFirstNameInput);
+        inputLastName = findViewById(R.id.createProfileLastNameInput);
         inputEmail = findViewById(R.id.inputEmail);
         inputPassword = findViewById(R.id.inputPassword);
         btnCreateAccount = findViewById(R.id.btnCreateAccount);
@@ -121,6 +121,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         user.put("fullName", firstName + " " + lastName);
         user.put("email", email);
         user.put("createdAt", System.currentTimeMillis());
+        user.put("role", Role.INDIVIDUAL.toString());
 
         db.collection("Users").document(userId)
                 .set(user)
