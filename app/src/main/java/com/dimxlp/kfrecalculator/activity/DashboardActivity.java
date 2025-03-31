@@ -38,6 +38,7 @@ import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -322,9 +323,13 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void setupIndividualLineChart(List<Calculation> calculations) {
-        List<Entry> twoYearEntries = IntStream.range(0, calculations.size())
-                .mapToObj(i -> new Entry(i, (float) calculations.get(i).getRisk2Yr()))
+        List<Calculation> reversedCalcs = new ArrayList<>(calculations);
+        Collections.reverse(reversedCalcs);
+
+        List<Entry> twoYearEntries = IntStream.range(0, reversedCalcs.size())
+                .mapToObj(i -> new Entry(i, (float) reversedCalcs.get(i).getRisk2Yr()))
                 .collect(Collectors.toList());
+
 
         LineDataSet twoYearDataSet = new LineDataSet(twoYearEntries, "2-Year KFRE Risk");
         int twoYearLineColor = ContextCompat.getColor(getApplicationContext(), R.color.colorSecondary);
@@ -334,8 +339,8 @@ public class DashboardActivity extends AppCompatActivity {
         twoYearDataSet.setCircleRadius(4f);
         twoYearDataSet.setCircleColor(twoYearLineColor);
 
-        List<Entry> fiveYearEntries = IntStream.range(0, calculations.size())
-                .mapToObj(i -> new Entry(i, (float) calculations.get(i).getRisk5Yr()))
+        List<Entry> fiveYearEntries = IntStream.range(0, reversedCalcs.size())
+                .mapToObj(i -> new Entry(i, (float) reversedCalcs.get(i).getRisk5Yr()))
                 .collect(Collectors.toList());
 
         LineDataSet fiveYearDataSet = new LineDataSet(fiveYearEntries, "5-Year KFRE Risk");
@@ -351,7 +356,7 @@ public class DashboardActivity extends AppCompatActivity {
         lineChartIndividual.setDrawGridBackground(false);
 
         Description description = new Description();
-        description.setText("Time (Newest → Oldest)");
+        description.setText("Time (Oldest → Newest)");
         lineChartIndividual.setDescription(description);
 
         XAxis xAxis = lineChartIndividual.getXAxis();
