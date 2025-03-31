@@ -241,7 +241,7 @@ public class DashboardActivity extends AppCompatActivity {
         long oneMonthAgo = now - (30L * 24 * 60 * 60 * 1000);
 
         long total = patients.size();
-        long highRisk = patients.stream().filter(p -> p.getRisk() == Risk.HIGH).count();
+        long highRisk = patients.stream().filter(p -> p.getRisk2Yr() == Risk.HIGH).count();
         long recent = patients.stream().filter(p -> p.getCreatedAt() >= oneMonthAgo).count();
 
         totalDoctor.setText(String.valueOf(total));
@@ -291,7 +291,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void setupDoctorPieChart(List<Patient> patients) {
         int low = 0, medium = 0, high = 0;
         for (Patient p : patients) {
-            switch (p.getRisk()) {
+            switch (p.getRisk2Yr()) {
                 case LOW: low++; break;
                 case MEDIUM: medium++; break;
                 case HIGH: high++; break;

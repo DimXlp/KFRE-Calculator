@@ -17,11 +17,12 @@ public class Patient {
     private String generalHistoryNote;
     private long createdAt;
     private long lastUpdated;
-    private Risk risk;
+    private Risk risk2Yr;
+    private Risk risk5Yr;
 
     public Patient() {}
 
-    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, long createdAt, long lastUpdated, Risk risk) {
+    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, long createdAt, long lastUpdated, Risk risk2Yr, Risk risk5Yr) {
         this.patientId = patientId;
         this.userId = userId;
         this.firstName = firstName;
@@ -34,14 +35,15 @@ public class Patient {
         this.generalHistoryNote = generalHistoryNote;
         this.createdAt = createdAt;
         this.lastUpdated = lastUpdated;
-        this.risk = risk;
+        this.risk2Yr = risk2Yr;
+        this.risk5Yr = risk5Yr;
     }
 
-    public Patient(String fullName, String birthDate, long lastUpdated, Risk risk) {
+    public Patient(String fullName, String birthDate, long lastUpdated, Risk risk2Yr) {
         this.fullName = fullName;
         this.birthDate = birthDate;
         this.lastUpdated = lastUpdated;
-        this.risk = risk;
+        this.risk2Yr = risk2Yr;
     }
 
     public String getPatientId() {
@@ -140,11 +142,19 @@ public class Patient {
         this.lastUpdated = lastUpdated;
     }
 
-    public Risk getRisk() {
-        return risk;
+    public Risk getRisk2Yr() {
+        return risk2Yr;
     }
 
-    public void setRisk(Risk risk) {
-        this.risk = risk;
+    public void setRisk2Yr(Risk risk2Yr) {
+        this.risk2Yr = risk2Yr;
+    }
+
+    public Risk getRisk5Yr() {
+        return risk5Yr;
+    }
+
+    public void setRisk5Yr(Risk risk5Yr) {
+        this.risk5Yr = risk5Yr;
     }
 }
