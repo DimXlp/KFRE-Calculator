@@ -1,5 +1,6 @@
 package com.dimxlp.kfrecalculator.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,7 +27,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
 
@@ -37,6 +40,7 @@ public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "RAFI|MedicationPickerBottomSheet";
     private EditText inputSearch;
     private RecyclerView recyclerView;
+    private Button btnShowAddDialog;
     private Spinner spinnerFrequency;
     private Button btnAdd;
     private MedicationAdapter adapter;
@@ -72,6 +76,7 @@ public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
         recyclerView = view.findViewById(R.id.medicationRecyclerView);
         spinnerFrequency = view.findViewById(R.id.spinnerFrequency);
         btnAdd = view.findViewById(R.id.btnAddSelectedMedication);
+        btnShowAddDialog = view.findViewById(R.id.btnShowAddMedicationDialog);
 
         loadMedicationsFromFirestore();
 
@@ -98,7 +103,46 @@ public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
                 dismiss();
             }
         });
+
+        btnShowAddDialog.setOnClickListener(v -> showAddMedicationDialog());
     }
+
+    private void showAddMedicationDialog() {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_medication, null);
+        EditText inputName = dialogView.findViewById(R.id.inputMedicationName);
+        EditText inputDosage = dialogView.findViewById(R.id.inputMedicationDosage);
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Add Medication")
+                .setView(dialogView)
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String name = inputName.getText().toString().trim();
+                    String dosageValue = inputDosage.getText().toString().trim();
+                    String dosage = dosageValue + " mg";
+
+                    if (!name.isEmpty() && !dosageValue.isEmpty()) {
+                        Map<String, Object> newMed = new HashMap<>();
+                        newMed.put("name", name);
+                        newMed.put("dosage", dosage);
+
+                        FirebaseFirestore.getInstance().collection("Medications")
+                                .add(newMed)
+                                .addOnSuccessListener(docRef -> {
+                                    Toast.makeText(getContext(), "Medication added", Toast.LENGTH_SHORT).show();
+                                    loadMedicationsFromFirestore(); // refresh list
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Failed to add medication", Toast.LENGTH_SHORT).show();
+                                    Log.e(TAG, "Error adding new medication", e);
+                                });
+                    } else {
+                        Toast.makeText(getContext(), "Please fill both fields", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
 
     private void loadMedicationsFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -123,5 +167,4 @@ public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
                     Toast.makeText(getContext(), "Error loading medications", Toast.LENGTH_SHORT).show();
                 });
     }
-
 }
