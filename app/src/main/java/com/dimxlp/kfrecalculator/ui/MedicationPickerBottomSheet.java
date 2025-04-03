@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -42,6 +44,7 @@ public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
     private RecyclerView recyclerView;
     private Button btnShowAddDialog;
     private Spinner spinnerFrequency;
+    private EditText inputCustomFrequency;
     private Button btnAdd;
     private MedicationAdapter adapter;
     private List<Medication> medicationList = new ArrayList<>();
@@ -75,8 +78,17 @@ public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
         inputSearch = view.findViewById(R.id.inputSearchMedication);
         recyclerView = view.findViewById(R.id.medicationRecyclerView);
         spinnerFrequency = view.findViewById(R.id.spinnerFrequency);
+        inputCustomFrequency = view.findViewById(R.id.inputCustomFrequency);
         btnAdd = view.findViewById(R.id.btnAddSelectedMedication);
         btnShowAddDialog = view.findViewById(R.id.btnShowAddMedicationDialog);
+
+        ArrayAdapter<CharSequence> frequencyAdapter = ArrayAdapter.createFromResource(
+                getContext(),
+                R.array.frequency_options,
+                android.R.layout.simple_spinner_item
+        );
+        frequencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFrequency.setAdapter(frequencyAdapter);
 
         loadMedicationsFromFirestore();
 
@@ -93,9 +105,29 @@ public class MedicationPickerBottomSheet extends BottomSheetDialogFragment {
             public void afterTextChanged(Editable s) {}
         });
 
+        spinnerFrequency.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = parent.getItemAtPosition(position).toString();
+                if (selected.equalsIgnoreCase("Custom...")) {
+                    inputCustomFrequency.setVisibility(View.VISIBLE);
+                } else {
+                    inputCustomFrequency.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
         btnAdd.setOnClickListener(v -> {
             Medication selectedMed = adapter.getSelectedMedication();
-            String frequency = spinnerFrequency.getSelectedItem() != null ? spinnerFrequency.getSelectedItem().toString() : "";
+            String frequency;
+            if (spinnerFrequency.getSelectedItem().toString().equalsIgnoreCase("Custom...")) {
+                frequency = inputCustomFrequency.getText().toString().trim();
+            } else {
+                frequency = spinnerFrequency.getSelectedItem().toString();
+            }
             if (selectedMed != null && !frequency.isEmpty()) {
                 if (listener != null) {
                     listener.onMedicationSelected(selectedMed.getMedicationId(), selectedMed.getName(), frequency);

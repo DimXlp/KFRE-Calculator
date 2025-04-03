@@ -43,7 +43,6 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
     private final List<String> diseasesList = List.of("Diabetes", "Hypertension", "Cardiovascular Disease", "Kidney Disease");
     private final Map<String, Disease> selectedDiseases = new HashMap<>();
     private String currentDiseaseId = null;
-    private LinearLayout medicalHistoryContainer;
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -85,7 +84,7 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
 
     private void setupDiseaseChecklist() {
         for (String disease : diseasesList) {
-            View view = LayoutInflater.from(this).inflate(R.layout.item_disease_section, medicalHistoryContainer, false);
+            View view = LayoutInflater.from(this).inflate(R.layout.item_disease_section, medHistoryContainer, false);
 
             TextView txtDiseaseName = view.findViewById(R.id.txtDiseaseName);
             CheckBox checkBox = new CheckBox(this);
@@ -140,8 +139,8 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
         Disease disease = selectedDiseases.get(currentDiseaseId);
         disease.addMedication(new MedicationAssignment(medicationId, medicationName, frequency));
 
-        for (int i = 0; i < medicalHistoryContainer.getChildCount(); i++) {
-            View container = medicalHistoryContainer.getChildAt(i);
+        for (int i = 0; i < medHistoryContainer.getChildCount(); i++) {
+            View container = medHistoryContainer.getChildAt(i);
             LinearLayout medsLayout = container.findViewById(R.id.medicationsContainer);
             if (medsLayout != null && currentDiseaseId.equals(medsLayout.getTag())) {
                 TextView medView = new TextView(this);

@@ -8,7 +8,16 @@
     <string-array name="roles_array">
         <item>Select Role</item>
         <item>Doctor</item>
-        <item>Patient</item>
+        <item>Individual</item>
+    </string-array>
+
+    <string-array name="frequency_options">
+        <item>Once daily</item>
+        <item>Twice daily</item>
+        <item>Three times daily</item>
+        <item>Weekly</item>
+        <item>As needed</item>
+        <item>Custom...</item>
     </string-array>
 
 </resources>
