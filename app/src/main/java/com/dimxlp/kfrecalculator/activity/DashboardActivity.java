@@ -1,5 +1,6 @@
 package com.dimxlp.kfrecalculator.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -136,7 +137,9 @@ public class DashboardActivity extends AppCompatActivity {
     private void setupListeners() {
         addPatientBtn.setOnClickListener(v -> {
             Log.d(TAG, "Add Patient clicked");
-            Toast.makeText(this, "Add Patient coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardActivity.this, AddPatientActivity.class);
+            startActivity(intent);
+//            Toast.makeText(this, "Add Patient coming soon", Toast.LENGTH_SHORT).show();
         });
 
         addCalcBtn.setOnClickListener(v -> {

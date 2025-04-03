@@ -1,21 +1,28 @@
 package com.dimxlp.kfrecalculator.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Disease {
     private boolean hasDisease;
-    private List<String> medications;
-    private Map<String, String> medicationFrequencies; // Maps medicationId to frequency
+    private String name;
     private String details;
+    private List<MedicationAssignment> medications;
 
-    public Disease() {}
+    public Disease() {
+        this.hasDisease = false;
+        this.name = name;
+        this.details = "";
+        this.medications = new ArrayList<>();
+    }
 
-    public Disease(boolean hasDisease, List<String> medications, Map<String, String> medicationFrequencies, String details) {
-        this.hasDisease = hasDisease;
-        this.medications = medications;
-        this.medicationFrequencies = medicationFrequencies;
-        this.details = details;
+    public Disease(String name) {
+        this.hasDisease = true;
+        this.name = name;
+        this.details = "";
+        this.medications = new ArrayList<>();
     }
 
     public boolean isHasDisease() {
@@ -26,20 +33,12 @@ public class Disease {
         this.hasDisease = hasDisease;
     }
 
-    public List<String> getMedications() {
-        return medications;
+    public String getName() {
+        return name;
     }
 
-    public void setMedications(List<String> medications) {
-        this.medications = medications;
-    }
-
-    public Map<String, String> getMedicationFrequencies() {
-        return medicationFrequencies;
-    }
-
-    public void setMedicationFrequencies(Map<String, String> medicationFrequencies) {
-        this.medicationFrequencies = medicationFrequencies;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDetails() {
@@ -48,5 +47,28 @@ public class Disease {
 
     public void setDetails(String details) {
         this.details = details;
+    }
+
+    public void addMedication(MedicationAssignment medication) {
+        medications.add(medication);
+    }
+
+    public List<MedicationAssignment> getMedications() {
+        return medications;
+    }
+
+    public void setMedications(List<MedicationAssignment> medications) {
+        this.medications = medications;
+    }
+
+    public List<Map<String, String>> getMedicationsAsMap() {
+        List<Map<String, String>> medList = new ArrayList<>();
+        for (MedicationAssignment med : medications) {
+            Map<String, String> map = new HashMap<>();
+            map.put("name", med.getMedicationName());
+            map.put("frequency", med.getFrequency());
+            medList.add(map);
+        }
+        return medList;
     }
 }

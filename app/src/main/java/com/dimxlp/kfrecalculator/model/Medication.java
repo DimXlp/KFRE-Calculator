@@ -17,6 +17,12 @@ public class Medication {
         this.createdAt = createdAt;
     }
 
+    public Medication(String medicationId, String name, String dosage) {
+        this.medicationId = medicationId;
+        this.name = name;
+        this.dosage = dosage;
+    }
+
     public String getMedicationId() {
         return medicationId;
     }

@@ -37,6 +37,10 @@
         <activity
             android:name=".activity.DashboardActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".activity.AddPatientActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
