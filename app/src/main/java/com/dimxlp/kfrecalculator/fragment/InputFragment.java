@@ -1,4 +1,4 @@
-package com.dimxlp.kfrecalculator.ui;
+package com.dimxlp.kfrecalculator.fragment;
 
 import android.os.Bundle;
 import android.util.Log;
