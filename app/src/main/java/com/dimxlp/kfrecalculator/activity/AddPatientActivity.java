@@ -206,10 +206,32 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
             View container = medHistoryContainer.getChildAt(i);
             LinearLayout medsLayout = container.findViewById(R.id.medicationsContainer);
             if (medsLayout != null && currentDiseaseId.equals(medsLayout.getTag())) {
+
+                // Create horizontal layout
+                LinearLayout row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+
+                // TextView for medication info
                 TextView medView = new TextView(this);
                 medView.setText("- " + medicationName + " (" + frequency + ")");
                 medView.setTextColor(getColor(R.color.textSecondary));
-                medsLayout.addView(medView);
+                medView.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+                // Delete button
+                Button deleteButton = new Button(this);
+                deleteButton.setText("🗑");
+                deleteButton.setBackgroundColor(getColor(android.R.color.transparent));
+                deleteButton.setTextColor(getColor(R.color.colorHighRisk));
+                deleteButton.setOnClickListener(v -> {
+                    medsLayout.removeView(row);
+                    medicationAssignmentsByDisease.get(currentDiseaseId).remove(assignment);
+                    Log.d(TAG, "Removed medication: " + medicationName);
+                });
+
+                row.addView(medView);
+                row.addView(deleteButton);
+                medsLayout.addView(row);
+
                 break;
             }
         }
