@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
 
     private static final String TAG = "RAFI|AddPatient";
 
+    private ImageView appLogo, profileImg;
     private TextInputEditText firstNameEditText, lastNameEditText, notesEditText;
     private TextView dobTextView;
     private RadioGroup genderRadioGroup;
@@ -60,11 +63,58 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
         auth = FirebaseAuth.getInstance();
 
         initViews();
+        setTopBarFunctionalities();
         setupDatePicker();
         setupDiseaseChecklist();
     }
 
+    private void setTopBarFunctionalities() {
+        appLogo.setOnClickListener(v -> {
+            Log.d(TAG, "App Logo clicked");
+            Intent intent = new Intent(AddPatientActivity.this, DashboardActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        profileImg.setOnClickListener(v -> {
+            Log.d(TAG, "Profile clicked");
+            PopupMenu popup = new PopupMenu(this, v);
+            popup.getMenuInflater().inflate(R.menu.profile_menu, popup.getMenu());
+
+            // Force icons to show using reflection
+            try {
+                java.lang.reflect.Field[] fields = popup.getClass().getDeclaredFields();
+                for (java.lang.reflect.Field field : fields) {
+                    if ("mPopup".equals(field.getName())) {
+                        field.setAccessible(true);
+                        Object menuPopupHelper = field.get(popup);
+                        Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                        java.lang.reflect.Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                        setForceIcons.invoke(menuPopupHelper, true);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error showing menu icons", e);
+            }
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_profile) {
+                    Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
+                } else if (itemId == R.id.menu_logout) {
+                    Toast.makeText(this, "Logout feature coming soon", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            });
+
+            popup.show();
+        });
+    }
+
     private void initViews() {
+        appLogo = findViewById(R.id.addPatientAppLogo);
+        profileImg = findViewById(R.id.addPatientProfileImg);
         firstNameEditText = findViewById(R.id.addPatientFirstName);
         lastNameEditText = findViewById(R.id.addPatientLastName);
         dobTextView = findViewById(R.id.addPatientDob);
