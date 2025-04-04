@@ -1,33 +1,41 @@
 package com.dimxlp.kfrecalculator.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MedicationAssignment {
-    private String medicationId;
-    private String medicationName;
+    private String assignmentId;
+    private String patientId;
     private String diseaseId;
+    private String medicationId;
     private String frequency;
 
-    public MedicationAssignment() {}
+    public MedicationAssignment() {
 
-    public MedicationAssignment(String medicationId, String medicationName, String frequency) {
+    }
+
+    public MedicationAssignment(String assignmentId, String patientId, String diseaseId, String medicationId, String frequency) {
+        this.assignmentId = assignmentId;
+        this.patientId = patientId;
+        this.diseaseId = diseaseId;
         this.medicationId = medicationId;
-        this.medicationName = medicationName;
         this.frequency = frequency;
     }
 
-    public String getMedicationId() {
-        return medicationId;
+    public String getAssignmentId() {
+        return assignmentId;
     }
 
-    public void setMedicationId(String medicationId) {
-        this.medicationId = medicationId;
+    public void setAssignmentId(String assignmentId) {
+        this.assignmentId = assignmentId;
     }
 
-    public String getMedicationName() {
-        return medicationName;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setMedicationName(String medicationName) {
-        this.medicationName = medicationName;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
     public String getDiseaseId() {
@@ -38,11 +46,29 @@ public class MedicationAssignment {
         this.diseaseId = diseaseId;
     }
 
+    public String getMedicationId() {
+        return medicationId;
+    }
+
+    public void setMedicationId(String medicationId) {
+        this.medicationId = medicationId;
+    }
+
     public String getFrequency() {
         return frequency;
     }
 
     public void setFrequency(String frequency) {
         this.frequency = frequency;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("assignmentId", assignmentId);
+        map.put("patientId", patientId);
+        map.put("diseaseId", diseaseId);
+        map.put("medicationId", medicationId);
+        map.put("frequency", frequency);
+        return map;
     }
 }

@@ -1,6 +1,7 @@
 package com.dimxlp.kfrecalculator.activity;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +44,8 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
 
     private final List<String> diseasesList = List.of("Diabetes", "Hypertension", "Cardiovascular Disease", "Kidney Disease");
     private final Map<String, Disease> selectedDiseases = new HashMap<>();
+    private final Map<String, List<MedicationAssignment>> medicationAssignmentsByDisease = new HashMap<>();
+    private final Map<String, String> diseaseDetailsByName = new HashMap<>();
     private String currentDiseaseId = null;
 
     private FirebaseFirestore db;
@@ -92,7 +96,7 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
             checkBox.setChecked(false);
 
             EditText inputDetails = new EditText(this);
-            inputDetails.setHint("Enter details");
+            inputDetails.setHint("Enter details for " + disease);
             inputDetails.setVisibility(View.GONE);
 
             Button btnAddMedication = view.findViewById(R.id.btnAddMedication);
@@ -105,12 +109,21 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
                 if (isChecked) {
                     inputDetails.setVisibility(View.VISIBLE);
                     btnAddMedication.setVisibility(View.VISIBLE);
-                    selectedDiseases.put(disease, new Disease(disease));
+                    Disease d = new Disease(null, null, disease, true, "");
+                    selectedDiseases.put(disease, d);
+                    medicationAssignmentsByDisease.put(disease, new ArrayList<>());
                 } else {
                     inputDetails.setVisibility(View.GONE);
                     btnAddMedication.setVisibility(View.GONE);
                     medicationsContainer.removeAllViews();
                     selectedDiseases.remove(disease);
+                    medicationAssignmentsByDisease.remove(disease);
+                }
+            });
+
+            inputDetails.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    diseaseDetailsByName.put(disease, inputDetails.getText().toString().trim());
                 }
             });
 
@@ -136,8 +149,8 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
         Log.d(TAG, "Medication selected: " + medicationName + " - " + frequency);
         if (currentDiseaseId == null || !selectedDiseases.containsKey(currentDiseaseId)) return;
 
-        Disease disease = selectedDiseases.get(currentDiseaseId);
-        disease.addMedication(new MedicationAssignment(medicationId, medicationName, frequency));
+        MedicationAssignment assignment = new MedicationAssignment(null, null, currentDiseaseId, medicationId, frequency);
+        medicationAssignmentsByDisease.get(currentDiseaseId).add(assignment);
 
         for (int i = 0; i < medHistoryContainer.getChildCount(); i++) {
             View container = medHistoryContainer.getChildAt(i);
@@ -164,23 +177,39 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
             return;
         }
 
+        Map<String, Object> historyMap = new HashMap<>();
+        for (Map.Entry<String, Disease> entry : selectedDiseases.entrySet()) {
+            String diseaseName = entry.getKey();
+            Disease d = entry.getValue();
+            d.setHasDisease(true);
+            d.setDetails(diseaseDetailsByName.getOrDefault(diseaseName, ""));
+            historyMap.put(diseaseName, d.toMap());
+        }
+
         Map<String, Object> patient = new HashMap<>();
         patient.put("firstName", firstName);
         patient.put("lastName", lastName);
+        patient.put("fullName", firstName + " " + lastName);
         patient.put("dob", dob);
         patient.put("gender", gender);
         patient.put("notes", notes);
         patient.put("risk2Yr", 0.0);
         patient.put("risk5Yr", 0.0);
         patient.put("active", true);
+        patient.put("userId", auth.getCurrentUser().getUid());
+        patient.put("history", historyMap);
 
-        String uid = auth.getCurrentUser().getUid();
-
-        db.collection("Users").document(uid).collection("Patients")
+        db.collection("Patients")
                 .add(patient)
                 .addOnSuccessListener(documentReference -> {
-                    saveDiseases(documentReference);
+                    String patientId = documentReference.getId();
+                    Log.d(TAG, "Patient saved with ID: " + patientId);
+                    saveDiseases(patientId);
                     Toast.makeText(this, "Patient added!", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(AddPatientActivity.this, DashboardActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     finish();
                 })
                 .addOnFailureListener(e -> {
@@ -189,13 +218,53 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
                 });
     }
 
-    private void saveDiseases(DocumentReference patientRef) {
-        for (Disease disease : selectedDiseases.values()) {
-            Map<String, Object> diseaseData = new HashMap<>();
-            diseaseData.put("name", disease.getName());
-            diseaseData.put("Medications", disease.getMedicationsAsMap());
+    private void saveDiseases(String patientId) {
+        for (Map.Entry<String, Disease> entry : selectedDiseases.entrySet()) {
+            String diseaseName = entry.getKey();
+            Disease disease = entry.getValue();
+            disease.setPatientId(patientId);
+            disease.setDetails(diseaseDetailsByName.getOrDefault(diseaseName, ""));
 
-            patientRef.collection("Diseases").add(diseaseData);
+            db.collection("Diseases")
+                    .add(disease.toMap())
+                    .addOnSuccessListener(ref -> {
+                        String diseaseId = ref.getId();
+                        Log.d(TAG, "Disease saved: " + disease.getName() + " | ID: " + diseaseId);
+                        disease.setDiseaseId(diseaseId);
+                        saveMedicationAssignments(patientId, diseaseName, diseaseId);
+
+                        disease.setDiseaseId(diseaseId);
+                        db.collection("Diseases").document(diseaseId)
+                                .update("diseaseId", diseaseId)
+                                .addOnSuccessListener(unused -> Log.d(TAG, "Disease ID updated: " + diseaseId))
+                                .addOnFailureListener(e -> Log.e(TAG, "Failed to update disease ID", e));
+                    })
+                    .addOnFailureListener(e -> Log.e(TAG, "Failed to save disease: " + disease.getName(), e));
+        }
+    }
+
+    private void saveMedicationAssignments(String patientId, String diseaseName, String diseaseId) {
+        List<MedicationAssignment> assignments = medicationAssignmentsByDisease.get(diseaseName);
+        if (assignments == null) return;
+
+        for (MedicationAssignment assignment : assignments) {
+            assignment.setPatientId(patientId);
+            assignment.setDiseaseId(diseaseId);
+
+            db.collection("MedicationAssignments")
+                    .add(assignment.toMap())
+                    .addOnSuccessListener(ref -> {
+                        String generatedId = ref.getId();
+                        assignment.setAssignmentId(generatedId);
+
+                        db.collection("MedicationAssignments").document(generatedId)
+                                .update("assignmentId", generatedId)
+                                .addOnSuccessListener(unused -> Log.d(TAG, "Assignment ID updated: " + generatedId))
+                                .addOnFailureListener(e -> Log.e(TAG, "Failed to update assignment ID", e));
+
+                        Log.d(TAG, "MedicationAssignment saved with ID: " + generatedId);
+                    })
+                    .addOnFailureListener(e -> Log.e(TAG, "Error saving medication assignment", e));
         }
     }
 
