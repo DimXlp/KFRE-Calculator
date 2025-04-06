@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.ui.MedicationPickerBottomSheet;
 import com.dimxlp.kfrecalculator.model.Disease;
 import com.dimxlp.kfrecalculator.model.MedicationAssignment;
@@ -267,6 +268,7 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
         patient.put("notes", notes);
         patient.put("risk2Yr", 0.0);
         patient.put("risk5Yr", 0.0);
+        patient.put("risk", Risk.UNKNOWN);
         patient.put("active", true);
         patient.put("userId", auth.getCurrentUser().getUid());
         patient.put("history", historyMap);

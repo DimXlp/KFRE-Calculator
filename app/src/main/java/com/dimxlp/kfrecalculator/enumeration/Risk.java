@@ -3,7 +3,8 @@ package com.dimxlp.kfrecalculator.enumeration;
 public enum Risk {
     HIGH("High"),
     MEDIUM("Medium"),
-    LOW("Low");
+    LOW("Low"),
+    UNKNOWN("Unknown");
 
     String risk;
 

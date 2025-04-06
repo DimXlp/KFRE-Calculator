@@ -17,12 +17,13 @@ public class Patient {
     private String generalHistoryNote;
     private long createdAt;
     private long lastUpdated;
-    private Risk risk2Yr;
-    private Risk risk5Yr;
+    private double risk2Yr;
+    private double risk5Yr;
+    private Risk risk;
 
     public Patient() {}
 
-    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, long createdAt, long lastUpdated, Risk risk2Yr, Risk risk5Yr) {
+    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, long createdAt, long lastUpdated, double risk2Yr, double risk5Yr, Risk risk) {
         this.patientId = patientId;
         this.userId = userId;
         this.firstName = firstName;
@@ -37,13 +38,14 @@ public class Patient {
         this.lastUpdated = lastUpdated;
         this.risk2Yr = risk2Yr;
         this.risk5Yr = risk5Yr;
+        this.risk = risk;
     }
 
-    public Patient(String fullName, String birthDate, long lastUpdated, Risk risk2Yr) {
+    public Patient(String fullName, String birthDate, long lastUpdated, Risk risk) {
         this.fullName = fullName;
         this.birthDate = birthDate;
         this.lastUpdated = lastUpdated;
-        this.risk2Yr = risk2Yr;
+        this.risk = risk;
     }
 
     public String getPatientId() {
@@ -142,19 +144,27 @@ public class Patient {
         this.lastUpdated = lastUpdated;
     }
 
-    public Risk getRisk2Yr() {
+    public double getRisk2Yr() {
         return risk2Yr;
     }
 
-    public void setRisk2Yr(Risk risk2Yr) {
+    public void setRisk2Yr(double risk2Yr) {
         this.risk2Yr = risk2Yr;
     }
 
-    public Risk getRisk5Yr() {
+    public double getRisk5Yr() {
         return risk5Yr;
     }
 
-    public void setRisk5Yr(Risk risk5Yr) {
+    public void setRisk5Yr(double risk5Yr) {
         this.risk5Yr = risk5Yr;
+    }
+
+    public Risk getRisk() {
+        return risk;
+    }
+
+    public void setRisk(Risk risk) {
+        this.risk = risk;
     }
 }

@@ -40,7 +40,7 @@ public class RecentPatientAdapter extends RecyclerView.Adapter<RecentPatientAdap
         holder.name.setText(patient.getFullName());
         holder.age.setText("Age: " + calculateAge(patient.getBirthDate()));
         holder.lastAssessment.setText("Last Assessment: " + formatDate(patient.getLastUpdated()));
-        holder.risk.setText("Risk: " + patient.getRisk2Yr().name());
+        holder.risk.setText("Risk: " + patient.getRisk().name());
     }
 
     @Override
