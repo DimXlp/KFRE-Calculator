@@ -139,7 +139,6 @@ public class DashboardActivity extends AppCompatActivity {
             Log.d(TAG, "Add Patient clicked");
             Intent intent = new Intent(DashboardActivity.this, AddPatientActivity.class);
             startActivity(intent);
-//            Toast.makeText(this, "Add Patient coming soon", Toast.LENGTH_SHORT).show();
         });
 
         addCalcBtn.setOnClickListener(v -> {
@@ -154,7 +153,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         viewAllPatientsBtn.setOnClickListener(v -> {
             Log.d(TAG, "View All Patients clicked");
-            Toast.makeText(this, "All Patients screen coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardActivity.this, PatientListActivity.class);
+            startActivity(intent);
         });
 
         viewAllCalcsBtn.setOnClickListener(v -> {

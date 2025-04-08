@@ -263,7 +263,7 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
         patient.put("firstName", firstName);
         patient.put("lastName", lastName);
         patient.put("fullName", firstName + " " + lastName);
-        patient.put("dob", dob);
+        patient.put("birthDate", dob);
         patient.put("gender", gender);
         patient.put("notes", notes);
         patient.put("risk2Yr", 0.0);

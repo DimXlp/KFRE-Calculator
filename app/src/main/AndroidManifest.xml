@@ -45,6 +45,10 @@
         <activity
             android:name=".activity.PatientDetailsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".activity.PatientListActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
