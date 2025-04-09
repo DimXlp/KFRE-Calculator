@@ -278,10 +278,16 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
                 .addOnSuccessListener(documentReference -> {
                     String patientId = documentReference.getId();
                     Log.d(TAG, "Patient saved with ID: " + patientId);
+
+                    documentReference.update("patientId", patientId)
+                            .addOnSuccessListener(unused -> Log.d(TAG, "Patient ID updated in document"))
+                            .addOnFailureListener(e -> Log.e(TAG, "Failed to update patientId field", e));
+
                     saveDiseases(patientId);
                     Toast.makeText(this, "Patient added!", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(AddPatientActivity.this, PatientDetailsActivity.class);
+                    intent.putExtra("patientId", patientId);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();

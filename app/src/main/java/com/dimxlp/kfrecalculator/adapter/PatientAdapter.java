@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -130,11 +132,13 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.PatientV
     }
 
     static class PatientViewHolder extends RecyclerView.ViewHolder {
+        CardView patientCard;
         TextView txtName, txtAge, txtLastAssessment;
         ImageView imgRiskLevel;
 
         public PatientViewHolder(@NonNull View itemView) {
             super(itemView);
+            patientCard = itemView.findViewById(R.id.patientCard);
             txtName = itemView.findViewById(R.id.txtPatientName);
             txtAge = itemView.findViewById(R.id.txtPatientAge);
             txtLastAssessment = itemView.findViewById(R.id.txtPatientLastAssessment);

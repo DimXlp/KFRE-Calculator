@@ -68,6 +68,11 @@ public class PatientListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PatientAdapter(filteredPatients);
         recyclerView.setAdapter(adapter);
+        adapter.setOnPatientClickListener(patient -> {
+            Intent intent = new Intent(this, PatientDetailsActivity.class);
+            intent.putExtra("patientId", patient.getPatientId());
+            startActivity(intent);
+        });
     }
 
     private void setupListeners() {

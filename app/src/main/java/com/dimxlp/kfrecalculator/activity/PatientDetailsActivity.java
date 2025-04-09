@@ -30,7 +30,13 @@ public class PatientDetailsActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.patientDetailTabLayout);
         viewPager = findViewById(R.id.patientDetailViewPager);
 
-        viewPager.setAdapter(new PatientDetailsPagerAdapter(this));
+        String patientId = getIntent().getStringExtra("patientId");
+        if (patientId == null) {
+            Log.e(TAG, "No patientId passed to PatientDetailsActivity");
+            finish();
+            return;
+        }
+        viewPager.setAdapter(new PatientDetailsPagerAdapter(this, patientId));
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
@@ -48,22 +54,34 @@ public class PatientDetailsActivity extends AppCompatActivity {
     }
 
     private static class PatientDetailsPagerAdapter extends FragmentStateAdapter {
+        private final String patientId;
 
-        public PatientDetailsPagerAdapter(@NonNull AppCompatActivity activity) {
+        public PatientDetailsPagerAdapter(@NonNull AppCompatActivity activity, String patientId) {
             super(activity);
+            this.patientId = patientId;
         }
 
         @NonNull
         @Override
         public Fragment createFragment(int position) {
+            Bundle args = new Bundle();
+            args.putString("patientId", patientId);
+
+            Fragment fragment;
             switch (position) {
                 case 0:
-                    return new PatientDetailsFragment();
+                    fragment = new PatientDetailsFragment();
+                    break;
                 case 1:
-                    return new InputFragment();  // You already have this fragment
+                    fragment = new InputFragment();
+                    break;
                 default:
-                    return new PatientDetailsFragment();
+                    fragment = new PatientDetailsFragment();
+                    break;
             }
+
+            fragment.setArguments(args);
+            return fragment;
         }
 
         @Override
