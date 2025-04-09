@@ -7,7 +7,9 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,7 +36,7 @@ public class PatientListActivity extends AppCompatActivity {
     private EditText searchEditText;
     private RadioGroup filterRadioGroup;
     private FloatingActionButton fabAddPatient;
-    private ImageView profileImage;
+    private ImageView appLogo, profileImage;
 
     private List<Patient> allPatients = new ArrayList<>();
     private List<Patient> filteredPatients = new ArrayList<>();
@@ -51,6 +53,7 @@ public class PatientListActivity extends AppCompatActivity {
         Log.d(TAG, "PatientListActivity initialized");
 
         initViews();
+        setTopBarFunctionalities();
         setupRecyclerView();
         setupListeners();
         fetchPatients();
@@ -61,7 +64,52 @@ public class PatientListActivity extends AppCompatActivity {
         searchEditText = findViewById(R.id.searchPatientEditText);
         filterRadioGroup = findViewById(R.id.patientListFilterRadioGroup);
         fabAddPatient = findViewById(R.id.patientListFabAddPatient);
+        appLogo = findViewById(R.id.patientListLogo);
         profileImage = findViewById(R.id.patientListProfileImg);
+    }
+
+    private void setTopBarFunctionalities() {
+        appLogo.setOnClickListener(v -> {
+            Log.d(TAG, "App Logo clicked");
+            Intent intent = new Intent(PatientListActivity.this, DashboardActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        profileImage.setOnClickListener(v -> {
+            Log.d(TAG, "Profile clicked");
+            PopupMenu popup = new PopupMenu(this, v);
+            popup.getMenuInflater().inflate(R.menu.profile_menu, popup.getMenu());
+
+            // Force icons to show using reflection
+            try {
+                java.lang.reflect.Field[] fields = popup.getClass().getDeclaredFields();
+                for (java.lang.reflect.Field field : fields) {
+                    if ("mPopup".equals(field.getName())) {
+                        field.setAccessible(true);
+                        Object menuPopupHelper = field.get(popup);
+                        Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                        java.lang.reflect.Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                        setForceIcons.invoke(menuPopupHelper, true);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error showing menu icons", e);
+            }
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_profile) {
+                    Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
+                } else if (itemId == R.id.menu_logout) {
+                    Toast.makeText(this, "Logout feature coming soon", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            });
+
+            popup.show();
+        });
     }
 
     private void setupRecyclerView() {
@@ -79,10 +127,6 @@ public class PatientListActivity extends AppCompatActivity {
         fabAddPatient.setOnClickListener(v -> {
             Log.d(TAG, "Navigating to AddPatientActivity");
             startActivity(new Intent(this, AddPatientActivity.class));
-        });
-
-        profileImage.setOnClickListener(v -> {
-            Log.d(TAG, "Profile picture clicked");
         });
 
         searchEditText.addTextChangedListener(new TextWatcher() {
