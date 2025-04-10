@@ -31,6 +31,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".activity.QuickCalculationActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".activity.CreateProfileActivity"
             android:exported="false" />
 
