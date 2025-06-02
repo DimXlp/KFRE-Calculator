@@ -141,42 +141,47 @@ public class QuickCalculationActivity extends AppCompatActivity {
      * @return Risk percentage (0–100)
      */
     private double calculateKFRE(int age, String sex, double egfr, double acr, int years) {
-        // Safety for ACR
-        acr = Math.max(acr, 0);
-        double logAcr = Math.log(acr + 1);
+        acr = Math.max(acr, 1e-6); // Prevent log(0)
+        double logAcr = Math.log(acr); // Use natural log
         int isMale = "male".equalsIgnoreCase(sex) ? 1 : 0;
 
-        Log.d(TAG, "Calc acr: " + acr);
-        Log.d(TAG, "logAcr: " + logAcr);
-        Log.d(TAG, "isMale: " + isMale);
+        // Mean values from original Canadian cohort (Tangri et al., 2011)
+        double meanAge = 70.36;
+        double meanMale = 0.5642;
+        double meanEgfr = 36.11; // 5 × 7.222
+        double meanLogAcr = 5.137;
 
-        double intercept, coefAge, coefSexMale, coefEgfr, coefLogAcr, base;
+        // Coefficients
+        double coefAgePer10Yr = -0.2201;
+        double coefSexMale = 0.2467;
+        double coefEgfrPer5 = -0.5567;
+        double coefLogAcr = 0.4510;
 
+        // Baseline survival
+        double baselineSurvival;
         if (years == 2) {
-            intercept = -0.5567;
-            coefAge = 0.2202;
-            coefSexMale = 0.2467;
-            coefEgfr = -0.5567;
-            coefLogAcr = 0.8465;
-            base = 0.914;
+            baselineSurvival = 0.9751;
         } else if (years == 5) {
-            intercept = -0.2202;
-            coefAge = 0.2467;
-            coefSexMale = 0.4510;
-            coefEgfr = -0.5567;
-            coefLogAcr = 0.4510;
-            base = 0.965;
+            baselineSurvival = 0.9240;
         } else {
             throw new IllegalArgumentException("Only 2 or 5-year risk supported");
         }
 
-        double lp = intercept +
-                (coefAge * age) +
-                (coefSexMale * isMale) +
-                (coefEgfr * egfr) +
-                (coefLogAcr * logAcr);
+        // Calculate centered and scaled values
+        double xAge = (age / 10.0) - (meanAge / 10.0);
+        double xSex = isMale - meanMale;
+        double xEgfr = (egfr / 5.0) - (meanEgfr / 5.0);
+        double xLogAcr = logAcr - meanLogAcr;
 
-        double risk = 1 - Math.pow(base, Math.exp(lp));
-        return Math.max(0, Math.min(risk * 100, 100.0));
+        // Linear predictor
+        double lp = (coefAgePer10Yr * xAge) +
+                (coefSexMale * xSex) +
+                (coefEgfrPer5 * xEgfr) +
+                (coefLogAcr * xLogAcr);
+
+        // Risk calculation
+        double risk = 1 - Math.pow(baselineSurvival, Math.exp(lp));
+        return Math.max(0, Math.min(risk * 100.0, 100.0)); // Convert to percentage
     }
+
 }
