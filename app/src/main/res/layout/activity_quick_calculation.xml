@@ -98,13 +98,6 @@
                     android:layout_height="wrap_content"
                     android:text="Female"
                     android:layout_marginStart="16dp" />
-
-                <RadioButton
-                    android:id="@+id/radioOther"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Other"
-                    android:layout_marginStart="16dp" />
             </RadioGroup>
 
             <!-- eGFR -->
