@@ -133,7 +133,7 @@ public class KfreQuickCalculatorFragment extends Fragment {
      * Calculates KFRE risk (2-year or 5-year) based on the Tangri 4-variable model.
      *
      * @param age   Age in years
-     * @param sex   "Male", "Female", or "Other"
+     * @param sex   "Male", "Female"
      * @param egfr  eGFR (mL/min/1.73m²)
      * @param acr   Albumin-to-Creatinine Ratio (ACR) in mg/g
      * @param years 2 or 5 (for 2-year or 5-year risk)
