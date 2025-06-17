@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.dimxlp.kfrecalculator.R;
-import com.dimxlp.kfrecalculator.fragment.InputFragment;
+import com.dimxlp.kfrecalculator.fragment.PatientInputFragment;
 import com.dimxlp.kfrecalculator.fragment.PatientDetailsFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -73,7 +73,7 @@ public class PatientDetailsActivity extends AppCompatActivity {
                     fragment = new PatientDetailsFragment();
                     break;
                 case 1:
-                    fragment = new InputFragment();
+                    fragment = new PatientInputFragment();
                     break;
                 default:
                     fragment = new PatientDetailsFragment();

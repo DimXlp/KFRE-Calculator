@@ -14,11 +14,11 @@ import androidx.fragment.app.Fragment;
 import com.dimxlp.kfrecalculator.R;
 import com.google.android.material.slider.Slider;
 
-public class InputFragment extends Fragment {
+public class PatientInputFragment extends Fragment {
 
     private static final String TAG = "RAFI|InputFragment";
 
-    public InputFragment() {}
+    public PatientInputFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

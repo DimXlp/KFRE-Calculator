@@ -1,7 +1,7 @@
 package com.dimxlp.kfrecalculator.model;
 
-public class Calculation {
-    private String calculationId;
+public class KfreCalculation {
+    private String kfreCalculationId;
     private String patientId;
     private String userId;
     private int age;
@@ -14,10 +14,10 @@ public class Calculation {
     private long updatedAt;
     private String notes;
 
-    public Calculation() {}
+    public KfreCalculation() {}
 
-    public Calculation(String calculationId, String patientId, String userId, int age, String sex, double egfr, double acr, double risk2Yr, double risk5Yr, long createdAt, long updatedAt, String notes) {
-        this.calculationId = calculationId;
+    public KfreCalculation(String kfreCalculationId, String patientId, String userId, int age, String sex, double egfr, double acr, double risk2Yr, double risk5Yr, long createdAt, long updatedAt, String notes) {
+        this.kfreCalculationId = kfreCalculationId;
         this.patientId = patientId;
         this.userId = userId;
         this.age = age;
@@ -31,12 +31,12 @@ public class Calculation {
         this.notes = notes;
     }
 
-    public String getCalculationId() {
-        return calculationId;
+    public String getKfreCalculationId() {
+        return kfreCalculationId;
     }
 
-    public void setCalculationId(String calculationId) {
-        this.calculationId = calculationId;
+    public void setKfreCalculationId(String kfreCalculationId) {
+        this.kfreCalculationId = kfreCalculationId;
     }
 
     public String getPatientId() {

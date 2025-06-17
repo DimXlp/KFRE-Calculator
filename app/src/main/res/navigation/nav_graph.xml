@@ -16,7 +16,7 @@
 
     <fragment
         android:id="@+id/inputFragment"
-        android:name="com.dimxlp.kfrecalculator.fragment.InputFragment"
+        android:name="com.dimxlp.kfrecalculator.fragment.PatientInputFragment"
         android:label="Input"
         tools:layout="@layout/fragment_input" />
 

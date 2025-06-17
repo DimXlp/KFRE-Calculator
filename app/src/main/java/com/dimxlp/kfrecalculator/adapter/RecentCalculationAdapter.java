@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
-import com.dimxlp.kfrecalculator.model.Calculation;
+import com.dimxlp.kfrecalculator.model.KfreCalculation;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,10 +18,10 @@ import java.util.Locale;
 
 public class RecentCalculationAdapter extends RecyclerView.Adapter<RecentCalculationAdapter.ViewHolder> {
 
-    private final List<Calculation> calculationList;
+    private final List<KfreCalculation> kfreCalculationList;
 
-    public RecentCalculationAdapter(List<Calculation> calculationList) {
-        this.calculationList = calculationList;
+    public RecentCalculationAdapter(List<KfreCalculation> kfreCalculationList) {
+        this.kfreCalculationList = kfreCalculationList;
     }
 
     @NonNull
@@ -34,7 +34,7 @@ public class RecentCalculationAdapter extends RecyclerView.Adapter<RecentCalcula
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Calculation calc = calculationList.get(position);
+        KfreCalculation calc = kfreCalculationList.get(position);
 
         holder.date.setText(formatDate(calc.getCreatedAt()));
         holder.egfr.setText("eGFR: " + formatEgfr(calc.getEgfr()));
@@ -44,7 +44,7 @@ public class RecentCalculationAdapter extends RecyclerView.Adapter<RecentCalcula
 
     @Override
     public int getItemCount() {
-        return calculationList.size();
+        return kfreCalculationList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

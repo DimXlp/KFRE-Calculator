@@ -21,7 +21,7 @@ import com.dimxlp.kfrecalculator.adapter.RecentCalculationAdapter;
 import com.dimxlp.kfrecalculator.adapter.RecentPatientAdapter;
 import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.enumeration.Role;
-import com.dimxlp.kfrecalculator.model.Calculation;
+import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -252,18 +252,18 @@ public class DashboardActivity extends AppCompatActivity {
         recentDoctor.setText(String.valueOf(recent));
     }
 
-    private void setupIndividualQuickStats(List<Calculation> calculations) {
+    private void setupIndividualQuickStats(List<KfreCalculation> kfreCalculations) {
         long now = System.currentTimeMillis();
 
-        long totalCalcs = calculations.size();
+        long totalCalcs = kfreCalculations.size();
 
         String lastCalc = totalCalcs > 0
-                ? android.text.format.DateFormat.format("dd MMM yyyy", calculations.get(0).getCreatedAt()).toString()
+                ? android.text.format.DateFormat.format("dd MMM yyyy", kfreCalculations.get(0).getCreatedAt()).toString()
                 : "-";
 
         String riskLabel = "-";
         if (totalCalcs > 0) {
-            double lastRisk = calculations.get(0).getRisk2Yr();
+            double lastRisk = kfreCalculations.get(0).getRisk2Yr();
             if (lastRisk < 5) riskLabel = "Low";
             else if (lastRisk < 15) riskLabel = "Medium";
             else riskLabel = "High";
@@ -283,11 +283,11 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
 
-    private void setupCharts(List<Patient> patients, List<Calculation> calculations, Role role) {
+    private void setupCharts(List<Patient> patients, List<KfreCalculation> kfreCalculations, Role role) {
         if (role == Role.DOCTOR) {
             setupDoctorPieChart(patients);
         } else {
-            setupIndividualLineChart(calculations);
+            setupIndividualLineChart(kfreCalculations);
         }
     }
 
@@ -325,8 +325,8 @@ public class DashboardActivity extends AppCompatActivity {
         pieChartDoctor.invalidate();
     }
 
-    private void setupIndividualLineChart(List<Calculation> calculations) {
-        List<Calculation> reversedCalcs = new ArrayList<>(calculations);
+    private void setupIndividualLineChart(List<KfreCalculation> kfreCalculations) {
+        List<KfreCalculation> reversedCalcs = new ArrayList<>(kfreCalculations);
         Collections.reverse(reversedCalcs);
 
         List<Entry> twoYearEntries = IntStream.range(0, reversedCalcs.size())
@@ -404,11 +404,11 @@ public class DashboardActivity extends AppCompatActivity {
         RecentPatientAdapter recentPatientAdapter = new RecentPatientAdapter(dummyPatients);
         recentPatientsRecView.setAdapter(recentPatientAdapter);
 
-        List<Calculation> dummyCalculations = generateDummyCalculations();
+        List<KfreCalculation> dummyKfreCalculations = generateDummyCalculations();
 
         // Individual view
         recentCalculationsRecView.setLayoutManager(new LinearLayoutManager(this));
-        RecentCalculationAdapter recentCalculationAdapter = new RecentCalculationAdapter(dummyCalculations);
+        RecentCalculationAdapter recentCalculationAdapter = new RecentCalculationAdapter(dummyKfreCalculations);
         recentCalculationsRecView.setAdapter(recentCalculationAdapter);
     }
 
@@ -420,12 +420,12 @@ public class DashboardActivity extends AppCompatActivity {
         return list;
     }
 
-    private List<Calculation> generateDummyCalculations() {
-        List<Calculation> calculations = new ArrayList<>();
+    private List<KfreCalculation> generateDummyCalculations() {
+        List<KfreCalculation> kfreCalculations = new ArrayList<>();
 
         long now = System.currentTimeMillis();
 
-        calculations.add(new Calculation(
+        kfreCalculations.add(new KfreCalculation(
                 "calc1", null, null, 67, "Male",
                 45.0, 300.0,
                 14.0, 24.0,
@@ -433,7 +433,7 @@ public class DashboardActivity extends AppCompatActivity {
                 "Stable condition"
         ));
 
-        calculations.add(new Calculation(
+        kfreCalculations.add(new KfreCalculation(
                 "calc2", null, null, 72, "Female",
                 25.0, 900.0,
                 34.0, 75.0,
@@ -441,7 +441,7 @@ public class DashboardActivity extends AppCompatActivity {
                 "High ACR, follow-up needed"
         ));
 
-        calculations.add(new Calculation(
+        kfreCalculations.add(new KfreCalculation(
                 "calc3", null, null, 59, "Male",
                 60.0, 120.0,
                 5.0, 15.0,
@@ -449,7 +449,7 @@ public class DashboardActivity extends AppCompatActivity {
                 "Improving metrics"
         ));
 
-        return calculations;
+        return kfreCalculations;
     }
 
 }
