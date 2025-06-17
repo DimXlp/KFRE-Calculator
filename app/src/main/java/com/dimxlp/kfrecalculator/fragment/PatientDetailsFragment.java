@@ -215,10 +215,5 @@ public class PatientDetailsFragment extends Fragment {
             return "-";
         }
     }
-
-    private String formatDate(Date date) {
-        if (date == null) return "-";
-        return new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(date);
-    }
 }
 
