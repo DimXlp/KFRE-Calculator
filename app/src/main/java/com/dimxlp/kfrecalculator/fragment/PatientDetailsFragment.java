@@ -9,25 +9,33 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.dimxlp.kfrecalculator.R;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class PatientDetailsFragment extends Fragment {
 
-    // Views
-    private TextView nameTextView, ageGenderTextView, dobTextView, lastUpdatedTextView, notesTextView;
-    private ChipGroup historyChipsGroup;
-    private LinearLayout medicationsContainer, assessmentsContainer;
+    private FirebaseFirestore db;
+    private String patientId;
 
-    public PatientDetailsFragment() {
-        // Required empty public constructor
-    }
+    // Views
+    private TextView nameView, ageGenderView, dobView, lastUpdatedView, notesView;
+    private ChipGroup historyChips;
+    private LinearLayout medicationsContainer, assessmentsContainer;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -36,84 +44,181 @@ public class PatientDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(v, savedInstanceState);
 
-        // Initialize Views
-        nameTextView = view.findViewById(R.id.patientDetailName);
-        ageGenderTextView = view.findViewById(R.id.patientDetailAgeGender);
-        dobTextView = view.findViewById(R.id.patientDetailDob);
-        lastUpdatedTextView = view.findViewById(R.id.patientDetailLastUpdated);
-        notesTextView = view.findViewById(R.id.patientNotes);
-        historyChipsGroup = view.findViewById(R.id.historyChips);
-        medicationsContainer = view.findViewById(R.id.medicationsContainer);
-        assessmentsContainer = view.findViewById(R.id.assessmentsContainer);
+        // Get patientId from arguments
+        patientId = getArguments() != null ? getArguments().getString("patientId") : null;
+        db = FirebaseFirestore.getInstance();
 
-        // Load mock data
-        loadPatientInfo();
-        loadMedicalHistory();
-        loadMedications();
-        loadAssessments();
-    }
+        // Init views
+        nameView = v.findViewById(R.id.patientDetailName);
+        ageGenderView = v.findViewById(R.id.patientDetailAgeGender);
+        dobView = v.findViewById(R.id.patientDetailDob);
+        lastUpdatedView = v.findViewById(R.id.patientDetailLastUpdated);
+        notesView = v.findViewById(R.id.patientNotes);
+        historyChips = v.findViewById(R.id.historyChips);
+        medicationsContainer = v.findViewById(R.id.medicationsContainer);
+        assessmentsContainer = v.findViewById(R.id.assessmentsContainer);
 
-    private void loadPatientInfo() {
-        nameTextView.setText("John Doe");
-        ageGenderTextView.setText("54 • Male");
-        dobTextView.setText("DOB: 12 Mar 1971");
-        lastUpdatedTextView.setText("Last updated: May 2025");
-    }
-
-    private void loadMedicalHistory() {
-        List<String> conditions = Arrays.asList("Diabetes", "Hypertension", "CKD Stage 3");
-
-        historyChipsGroup.removeAllViews();
-        for (String condition : conditions) {
-            Chip chip = new Chip(requireContext());
-            chip.setText(condition);
-            chip.setChipBackgroundColorResource(R.color.colorAccentLight);
-            chip.setTextColor(getResources().getColor(R.color.colorPrimary, null));
-            chip.setChipCornerRadius(24);
-            chip.setClickable(false);
-            chip.setCheckable(false);
-            historyChipsGroup.addView(chip);
+        if (patientId != null) {
+            loadPatientDetails();
+            loadMedications();
+            loadAssessments();
         }
+    }
 
-        notesTextView.setText("Patient shows early signs of nephropathy. Monitoring required.");
+    private void loadPatientDetails() {
+        db.collection("Patients").document(patientId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        String firstName = snapshot.getString("firstName");
+                        String lastName = snapshot.getString("lastName");
+                        String gender = snapshot.getString("gender");
+                        String dob = snapshot.getString("birthDate");
+                        String notes = snapshot.getString("notes");
+                        mapHistory(snapshot);
+//                        Date updated = snapshot.getDate("lastUpdated");
+
+                        nameView.setText(firstName + " " + lastName);
+                        ageGenderView.setText(getAgeFromDob(dob) + " • " + gender);
+                        dobView.setText("Date of Birth: " + dob);
+//                        lastUpdatedView.setText("Last updated: " + formatDate(updated));
+                        notesView.setText(notes != null ? notes : "No notes available");
+                    }
+                });
+    }
+
+    private void mapHistory(DocumentSnapshot snapshot) {
+        Object historyObject = snapshot.get("history");
+
+        if (historyObject instanceof Map) {
+            Map<String, Map<String, Object>> historyMap = (Map<String, Map<String, Object>>) historyObject;
+            List<String> selectedHistory = new ArrayList<>();
+
+            for (Map.Entry<String, Map<String, Object>> entry : historyMap.entrySet()) {
+                Map<String, Object> diseaseDetails = entry.getValue();
+                Boolean hasDisease = (Boolean) diseaseDetails.get("hasDisease");
+
+                if (hasDisease != null && hasDisease) {
+                    String diseaseName = (String) diseaseDetails.get("name");
+                    String details = (String) diseaseDetails.get("details");
+
+                    String display = diseaseName;
+                    if (details != null && !details.isEmpty()) {
+                        display += " (" + details + ")";
+                    }
+
+                    selectedHistory.add(display);
+                }
+            }
+
+            populateChips(selectedHistory);
+        }
+    }
+
+    private void populateChips(List<String> history) {
+        historyChips.removeAllViews();
+        if (history != null) {
+            for (String item : history) {
+                Chip chip = new Chip(requireContext(), null, R.style.App_Chip_Assist);
+                chip.setText(item);
+                chip.setChipBackgroundColorResource(R.color.colorAccentLight);
+                chip.setTextColor(getResources().getColor(R.color.colorPrimary, null));
+                chip.setClickable(false);
+                chip.setCheckable(false);
+                historyChips.addView(chip);
+            }
+        }
     }
 
     private void loadMedications() {
         medicationsContainer.removeAllViews();
 
-        List<String> meds = Arrays.asList(
-                "Metformin 500mg • Daily",
-                "Lisinopril 10mg • Every Morning"
-        );
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        for (String med : meds) {
-            TextView medView = new TextView(requireContext());
-            medView.setText(med);
-            medView.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
-            medView.setTextColor(getResources().getColor(R.color.textSecondary, null));
-            medView.setPadding(0, 8, 0, 8);
-            medicationsContainer.addView(medView);
-        }
+        db.collection("MedicationAssignments")
+                .whereEqualTo("patientId", patientId)
+                .get()
+                .addOnSuccessListener(assignments -> {
+                    for (QueryDocumentSnapshot assignment : assignments) {
+                        String medicationId = assignment.getString("medicationId");
+                        String frequency = assignment.getString("frequency");
+
+                        if (medicationId != null) {
+                            db.collection("Medications").document(medicationId)
+                                    .get()
+                                    .addOnSuccessListener(medDoc -> {
+                                        if (medDoc.exists()) {
+                                            String name = medDoc.getString("name");
+                                            String dosage = medDoc.getString("dosage");
+
+                                            String display = name + " " + dosage + " • " + frequency;
+
+                                            TextView medView = new TextView(requireContext());
+                                            medView.setText(display);
+                                            medView.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
+                                            medView.setTextColor(ContextCompat.getColor(requireContext(), R.color.textSecondary));
+                                            medView.setPadding(0, 8, 0, 8);
+                                            medicationsContainer.addView(medView);
+                                        }
+                                    });
+                        }
+                    }
+                });
     }
 
     private void loadAssessments() {
-        assessmentsContainer.removeAllViews();
+        db.collection("Calculations")
+                .whereEqualTo("patientId", patientId)
+                .get()
+                .addOnSuccessListener(query -> {
+                    assessmentsContainer.removeAllViews();
+                    for (QueryDocumentSnapshot doc : query) {
+                        Double risk2yr = doc.getDouble("risk2yr");
+                        Double risk5yr = doc.getDouble("risk5yr");
+                        String date = doc.getString("date");
 
-        List<String> results = Arrays.asList(
-                "2-Yr Risk: 3.2% • 5-Yr Risk: 7.6% • Apr 2025",
-                "2-Yr Risk: 2.8% • 5-Yr Risk: 6.5% • Jan 2025"
-        );
+                        TextView resultView = new TextView(requireContext());
+                        resultView.setText("2-Yr Risk: " + risk2yr + "% • 5-Yr Risk: " + risk5yr + "% • " + date);
+                        resultView.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
+                        resultView.setTextColor(getResources().getColor(R.color.textSecondary, null));
+                        resultView.setPadding(0, 8, 0, 8);
+                        assessmentsContainer.addView(resultView);
+                    }
+                });
+    }
 
-        for (String result : results) {
-            TextView resultView = new TextView(requireContext());
-            resultView.setText(result);
-            resultView.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
-            resultView.setTextColor(getResources().getColor(R.color.textSecondary, null));
-            resultView.setPadding(0, 8, 0, 8);
-            assessmentsContainer.addView(resultView);
+    private String getAgeFromDob(String dobString) {
+        if (dobString == null || dobString.isEmpty()) return "-";
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
+            Date dob = sdf.parse(dobString);
+
+            Calendar birthCal = Calendar.getInstance();
+            birthCal.setTime(dob);
+
+            Calendar today = Calendar.getInstance();
+
+            int age = today.get(Calendar.YEAR) - birthCal.get(Calendar.YEAR);
+
+            // Adjust if birthday hasn't occurred yet this year
+            if (today.get(Calendar.DAY_OF_YEAR) < birthCal.get(Calendar.DAY_OF_YEAR)) {
+                age--;
+            }
+
+            return String.valueOf(age);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "-";
         }
     }
+
+    private String formatDate(Date date) {
+        if (date == null) return "-";
+        return new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(date);
+    }
 }
+

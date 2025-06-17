@@ -196,23 +196,4 @@ public class PatientListActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to fetch patients", e));
     }
 
-    private void filterPatients(String searchQuery) {
-        String query = searchQuery.toLowerCase(Locale.getDefault());
-        int checkedId = filterRadioGroup.getCheckedRadioButtonId();
-
-        filteredPatients.clear();
-        for (Patient p : allPatients) {
-            boolean matchesSearch = p.getFullName().toLowerCase(Locale.getDefault()).contains(query);
-            boolean matchesFilter = (checkedId == R.id.patientListFilterAllRadio) ||
-                    (checkedId == R.id.patientListFilterActiveRadio && p.isActive()) ||
-                    (checkedId == R.id.patientListFilterInactiveRadio && !p.isActive());
-
-            if (matchesSearch && matchesFilter) {
-                filteredPatients.add(p);
-            }
-        }
-
-        adapter.notifyDataSetChanged();
-        Log.d(TAG, "Filtered list: " + filteredPatients.size());
-    }
 }

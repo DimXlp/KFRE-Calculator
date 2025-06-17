@@ -36,4 +36,10 @@
         <item name="boxStrokeWidthFocused">1dp</item>
     </style>
 
+    <style name="App.Chip.Assist" parent="Widget.Material3.Chip.Assist">
+        <item name="chipCornerRadius">24dp</item>
+        <item name="chipBackgroundColor">@color/colorAccentLight</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
 </resources>
