@@ -5,9 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,19 +20,22 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Locale;
 
-public class KfreQuickCalculatorFragment extends Fragment {
+public abstract class BaseKfreCalculatorFragment extends Fragment {
 
-    private static final String TAG = "RAFI|KfreQuickCalc";
+    protected TextInputEditText inputAge, inputEgfr, inputAlbuminuria;
+    protected RadioGroup radioGender;
+    protected LinearLayout resultContainer;
+    protected TextView txtRisk2Yr, txtRisk5Yr, txtRiskLevel, txtRiskMessage;
 
-    private TextInputEditText inputAge, inputEgfr, inputAlbuminuria;
-    private RadioGroup radioGender;
-    private LinearLayout resultContainer;
-    private TextView txtRisk2Yr, txtRisk5Yr, txtRiskLevel, txtRiskMessage;
+    protected double risk2Yr, risk5Yr;
+
+    protected abstract int getLayoutId();
+    protected abstract String getLogTag();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_base_kfre_calculator, container, false);
+        View view = inflater.inflate(getLayoutId(), container, false);
 
         inputAge = view.findViewById(R.id.inputAge);
         inputEgfr = view.findViewById(R.id.inputEgfr);
@@ -47,16 +48,13 @@ public class KfreQuickCalculatorFragment extends Fragment {
         txtRiskMessage = view.findViewById(R.id.txtRiskMessage);
         resultContainer = view.findViewById(R.id.resultContainer);
 
-        Button btnCalculate = view.findViewById(R.id.btnCalculate);
-        Button btnClear = view.findViewById(R.id.btnClear);
-
-        btnCalculate.setOnClickListener(v -> performCalculation());
-        btnClear.setOnClickListener(v -> clearFields());
+        view.findViewById(R.id.btnCalculate).setOnClickListener(v -> performCalculation());
+        view.findViewById(R.id.btnClear).setOnClickListener(v -> clearFields());
 
         return view;
     }
 
-    private void performCalculation() {
+    protected void performCalculation() {
         String ageStr = inputAge.getText().toString().trim();
         String egfrStr = inputEgfr.getText().toString().trim();
         String acrStr = inputAlbuminuria.getText().toString().trim();
@@ -70,49 +68,54 @@ public class KfreQuickCalculatorFragment extends Fragment {
             int age = Integer.parseInt(ageStr);
             double egfr = Double.parseDouble(egfrStr);
             double acr = Double.parseDouble(acrStr);
-            String gender = getSelectedGender();
+            String sex = getSelectedGender();
 
-            Log.d(TAG, "Age: " + age);
-            Log.d(TAG, "gender: " + gender);
-            Log.d(TAG, "egfr: " + egfr);
-            Log.d(TAG, "acr: " + acr);
-            double risk2Yr = calculateKFRE(age, gender, egfr, acr, 2);
-            double risk5Yr = calculateKFRE(age, gender, egfr, acr, 5);
+            Log.d(getLogTag(), "Age: " + age);
+            Log.d(getLogTag(), "Gender: " + sex);
+            Log.d(getLogTag(), "eGFR: " + egfr);
+            Log.d(getLogTag(), "ACR: " + acr);
 
-            txtRisk2Yr.setText(String.format(Locale.getDefault(), "2-Year Risk: %.2f%%", risk2Yr));
-            txtRisk5Yr.setText(String.format(Locale.getDefault(), "5-Year Risk: %.2f%%", risk5Yr));
+            risk2Yr = calculateKFRE(age, sex, egfr, acr, 2);
+            risk5Yr = calculateKFRE(age, sex, egfr, acr, 5);
 
-            String level, message;
-            int levelColor;
+            displayResults(risk2Yr, risk5Yr);
 
-            if (risk2Yr >= 20.0) {
-                level = "High";
-                levelColor = ContextCompat.getColor(requireContext(), R.color.colorHighRiskStat);
-                message = "Your risk of kidney failure is high. Please consult a specialist.";
-            } else if (risk2Yr >= 10.0) {
-                level = "Medium";
-                levelColor = ContextCompat.getColor(requireContext(), R.color.colorMediumRiskStat);
-                message = "Your risk is moderate. Monitoring is recommended.";
-            } else {
-                level = "Low";
-                levelColor = ContextCompat.getColor(requireContext(), R.color.colorLowRiskStat);
-                message = "Your risk is low.";
-            }
-
-            txtRiskLevel.setText("Risk Level: " + level);
-            txtRiskLevel.setTextColor(levelColor);
-            txtRisk2Yr.setTextColor(levelColor);
-            txtRisk5Yr.setTextColor(levelColor);
-            txtRiskMessage.setText(message);
-            resultContainer.setVisibility(View.VISIBLE);
-
-            Log.d(TAG, "Calculation complete: 2yr=" + risk2Yr + ", 5yr=" + risk5Yr);
+            Log.d(getLogTag(), "Calculation complete: 2yr=" + risk2Yr + ", 5yr=" + risk5Yr);
         } catch (NumberFormatException e) {
             Toast.makeText(getContext(), "Invalid numeric input", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void clearFields() {
+    protected void displayResults(double risk2Yr, double risk5Yr) {
+        txtRisk2Yr.setText(String.format(Locale.getDefault(), "2-Year Risk: %.2f%%", risk2Yr));
+        txtRisk5Yr.setText(String.format(Locale.getDefault(), "5-Year Risk: %.2f%%", risk5Yr));
+
+        String level, message;
+        int levelColor;
+
+        if (risk2Yr >= 20.0) {
+            level = "High";
+            levelColor = ContextCompat.getColor(requireContext(), R.color.colorHighRiskStat);
+            message = "Your risk of kidney failure is high. Please consult a specialist.";
+        } else if (risk2Yr >= 10.0) {
+            level = "Medium";
+            levelColor = ContextCompat.getColor(requireContext(), R.color.colorMediumRiskStat);
+            message = "Your risk is moderate. Monitoring is recommended.";
+        } else {
+            level = "Low";
+            levelColor = ContextCompat.getColor(requireContext(), R.color.colorLowRiskStat);
+            message = "Your risk is low.";
+        }
+
+        txtRiskLevel.setText("Risk Level: " + level);
+        txtRiskLevel.setTextColor(levelColor);
+        txtRisk2Yr.setTextColor(levelColor);
+        txtRisk5Yr.setTextColor(levelColor);
+        txtRiskMessage.setText(message);
+        resultContainer.setVisibility(View.VISIBLE);
+    }
+
+    protected void clearFields() {
         inputAge.setText("");
         inputEgfr.setText("");
         inputAlbuminuria.setText("");
@@ -120,13 +123,11 @@ public class KfreQuickCalculatorFragment extends Fragment {
         resultContainer.setVisibility(View.GONE);
     }
 
-    private String getSelectedGender() {
+    protected String getSelectedGender() {
         int selectedId = radioGender.getCheckedRadioButtonId();
-        if (selectedId != -1) {
-            RadioButton selected = radioGender.findViewById(selectedId);
-            return selected.getText().toString();
-        }
-        return null;
+        if (selectedId == R.id.radioMale) return "male";
+        else if (selectedId == R.id.radioFemale) return "female";
+        return "";
     }
 
     /**
@@ -139,9 +140,9 @@ public class KfreQuickCalculatorFragment extends Fragment {
      * @param years 2 or 5 (for 2-year or 5-year risk)
      * @return Risk percentage (0–100)
      */
-    private double calculateKFRE(int age, String sex, double egfr, double acr, int years) {
+    protected double calculateKFRE(int age, String sex, double egfr, double acr, int years) {
         acr = Math.max(acr, 1e-6); // Prevent log(0)
-        double logAcr = Math.log(acr); // Use natural log
+        double logAcr = Math.log(acr);
         int isMale = "male".equalsIgnoreCase(sex) ? 1 : 0;
 
         // Mean values from original Canadian cohort (Tangri et al., 2011)
@@ -182,5 +183,4 @@ public class KfreQuickCalculatorFragment extends Fragment {
         double risk = 1 - Math.pow(baselineSurvival, Math.exp(lp));
         return Math.max(0, Math.min(risk * 100.0, 100.0)); // Convert to percentage
     }
-
 }
