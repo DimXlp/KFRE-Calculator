@@ -40,6 +40,9 @@ public class PatientDetailsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getParentFragmentManager().setFragmentResultListener(
+                "reload_assessments", this, (key, bundle) -> loadAssessments());
         return inflater.inflate(R.layout.fragment_patient_details, container, false);
     }
 
@@ -170,18 +173,22 @@ public class PatientDetailsFragment extends Fragment {
     }
 
     private void loadAssessments() {
-        db.collection("Calculations")
+        db.collection("KfreCalculations")
                 .whereEqualTo("patientId", patientId)
                 .get()
                 .addOnSuccessListener(query -> {
                     assessmentsContainer.removeAllViews();
                     for (QueryDocumentSnapshot doc : query) {
-                        Double risk2yr = doc.getDouble("risk2yr");
-                        Double risk5yr = doc.getDouble("risk5yr");
-                        String date = doc.getString("date");
+                        Double risk2yr = doc.getDouble("risk2Yr");
+                        Double risk5yr = doc.getDouble("risk5Yr");
+                        long timestamp = doc.getLong("createdAt");
+                        String date = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                                .format(new Date(timestamp));
 
                         TextView resultView = new TextView(requireContext());
-                        resultView.setText("2-Yr Risk: " + risk2yr + "% • 5-Yr Risk: " + risk5yr + "% • " + date);
+                        String formatted2yr = String.format(Locale.getDefault(), "%.2f", risk2yr);
+                        String formatted5yr = String.format(Locale.getDefault(), "%.2f", risk5yr);
+                        resultView.setText("2-Yr Risk: " + formatted2yr + "% • 5-Yr Risk: " + formatted5yr + "% • " + date);
                         resultView.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
                         resultView.setTextColor(getResources().getColor(R.color.textSecondary, null));
                         resultView.setPadding(0, 8, 0, 8);

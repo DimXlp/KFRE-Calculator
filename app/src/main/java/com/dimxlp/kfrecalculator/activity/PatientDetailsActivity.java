@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.dimxlp.kfrecalculator.R;
-import com.dimxlp.kfrecalculator.fragment.PatientKfreCalculationFragment;
+import com.dimxlp.kfrecalculator.fragment.PatientKfreCalculatorFragment;
 import com.dimxlp.kfrecalculator.fragment.PatientDetailsFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -44,7 +44,7 @@ public class PatientDetailsActivity extends AppCompatActivity {
                     tab.setText("Info");
                     break;
                 case 1:
-                    tab.setText("Calculator");
+                    tab.setText("KFRE Calculator");
                     break;
                 // You can add more tabs here (e.g., History, Notes)
             }
@@ -73,7 +73,7 @@ public class PatientDetailsActivity extends AppCompatActivity {
                     fragment = new PatientDetailsFragment();
                     break;
                 case 1:
-                    fragment = new PatientKfreCalculationFragment();
+                    fragment = new PatientKfreCalculatorFragment();
                     break;
                 default:
                     fragment = new PatientDetailsFragment();
