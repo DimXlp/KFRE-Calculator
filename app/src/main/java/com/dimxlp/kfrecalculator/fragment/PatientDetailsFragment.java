@@ -1,18 +1,26 @@
 package com.dimxlp.kfrecalculator.fragment;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.adapter.KfreAssessmentAdapter;
+import com.dimxlp.kfrecalculator.model.KfreCalculation;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,7 +43,10 @@ public class PatientDetailsFragment extends Fragment {
     // Views
     private TextView nameView, ageGenderView, dobView, lastUpdatedView, notesView;
     private ChipGroup historyChips;
-    private LinearLayout medicationsContainer, assessmentsContainer;
+    private LinearLayout medicationsContainer;
+    private RecyclerView rvKfreAssessments;
+    private KfreAssessmentAdapter adapter;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -62,7 +73,21 @@ public class PatientDetailsFragment extends Fragment {
         notesView = v.findViewById(R.id.patientNotes);
         historyChips = v.findViewById(R.id.historyChips);
         medicationsContainer = v.findViewById(R.id.medicationsContainer);
-        assessmentsContainer = v.findViewById(R.id.assessmentsContainer);
+        rvKfreAssessments = v.findViewById(R.id.rvKfreAssessments);
+
+        adapter = new KfreAssessmentAdapter(getContext(), new ArrayList<>(), new KfreAssessmentAdapter.AssessmentClickListener() {
+            @Override
+            public void onAssessmentClick(KfreCalculation calc) {
+                showAssessmentDetails(calc);  // You'll define this later
+            }
+
+            @Override
+            public void onAssessmentDelete(KfreCalculation calc) {
+                confirmAndDeleteAssessment(calc);  // You'll define this later
+            }
+        });
+        rvKfreAssessments.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvKfreAssessments.setAdapter(adapter);
 
         if (patientId != null) {
             loadPatientDetails();
@@ -70,6 +95,54 @@ public class PatientDetailsFragment extends Fragment {
             loadAssessments();
         }
     }
+
+    private void showAssessmentDetails(KfreCalculation calc) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_assessment_details, null);
+
+        TextView txtAge = sheetView.findViewById(R.id.txtDetailAge);
+        TextView txtGender = sheetView.findViewById(R.id.txtDetailGender);
+        TextView txtEgfr = sheetView.findViewById(R.id.txtDetailEgfr);
+        TextView txtAcr = sheetView.findViewById(R.id.txtDetailAcr);
+        TextView txtRisk2 = sheetView.findViewById(R.id.txtDetailRisk2);
+        TextView txtRisk5 = sheetView.findViewById(R.id.txtDetailRisk5);
+        TextView txtNotes = sheetView.findViewById(R.id.txtDetailNotes);
+        Button btnClose = sheetView.findViewById(R.id.btnCloseDetail);
+
+        txtAge.setText(String.valueOf(calc.getAge()));
+        txtGender.setText(calc.getSex());
+        txtEgfr.setText(String.format(Locale.getDefault(), "%.2f", calc.getEgfr()));
+        txtAcr.setText(String.format(Locale.getDefault(), "%.2f", calc.getAcr()));
+        txtRisk2.setText(String.format(Locale.getDefault(), "%.2f%%", calc.getRisk2Yr()));
+        txtRisk5.setText(String.format(Locale.getDefault(), "%.2f%%", calc.getRisk5Yr()));
+        txtNotes.setText(calc.getNotes() == null || calc.getNotes().trim().isEmpty() ? "—" : calc.getNotes());
+
+        btnClose.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
+    }
+
+    private void confirmAndDeleteAssessment(KfreCalculation calc) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Assessment")
+                .setMessage("Are you sure you want to delete this KFRE assessment?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    FirebaseFirestore.getInstance()
+                            .collection("KfreCalculations")
+                            .document(calc.getKfreCalculationId())
+                            .delete()
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(getContext(), "Assessment deleted", Toast.LENGTH_SHORT).show();
+                                loadAssessments();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
 
     private void loadPatientDetails() {
         db.collection("Patients").document(patientId)
@@ -177,23 +250,12 @@ public class PatientDetailsFragment extends Fragment {
                 .whereEqualTo("patientId", patientId)
                 .get()
                 .addOnSuccessListener(query -> {
-                    assessmentsContainer.removeAllViews();
+                    List<KfreCalculation> list = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : query) {
-                        Double risk2yr = doc.getDouble("risk2Yr");
-                        Double risk5yr = doc.getDouble("risk5Yr");
-                        long timestamp = doc.getLong("createdAt");
-                        String date = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-                                .format(new Date(timestamp));
-
-                        TextView resultView = new TextView(requireContext());
-                        String formatted2yr = String.format(Locale.getDefault(), "%.2f", risk2yr);
-                        String formatted5yr = String.format(Locale.getDefault(), "%.2f", risk5yr);
-                        resultView.setText("2-Yr Risk: " + formatted2yr + "% • 5-Yr Risk: " + formatted5yr + "% • " + date);
-                        resultView.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
-                        resultView.setTextColor(getResources().getColor(R.color.textSecondary, null));
-                        resultView.setPadding(0, 8, 0, 8);
-                        assessmentsContainer.addView(resultView);
+                        KfreCalculation calc = doc.toObject(KfreCalculation.class);
+                        list.add(calc);
                     }
+                    adapter.updateData(list);
                 });
     }
 

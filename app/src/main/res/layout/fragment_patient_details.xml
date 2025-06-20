@@ -79,31 +79,48 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
-            android:layout_marginBottom="16dp"
             android:backgroundTint="@android:color/white">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:paddingTop="16dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Medical History"
-                    style="@style/TextAppearance.Material3.TitleSmall"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginBottom="8dp" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Medical History"
+                        style="@style/TextAppearance.Material3.TitleSmall"
+                        android:textColor="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DDDDDD"
+                    android:layout_marginTop="8dp" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/historyChips"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:singleLine="false"
-                    app:chipSpacing="8dp" />
+                    app:chipSpacing="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="16dp"/>
 
                 <TextView
                     android:id="@+id/patientNotes"
@@ -112,7 +129,8 @@
                     android:text="No significant notes"
                     style="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="@color/textSecondary"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginVertical="8dp"
+                    android:layout_marginHorizontal="16dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -126,24 +144,40 @@
             android:backgroundTint="@android:color/white">
 
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:paddingTop="16dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Medications"
-                    style="@style/TextAppearance.Material3.TitleSmall"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginBottom="8dp" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Medications"
+                        style="@style/TextAppearance.Material3.TitleSmall"
+                        android:textColor="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DDDDDD"
+                    android:layout_marginTop="8dp" />
 
                 <LinearLayout
                     android:id="@+id/medicationsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:orientation="vertical"
+                    android:layout_marginVertical="8dp"
+                    android:layout_marginHorizontal="16dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -157,24 +191,43 @@
             android:backgroundTint="@android:color/white">
 
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="KFRE Assessments"
-                    style="@style/TextAppearance.Material3.TitleSmall"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginBottom="8dp" />
+                android:paddingTop="16dp">
 
                 <LinearLayout
-                    android:id="@+id/assessmentsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="KFRE Assessments"
+                        style="@style/TextAppearance.Material3.TitleSmall"
+                        android:textColor="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DDDDDD"
+                    android:layout_marginTop="8dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvKfreAssessments"
+                    android:layout_width="match_parent"
+                    android:layout_height="270dp"
+                    android:maxHeight="270dp"
+                    android:clipToPadding="false"
+                    android:paddingBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="16dp"/>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

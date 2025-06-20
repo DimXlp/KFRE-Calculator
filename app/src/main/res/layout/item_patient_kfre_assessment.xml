@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingVertical="12dp">
+
+    <!-- Risk summary -->
+    <TextView
+        android:id="@+id/txtRiskSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2-Yr Risk: 7.45% • 5-Yr Risk: 14.30%"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary" />
+
+    <!-- Date -->
+    <TextView
+        android:id="@+id/txtAssessmentDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="17 June 2025"
+        android:textSize="14sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginTop="4dp" />
+
+    <!-- Optional note preview -->
+    <TextView
+        android:id="@+id/txtAssessmentNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This is a short note preview..."
+        android:textSize="14sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginTop="4dp"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <!-- Delete icon (hidden by default, shown on long-press) -->
+    <ImageButton
+        android:id="@+id/btnDeleteAssessment"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Delete assessment"
+        android:layout_gravity="end"
+        android:visibility="gone"
+        app:tint="@color/colorAccentDark" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="#EEEEEE" />
+</LinearLayout>

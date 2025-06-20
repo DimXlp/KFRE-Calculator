@@ -17,7 +17,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class PatientDetailsActivity extends AppCompatActivity {
 
-    private static final String TAG = "RAFI|PatientDetail";
+    private static final String TAG = "RAFI|PatientDetails";
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
