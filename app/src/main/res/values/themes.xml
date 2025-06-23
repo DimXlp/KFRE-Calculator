@@ -55,5 +55,12 @@
         <item name="android:layout_marginBottom">4dp</item>
     </style>
 
+    <style name="Theme.KfreCalculator.Fullscreen" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
 
 </resources>

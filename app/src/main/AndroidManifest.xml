@@ -53,6 +53,10 @@
         <activity
             android:name=".activity.PatientListActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".activity.FullscreenPatientKfreActivity"
+            android:theme="@style/Theme.KfreCalculator.Fullscreen" />
     </application>
 
 </manifest>

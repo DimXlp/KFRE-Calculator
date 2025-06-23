@@ -1,11 +1,13 @@
 package com.dimxlp.kfrecalculator.fragment;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.activity.FullscreenPatientKfreActivity;
 import com.dimxlp.kfrecalculator.adapter.KfreAssessmentAdapter;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -93,6 +96,7 @@ public class PatientDetailsFragment extends Fragment {
             loadPatientDetails();
             loadMedications();
             loadAssessments();
+            setupKfreCardToggle(v);
         }
     }
 
@@ -283,6 +287,16 @@ public class PatientDetailsFragment extends Fragment {
             e.printStackTrace();
             return "-";
         }
+    }
+
+    private void setupKfreCardToggle(View rootView) {
+        ImageView expandButton = rootView.findViewById(R.id.btnExpandCollapse);
+        expandButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), FullscreenPatientKfreActivity.class);
+            intent.putExtra("patientId", patientId);
+            startActivity(intent);
+            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        });
     }
 }
 

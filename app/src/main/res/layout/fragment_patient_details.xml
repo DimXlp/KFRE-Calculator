@@ -182,54 +182,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- KFRE Assessments -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@android:color/white">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:layout_marginHorizontal="16dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="KFRE Assessments"
-                        style="@style/TextAppearance.Material3.TitleSmall"
-                        android:textColor="@color/colorPrimary" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#DDDDDD"
-                    android:layout_marginTop="8dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvKfreAssessments"
-                    android:layout_width="match_parent"
-                    android:layout_height="270dp"
-                    android:maxHeight="270dp"
-                    android:clipToPadding="false"
-                    android:paddingBottom="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginHorizontal="16dp"/>
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        <include layout="@layout/expandable_kfre_assessments_card"/>
 
     </LinearLayout>
 </ScrollView>
