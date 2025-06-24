@@ -35,7 +35,6 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_filter"
-                android:layout_alignParentEnd="true"
                 android:visibility="gone"
                 android:contentDescription="Filter"
                 app:tint="@color/colorPrimary" />

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/filterDialogRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/filterContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Collapsible Card Template START -->
+        <!-- 1. Date Sort -->
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerDateSort"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/contentDateSort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <RadioGroup
+                android:id="@+id/rgDateSort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbDateNewest"
+                    android:text="Newest → Oldest" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbDateOldest"
+                    android:text="Oldest → Newest" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- 2. 2-Year Risk -->
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerRisk2Sort"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/contentRisk2Sort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <RadioGroup
+                android:id="@+id/rgRisk2yrSort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbRisk2HighLow"
+                    android:text="High → Low" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbRisk2LowHigh"
+                    android:text="Low → High" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- 3. 5-Year Risk -->
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerRisk5Sort"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/contentRisk5Sort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <RadioGroup
+                android:id="@+id/rgRisk5yrSort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbRisk5HighLow"
+                    android:text="High → Low" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbRisk5LowHigh"
+                    android:text="Low → High" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- 4. Risk Category -->
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerRiskCategory"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/contentRiskCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <RadioGroup
+                android:id="@+id/rgRiskCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbRiskLow"
+                    android:text="Low" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbRiskMedium"
+                    android:text="Medium" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rbRiskHigh"
+                    android:text="High" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- 5. Has Note -->
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerHasNote"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/contentHasNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <CheckBox
+                android:id="@+id/cbHasNote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Only show assessments with note" />
+        </LinearLayout>
+
+        <!-- 6. Date Range -->
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerDateRange"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/contentDateRange"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <EditText
+                android:id="@+id/etStartDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Start Date"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none" />
+
+            <EditText
+                android:id="@+id/etEndDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="End Date"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Apply Button -->
+        <Button
+            android:id="@+id/btnApplyFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Apply Filters"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</ScrollView>
