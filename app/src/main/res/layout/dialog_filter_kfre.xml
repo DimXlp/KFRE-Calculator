@@ -219,5 +219,16 @@
             android:backgroundTint="@color/colorPrimary"
             android:textColor="@android:color/white" />
 
+        <!-- Clear Filters -->
+        <Button
+            android:id="@+id/btnClearFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear Filters"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/colorSecondary"
+            android:textColor="@android:color/white" />
+
+
     </LinearLayout>
 </ScrollView>
