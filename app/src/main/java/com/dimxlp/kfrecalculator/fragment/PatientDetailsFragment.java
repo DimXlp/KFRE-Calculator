@@ -1,5 +1,6 @@
 package com.dimxlp.kfrecalculator.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -50,6 +53,15 @@ public class PatientDetailsFragment extends Fragment {
     private RecyclerView rvKfreAssessments;
     private KfreAssessmentAdapter adapter;
 
+    private final ActivityResultLauncher<Intent> fullscreenKfreLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                // Check if the activity is returning an "OK" result code.
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    loadAssessments();
+                }
+            }
+    );
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -81,12 +93,12 @@ public class PatientDetailsFragment extends Fragment {
         adapter = new KfreAssessmentAdapter(getContext(), new ArrayList<>(), new KfreAssessmentAdapter.AssessmentClickListener() {
             @Override
             public void onAssessmentClick(KfreCalculation calc) {
-                showAssessmentDetails(calc);  // You'll define this later
+                showAssessmentDetails(calc);
             }
 
             @Override
             public void onAssessmentDelete(KfreCalculation calc) {
-                confirmAndDeleteAssessment(calc);  // You'll define this later
+                confirmAndDeleteAssessment(calc);
             }
         });
         rvKfreAssessments.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -146,7 +158,6 @@ public class PatientDetailsFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-
 
     private void loadPatientDetails() {
         db.collection("Patients").document(patientId)
@@ -294,8 +305,7 @@ public class PatientDetailsFragment extends Fragment {
         expandButton.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), FullscreenPatientKfreActivity.class);
             intent.putExtra("patientId", patientId);
-            startActivity(intent);
-            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            fullscreenKfreLauncher.launch(intent);
         });
     }
 }

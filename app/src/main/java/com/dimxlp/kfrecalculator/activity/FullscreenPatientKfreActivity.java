@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,6 +52,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     private final List<KfreCalculation> unfilteredAssessments = new ArrayList<>();
     private static final String TAG = "RAFI|FullscreenPatientKfre";
     private FilterOptions currentFilterOptions = new FilterOptions();
+    private boolean dataHasChanged = false;
 
     private static class FilterDialogViewHolder {
         // Main Buttons
@@ -122,12 +126,12 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
                 new KfreAssessmentAdapter.AssessmentClickListener() {
                     @Override
                     public void onAssessmentClick(KfreCalculation calc) {
-
+                        showAssessmentDetails(calc);
                     }
 
                     @Override
                     public void onAssessmentDelete(KfreCalculation calc) {
-
+                        confirmAndDeleteAssessment(calc);
                     }
                 });
         rvKfreAssessments.setLayoutManager(new LinearLayoutManager(this));
@@ -143,6 +147,54 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         });
 
         loadKfreAssessments(patientId);
+    }
+
+    private void showAssessmentDetails(KfreCalculation calc) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_assessment_details, null);
+
+        TextView txtAge = sheetView.findViewById(R.id.txtDetailAge);
+        TextView txtGender = sheetView.findViewById(R.id.txtDetailGender);
+        TextView txtEgfr = sheetView.findViewById(R.id.txtDetailEgfr);
+        TextView txtAcr = sheetView.findViewById(R.id.txtDetailAcr);
+        TextView txtRisk2 = sheetView.findViewById(R.id.txtDetailRisk2);
+        TextView txtRisk5 = sheetView.findViewById(R.id.txtDetailRisk5);
+        TextView txtNotes = sheetView.findViewById(R.id.txtDetailNotes);
+        Button btnClose = sheetView.findViewById(R.id.btnCloseDetail);
+
+        txtAge.setText(String.valueOf(calc.getAge()));
+        txtGender.setText(calc.getSex());
+        txtEgfr.setText(String.format(Locale.getDefault(), "%.2f", calc.getEgfr()));
+        txtAcr.setText(String.format(Locale.getDefault(), "%.2f", calc.getAcr()));
+        txtRisk2.setText(String.format(Locale.getDefault(), "%.2f%%", calc.getRisk2Yr()));
+        txtRisk5.setText(String.format(Locale.getDefault(), "%.2f%%", calc.getRisk5Yr()));
+        txtNotes.setText(calc.getNotes() == null || calc.getNotes().trim().isEmpty() ? "—" : calc.getNotes());
+
+        btnClose.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
+    }
+
+    private void confirmAndDeleteAssessment(KfreCalculation calc) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Assessment")
+                .setMessage("Are you sure you want to delete this KFRE assessment?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    FirebaseFirestore.getInstance()
+                            .collection("KfreCalculations")
+                            .document(calc.getKfreCalculationId())
+                            .delete()
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(this, "Assessment deleted", Toast.LENGTH_SHORT).show();
+                                dataHasChanged = true;
+                                loadKfreAssessments(calc.getPatientId());
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void showFilterDialog() {
@@ -429,6 +481,16 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         } else if (selectedDateSortId == R.id.rbDateOldest) {
             options.setDateSort(SortDirection.ASCENDING);
         }
+    }
+
+    @Override
+    public void finish() {
+        // Before finishing, check if data has changed and set a result if it has.
+        if (dataHasChanged) {
+            setResult(Activity.RESULT_OK);
+        }
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     private void setupExpandableGroup(View headerView, LinearLayout contentView, String title) {
