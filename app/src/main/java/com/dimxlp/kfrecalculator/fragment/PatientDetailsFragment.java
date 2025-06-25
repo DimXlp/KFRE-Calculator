@@ -36,6 +36,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -270,6 +271,10 @@ public class PatientDetailsFragment extends Fragment {
                         KfreCalculation calc = doc.toObject(KfreCalculation.class);
                         list.add(calc);
                     }
+
+                    Collections.sort(list, (a, b) ->
+                            Long.compare(a.getCreatedAt(), b.getCreatedAt()));
+
                     adapter.updateData(list);
                 });
     }
