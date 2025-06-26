@@ -24,7 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.activity.FullscreenPatientKfreActivity;
+import com.dimxlp.kfrecalculator.adapter.CkdEpiAssessmentAdapter;
 import com.dimxlp.kfrecalculator.adapter.KfreAssessmentAdapter;
+import com.dimxlp.kfrecalculator.model.CkdEpiCalculation;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
@@ -52,14 +54,16 @@ public class PatientDetailsFragment extends Fragment {
     private ChipGroup historyChips;
     private LinearLayout medicationsContainer;
     private RecyclerView rvKfreAssessments;
-    private KfreAssessmentAdapter adapter;
+    private RecyclerView rvCkdEpiAssessments;
+    private KfreAssessmentAdapter kfreAdapter;
+    private CkdEpiAssessmentAdapter ckdEpiAdapter;
 
     private final ActivityResultLauncher<Intent> fullscreenKfreLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 // Check if the activity is returning an "OK" result code.
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    loadAssessments();
+                    loadKfreAssessments();
                 }
             }
     );
@@ -69,7 +73,7 @@ public class PatientDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getParentFragmentManager().setFragmentResultListener(
-                "reload_assessments", this, (key, bundle) -> loadAssessments());
+                "reload_assessments", this, (key, bundle) -> loadKfreAssessments());
         return inflater.inflate(R.layout.fragment_patient_details, container, false);
     }
 
@@ -90,32 +94,93 @@ public class PatientDetailsFragment extends Fragment {
         historyChips = v.findViewById(R.id.historyChips);
         medicationsContainer = v.findViewById(R.id.medicationsContainer);
         rvKfreAssessments = v.findViewById(R.id.rvKfreAssessments);
+        rvCkdEpiAssessments = v.findViewById(R.id.rvCkdEpiAssessments);
 
-        adapter = new KfreAssessmentAdapter(getContext(), new ArrayList<>(), new KfreAssessmentAdapter.AssessmentClickListener() {
+        kfreAdapter = new KfreAssessmentAdapter(getContext(), new ArrayList<>(), new KfreAssessmentAdapter.AssessmentClickListener() {
             @Override
             public void onAssessmentClick(KfreCalculation calc) {
-                showAssessmentDetails(calc);
+                showKfreAssessmentDetails(calc);
             }
 
             @Override
             public void onAssessmentDelete(KfreCalculation calc) {
-                confirmAndDeleteAssessment(calc);
+                confirmAndDeleteKfreAssessment(calc);
             }
         });
         rvKfreAssessments.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvKfreAssessments.setAdapter(adapter);
+        rvKfreAssessments.setAdapter(kfreAdapter);
+
+        ckdEpiAdapter = new CkdEpiAssessmentAdapter(getContext(), new ArrayList<>(), new CkdEpiAssessmentAdapter.AssessmentClickListener() {
+            @Override
+            public void onAssessmentClick(CkdEpiCalculation calc) {
+                showCkdEpiAssessmentDetails(calc);
+            }
+
+            @Override
+            public void onAssessmentDelete(CkdEpiCalculation calc) {
+                confirmAndDeleteCkdEpiAssessment(calc);
+            }
+        });
+        rvCkdEpiAssessments.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvCkdEpiAssessments.setAdapter(ckdEpiAdapter);
 
         if (patientId != null) {
             loadPatientDetails();
             loadMedications();
-            loadAssessments();
+            loadKfreAssessments();
+            loadCkdEpiAssessments();
             setupKfreCardToggle(v);
         }
     }
 
-    private void showAssessmentDetails(KfreCalculation calc) {
+    private void showCkdEpiAssessmentDetails(CkdEpiCalculation calc) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_assessment_details, null);
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_ckd_epi_assessment_details, null);
+
+        // Find all views from the layout
+        TextView txtAge = sheetView.findViewById(R.id.txtDetailAge);
+        TextView txtGender = sheetView.findViewById(R.id.txtDetailGender);
+        TextView txtCreatinine = sheetView.findViewById(R.id.txtDetailCreatinine);
+        TextView txtEgfr = sheetView.findViewById(R.id.txtDetailEgfr);
+        TextView txtNotes = sheetView.findViewById(R.id.txtDetailNotes);
+        Button btnClose = sheetView.findViewById(R.id.btnCloseDetail);
+
+        // Set data for relevant fields
+        txtAge.setText(String.valueOf(calc.getAge()));
+        txtGender.setText(calc.getSex());
+        txtCreatinine.setText(calc.getCreatinine() + " mg/dL");
+        txtEgfr.setText(String.format(Locale.getDefault(), "%.2f", calc.getResult()) + " mL/min/1.73m²");
+        txtNotes.setText(calc.getNotes() == null || calc.getNotes().trim().isEmpty() ? "—" : calc.getNotes());
+
+        btnClose.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.setContentView(sheetView);
+        bottomSheetDialog.show();
+    }
+
+    private void confirmAndDeleteCkdEpiAssessment(CkdEpiCalculation calc) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Assessment")
+                .setMessage("Are you sure you want to delete this CKD-EPI assessment?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    FirebaseFirestore.getInstance()
+                            .collection("CkdEpiCalculations")
+                            .document(calc.getCkdEpiCalculationId())
+                            .delete()
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(getContext(), "Assessment deleted", Toast.LENGTH_SHORT).show();
+                                loadCkdEpiAssessments();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void showKfreAssessmentDetails(KfreCalculation calc) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_kfre_assessment_details, null);
 
         TextView txtAge = sheetView.findViewById(R.id.txtDetailAge);
         TextView txtGender = sheetView.findViewById(R.id.txtDetailGender);
@@ -140,7 +205,7 @@ public class PatientDetailsFragment extends Fragment {
         bottomSheetDialog.show();
     }
 
-    private void confirmAndDeleteAssessment(KfreCalculation calc) {
+    private void confirmAndDeleteKfreAssessment(KfreCalculation calc) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete Assessment")
                 .setMessage("Are you sure you want to delete this KFRE assessment?")
@@ -151,7 +216,7 @@ public class PatientDetailsFragment extends Fragment {
                             .delete()
                             .addOnSuccessListener(unused -> {
                                 Toast.makeText(getContext(), "Assessment deleted", Toast.LENGTH_SHORT).show();
-                                loadAssessments();
+                                loadKfreAssessments();
                             })
                             .addOnFailureListener(e ->
                                     Toast.makeText(getContext(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -261,7 +326,7 @@ public class PatientDetailsFragment extends Fragment {
                 });
     }
 
-    private void loadAssessments() {
+    private void loadKfreAssessments() {
         db.collection("KfreCalculations")
                 .whereEqualTo("patientId", patientId)
                 .get()
@@ -275,7 +340,25 @@ public class PatientDetailsFragment extends Fragment {
                     Collections.sort(list, (a, b) ->
                             Long.compare(a.getCreatedAt(), b.getCreatedAt()));
 
-                    adapter.updateData(list);
+                    kfreAdapter.updateData(list);
+                });
+    }
+
+    private void loadCkdEpiAssessments() {
+        db.collection("CkdEpiCalculations")
+                .whereEqualTo("patientId", patientId)
+                .get()
+                .addOnSuccessListener(query -> {
+                    List<CkdEpiCalculation> list = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : query) {
+                        CkdEpiCalculation calc = doc.toObject(CkdEpiCalculation.class);
+                        list.add(calc);
+                    }
+
+                    Collections.sort(list, (a, b) ->
+                            Long.compare(a.getCreatedAt(), b.getCreatedAt()));
+
+                    ckdEpiAdapter.updateData(list);
                 });
     }
 

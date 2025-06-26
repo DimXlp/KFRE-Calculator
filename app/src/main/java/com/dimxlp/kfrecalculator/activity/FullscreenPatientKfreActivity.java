@@ -151,7 +151,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
 
     private void showAssessmentDetails(KfreCalculation calc) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_assessment_details, null);
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_kfre_assessment_details, null);
 
         TextView txtAge = sheetView.findViewById(R.id.txtDetailAge);
         TextView txtGender = sheetView.findViewById(R.id.txtDetailGender);

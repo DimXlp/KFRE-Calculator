@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/white_rounded_background">
+
+    <TextView
+        android:id="@+id/titleDetailHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CKD-EPI Assessment Details"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Age -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Age"
+        style="@style/LabelStyle" />
+
+    <TextView
+        android:id="@+id/txtDetailAge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/ValueStyle"/>
+
+    <!-- Gender -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Gender"
+        style="@style/LabelStyle" />
+
+    <TextView
+        android:id="@+id/txtDetailGender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/ValueStyle"/>
+
+    <!-- Creatinine -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Serum Creatinine"
+        style="@style/LabelStyle" />
+
+    <TextView
+        android:id="@+id/txtDetailCreatinine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/ValueStyle"/>
+
+    <!-- eGFR Result -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="eGFR Result"
+        style="@style/LabelStyle" />
+
+    <TextView
+        android:id="@+id/txtDetailEgfr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/ValueStyle"/>
+
+    <!-- Notes -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Notes"
+        style="@style/LabelStyle" />
+
+    <TextView
+        android:id="@+id/txtDetailNotes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/ValueStyle"/>
+
+    <!-- Close Button -->
+    <Button
+        android:id="@+id/btnCloseDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Close"
+        style="@style/PrimaryButton"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
