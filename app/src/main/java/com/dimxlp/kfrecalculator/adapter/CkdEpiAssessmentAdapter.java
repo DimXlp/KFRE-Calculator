@@ -32,7 +32,7 @@ public class CkdEpiAssessmentAdapter extends RecyclerView.Adapter<CkdEpiAssessme
     private int lastSelectedPosition = RecyclerView.NO_POSITION;
 
 
-    public CkdEpiAssessmentAdapter(Context context, List<CkdEpiCalculation> items, AssessmentClickListener listener) { // Changed model
+    public CkdEpiAssessmentAdapter(Context context, List<CkdEpiCalculation> items, AssessmentClickListener listener) {
         this.context = context;
         this.items = items;
         this.listener = listener;
@@ -41,7 +41,6 @@ public class CkdEpiAssessmentAdapter extends RecyclerView.Adapter<CkdEpiAssessme
     @NonNull
     @Override
     public CkdEpiViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Changed layout file
         View view = LayoutInflater.from(context).inflate(R.layout.item_patient_ckd_epi_assessment, parent, false);
         return new CkdEpiViewHolder(view);
     }

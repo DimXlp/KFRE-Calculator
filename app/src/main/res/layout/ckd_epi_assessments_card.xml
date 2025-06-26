@@ -44,7 +44,7 @@
                 app:tint="@color/colorPrimary" />
 
             <ImageView
-                android:id="@+id/btnExpandCollapse"
+                android:id="@+id/btnCkdEpiExpandCollapse"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_expand_to_fullscreen"

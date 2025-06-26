@@ -30,7 +30,7 @@ import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.adapter.KfreAssessmentAdapter;
 import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.enumeration.SortDirection;
-import com.dimxlp.kfrecalculator.model.FilterOptions;
+import com.dimxlp.kfrecalculator.model.FilterOptionsKfre;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -51,7 +51,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     private KfreAssessmentAdapter adapter;
     private final List<KfreCalculation> unfilteredAssessments = new ArrayList<>();
     private static final String TAG = "RAFI|FullscreenPatientKfre";
-    private FilterOptions currentFilterOptions = new FilterOptions();
+    private FilterOptionsKfre currentFilterOptions = new FilterOptionsKfre();
     private boolean dataHasChanged = false;
 
     private static class FilterDialogViewHolder {
@@ -109,7 +109,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fullscreen_patient_kfre);
+        setContentView(R.layout.activity_fullscreen_patient_assessment);
 
         String patientId = getIntent().getStringExtra("patientId");
         Log.d(TAG, "patientId = " + patientId);
@@ -119,7 +119,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
             return;
         }
 
-        rvKfreAssessments = findViewById(R.id.rvKfreAssessments);
+        rvKfreAssessments = findViewById(R.id.rvAssessments);
         adapter = new KfreAssessmentAdapter(
                 this,
                 new ArrayList<>(),
@@ -136,6 +136,9 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
                 });
         rvKfreAssessments.setLayoutManager(new LinearLayoutManager(this));
         rvKfreAssessments.setAdapter(adapter);
+
+        TextView txtAssessmentTitle = findViewById(R.id.txtAssessmentTitle);
+        txtAssessmentTitle.setText("KFRE Assessments");
 
         ImageView btnCollapse = findViewById(R.id.btnExpandCollapse);
         btnCollapse.setOnClickListener(v -> finish());
@@ -217,7 +220,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         setupDatePicker(holder.etEndDate);
 
         holder.btnApply.setOnClickListener(v -> {
-            FilterOptions options = new FilterOptions();
+            FilterOptionsKfre options = new FilterOptionsKfre();
 
             // Read values from the holder's views
             sortByDate(holder.rgDateSort, options);
@@ -253,7 +256,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         dialog.show();
     }
 
-    private void populateFilterDialog(FilterDialogViewHolder holder, @NonNull FilterOptions options) {
+    private void populateFilterDialog(FilterDialogViewHolder holder, @NonNull FilterOptionsKfre options) {
         // 1. Date Sort
         if (options.getDateSort() != SortDirection.NONE) {
             if (options.getDateSort() == SortDirection.DESCENDING) holder.rgDateSort.check(R.id.rbDateNewest);
@@ -355,7 +358,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         chevron.setRotation(180);
     }
 
-    private void applyFilters(FilterOptions options) {
+    private void applyFilters(FilterOptionsKfre options) {
         List<KfreCalculation> result = new ArrayList<>();
 
         for (KfreCalculation calc : unfilteredAssessments) {
@@ -427,7 +430,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         });
     }
 
-    private static void setDateRange(EditText etStartDate, EditText etEndDate, FilterOptions options) {
+    private static void setDateRange(EditText etStartDate, EditText etEndDate, FilterOptionsKfre options) {
         options.setStartDate(parseDate(etStartDate.getText().toString()));
         options.setEndDate(parseDate(etEndDate.getText().toString()));
     }
@@ -441,7 +444,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         }
     }
 
-    private static void checkRiskCategory(RadioGroup rgRiskCategory, FilterOptions options) {
+    private static void checkRiskCategory(RadioGroup rgRiskCategory, FilterOptionsKfre options) {
         int selectedCategory = rgRiskCategory.getCheckedRadioButtonId();
         if (selectedCategory == R.id.rbRiskLow) {
             options.setRiskCategory(Risk.LOW);
@@ -452,11 +455,11 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         }
     }
 
-    private static void checkIfHasNote(CheckBox cbHasNote, FilterOptions options) {
+    private static void checkIfHasNote(CheckBox cbHasNote, FilterOptionsKfre options) {
         options.setHasNoteOnly(cbHasNote.isChecked());
     }
 
-    private static void sortBy5YearRisk(RadioGroup rgRisk5yrSort, FilterOptions options) {
+    private static void sortBy5YearRisk(RadioGroup rgRisk5yrSort, FilterOptionsKfre options) {
         int selectedRisk5 = rgRisk5yrSort.getCheckedRadioButtonId();
         if (selectedRisk5 == R.id.rbRisk5HighLow) {
             options.setRisk5YrSort(SortDirection.DESCENDING);
@@ -465,7 +468,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         }
     }
 
-    private static void sortBy2YearRisk(RadioGroup rgRisk2yrSort, FilterOptions options) {
+    private static void sortBy2YearRisk(RadioGroup rgRisk2yrSort, FilterOptionsKfre options) {
         int selectedRisk2 = rgRisk2yrSort.getCheckedRadioButtonId();
         if (selectedRisk2 == R.id.rbRisk2HighLow) {
             options.setRisk2YrSort(SortDirection.DESCENDING);
@@ -474,7 +477,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         }
     }
 
-    private static void sortByDate(RadioGroup rgDateSort, FilterOptions options) {
+    private static void sortByDate(RadioGroup rgDateSort, FilterOptionsKfre options) {
         int selectedDateSortId = rgDateSort.getCheckedRadioButtonId();
         if (selectedDateSortId == R.id.rbDateNewest) {
             options.setDateSort(SortDirection.DESCENDING);

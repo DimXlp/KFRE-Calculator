@@ -128,7 +128,7 @@ public class PatientKfreCalculatorFragment extends BaseKfreCalculatorFragment {
 
             requireActivity()
                     .getSupportFragmentManager()
-                    .setFragmentResult("reload_assessments", new Bundle());
+                    .setFragmentResult("reload_kfre_assessments", new Bundle());
 
         } catch (NumberFormatException e) {
             Toast.makeText(getContext(), "Invalid input fields", Toast.LENGTH_SHORT).show();

@@ -5,7 +5,7 @@ import com.dimxlp.kfrecalculator.enumeration.SortDirection;
 
 import java.util.Date;
 
-public class FilterOptions {
+public class FilterOptionsKfre {
 
     private SortDirection dateSort = SortDirection.NONE;
     private SortDirection risk2YrSort = SortDirection.NONE;

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.activity.FullscreenPatientCkdEpiActivity;
 import com.dimxlp.kfrecalculator.activity.FullscreenPatientKfreActivity;
 import com.dimxlp.kfrecalculator.adapter.CkdEpiAssessmentAdapter;
 import com.dimxlp.kfrecalculator.adapter.KfreAssessmentAdapter;
@@ -68,12 +69,24 @@ public class PatientDetailsFragment extends Fragment {
             }
     );
 
+    private final ActivityResultLauncher<Intent> fullscreenCkdEpiLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                // Check if the activity is returning an "OK" result code.
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    loadCkdEpiAssessments();
+                }
+            }
+    );
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getParentFragmentManager().setFragmentResultListener(
-                "reload_assessments", this, (key, bundle) -> loadKfreAssessments());
+                "reload_kfre_assessments", this, (key, bundle) -> loadKfreAssessments());
+        getParentFragmentManager().setFragmentResultListener(
+                "reload_ckd_epi_assessments", this, (key, bundle) -> loadCkdEpiAssessments());
         return inflater.inflate(R.layout.fragment_patient_details, container, false);
     }
 
@@ -129,7 +142,8 @@ public class PatientDetailsFragment extends Fragment {
             loadMedications();
             loadKfreAssessments();
             loadCkdEpiAssessments();
-            setupKfreCardToggle(v);
+            setupKfreCardExpansion(v);
+            setupCkdEpiCardExpansion(v);
         }
     }
 
@@ -235,7 +249,7 @@ public class PatientDetailsFragment extends Fragment {
                         String gender = snapshot.getString("gender");
                         String dob = snapshot.getString("birthDate");
                         String notes = snapshot.getString("notes");
-                        mapHistory(snapshot);
+                        mapMedicalHistory(snapshot);
 //                        Date updated = snapshot.getDate("lastUpdated");
 
                         nameView.setText(firstName + " " + lastName);
@@ -247,7 +261,7 @@ public class PatientDetailsFragment extends Fragment {
                 });
     }
 
-    private void mapHistory(DocumentSnapshot snapshot) {
+    private void mapMedicalHistory(DocumentSnapshot snapshot) {
         Object historyObject = snapshot.get("history");
 
         if (historyObject instanceof Map) {
@@ -266,11 +280,9 @@ public class PatientDetailsFragment extends Fragment {
                     if (details != null && !details.isEmpty()) {
                         display += " (" + details + ")";
                     }
-
                     selectedHistory.add(display);
                 }
             }
-
             populateChips(selectedHistory);
         }
     }
@@ -388,12 +400,25 @@ public class PatientDetailsFragment extends Fragment {
         }
     }
 
-    private void setupKfreCardToggle(View rootView) {
-        ImageView expandButton = rootView.findViewById(R.id.btnExpandCollapse);
+    private void setupKfreCardExpansion(View rootView) {
+        View kfreCard = rootView.findViewById(R.id.kfreAssessmentCard);
+        ImageView expandButton = kfreCard.findViewById(R.id.btnKfreExpandCollapse);
+
         expandButton.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), FullscreenPatientKfreActivity.class);
             intent.putExtra("patientId", patientId);
             fullscreenKfreLauncher.launch(intent);
+        });
+    }
+
+    private void setupCkdEpiCardExpansion(View rootView) {
+        View ckdEpiCard = rootView.findViewById(R.id.ckdEpiAssessmentCard);
+        ImageView expandButton = ckdEpiCard.findViewById(R.id.btnCkdEpiExpandCollapse);
+
+        expandButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), FullscreenPatientCkdEpiActivity.class);
+            intent.putExtra("patientId", patientId);
+            fullscreenCkdEpiLauncher.launch(intent);
         });
     }
 }

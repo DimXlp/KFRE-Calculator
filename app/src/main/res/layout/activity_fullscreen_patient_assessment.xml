@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fullscreenKfreRoot"
+    android:id="@+id/fullscreenAssessmentRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
@@ -13,19 +13,18 @@
         android:paddingTop="24dp"
         android:background="@android:color/white">
 
-        <!-- Header row with title, filter and chevron -->
         <RelativeLayout
-            android:id="@+id/kfreCardHeader"
+            android:id="@+id/assessmentCardHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:layout_marginHorizontal="16dp">
 
             <TextView
-                android:id="@+id/kfreTitle"
+                android:id="@+id/txtAssessmentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="KFRE Assessments"
+                android:text=""
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:textColor="@color/colorPrimary" />
@@ -37,7 +36,7 @@
                 android:src="@drawable/ic_collapse_from_fullscreen"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:contentDescription="Expand KFRE Assessments Card"
+                android:contentDescription="Collapse Card"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="6dp"
                 app:tint="@color/colorPrimary" />
@@ -53,7 +52,6 @@
                 android:layout_toStartOf="@id/btnExpandCollapse"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="8dp"/>
-
         </RelativeLayout>
 
         <View
@@ -62,9 +60,8 @@
             android:background="#DDDDDD"
             android:layout_marginTop="8dp" />
 
-        <!-- RecyclerView fixed height when collapsed -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvKfreAssessments"
+            android:id="@+id/rvAssessments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="true"

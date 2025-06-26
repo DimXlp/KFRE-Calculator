@@ -123,8 +123,7 @@ public class PatientCkdEpiCalculatorFragment extends BaseCkdEpiCalculatorFragmen
                     .addOnFailureListener(e ->
                             Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
-            // You might want to reload a list of assessments here, similar to the KFRE calculator
-            // requireActivity().getSupportFragmentManager().setFragmentResult("reload_assessments", new Bundle());
+            requireActivity().getSupportFragmentManager().setFragmentResult("reload_ckd_epi_assessments", new Bundle());
 
         } catch (NumberFormatException e) {
             Toast.makeText(getContext(), "Invalid input fields", Toast.LENGTH_SHORT).show();
