@@ -182,7 +182,10 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- KFRE Assessments -->
-        <include layout="@layout/expandable_kfre_assessments_card"/>
+        <include layout="@layout/kfre_assessments_card"/>
+
+        <!-- CKD-EPI Assessments -->
+        <include layout="@layout/ckd_epi_assessments_card"/>
 
     </LinearLayout>
 </ScrollView>
