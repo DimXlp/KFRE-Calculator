@@ -121,5 +121,15 @@
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimary" />
         </LinearLayout>
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Result"
+            style="@style/PrimaryButton"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

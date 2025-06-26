@@ -8,8 +8,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.dimxlp.kfrecalculator.R;
-import com.dimxlp.kfrecalculator.fragment.CkdEpiQuickCalculatorFragment;
-import com.dimxlp.kfrecalculator.fragment.KfreQuickCalculatorFragment;
+import com.dimxlp.kfrecalculator.fragment.QuickCkdEpiCalculatorFragment;
+import com.dimxlp.kfrecalculator.fragment.QuickKfreCalculatorFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -31,9 +31,9 @@ public class QuickCalculationActivity extends AppCompatActivity {
             @Override
             public Fragment createFragment(int position) {
                 if (position == 0)
-                    return new KfreQuickCalculatorFragment();
+                    return new QuickKfreCalculatorFragment();
                 else
-                    return new CkdEpiQuickCalculatorFragment();
+                    return new QuickCkdEpiCalculatorFragment();
             }
 
             @Override
