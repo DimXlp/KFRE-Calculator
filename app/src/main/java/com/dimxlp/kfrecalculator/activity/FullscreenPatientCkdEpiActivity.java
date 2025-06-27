@@ -90,12 +90,15 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_patient_assessment);
+        Log.d(TAG, "onCreate: Activity created.");
 
         String patientId = getIntent().getStringExtra("patientId");
         if (patientId == null) {
+            Log.e(TAG, "Patient ID is null. Finishing activity.");
             finish();
             return;
         }
+        Log.i(TAG, "Displaying fullscreen assessments for patientId: " + patientId);
 
         rvCkdEpiAssessments = findViewById(R.id.rvAssessments);
         adapter = new CkdEpiAssessmentAdapter(
@@ -124,6 +127,7 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
     }
 
     private void showAssessmentDetails(CkdEpiCalculation calc) {
+        Log.d(TAG, "showAssessmentDetails: Displaying details for CKD-EPI assessment created at " + new Date(calc.getCreatedAt()));
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_ckd_epi_assessment_details, null);
 
@@ -149,27 +153,33 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
     }
 
     private void confirmAndDeleteAssessment(CkdEpiCalculation calc) {
+        Log.d(TAG, "confirmAndDeleteAssessment: Showing confirmation dialog for CKD-EPI assessmentId: " + calc.getCkdEpiCalculationId());
         new AlertDialog.Builder(this)
                 .setTitle("Delete Assessment")
                 .setMessage("Are you sure you want to delete this CKD-EPI assessment?")
                 .setPositiveButton("Delete", (dialog, which) -> {
+                    Log.i(TAG, "User confirmed deletion for assessmentId: " + calc.getCkdEpiCalculationId());
                     FirebaseFirestore.getInstance()
                             .collection("CkdEpiCalculations")
                             .document(calc.getCkdEpiCalculationId())
                             .delete()
                             .addOnSuccessListener(unused -> {
+                                Log.d(TAG, "Successfully deleted assessment: " + calc.getCkdEpiCalculationId());
                                 Toast.makeText(this, "Assessment deleted", Toast.LENGTH_SHORT).show();
                                 dataHasChanged = true;
                                 loadCkdEpiAssessments(calc.getPatientId());
                             })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to delete assessment: " + calc.getCkdEpiCalculationId(), e);
+                                Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
     private void showFilterDialog() {
+        Log.d(TAG, "showFilterDialog: Displaying filter dialog.");
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_filter_ckd_epi, null);
         dialog.setContentView(view);
@@ -252,6 +262,7 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
     }
 
     private void applyFilters(FilterOptionsCkdEpi options) {
+        Log.d(TAG, "applyFilters: Applying filters. Unfiltered item count: " + unfilteredAssessments.size());
         List<CkdEpiCalculation> result = new ArrayList<>();
         for (CkdEpiCalculation calc : unfilteredAssessments) {
             if (options.isHasNoteOnly() && (calc.getNotes() == null || calc.getNotes().trim().isEmpty())) {
@@ -267,11 +278,13 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
         }
 
         if (options.getDateSort() != SortDirection.NONE) {
+            Log.d(TAG, "Sorting by date: " + options.getDateSort());
             result.sort((a, b) -> {
                 int cmp = Long.compare(a.getCreatedAt(), b.getCreatedAt());
                 return options.getDateSort() == SortDirection.ASCENDING ? cmp : -cmp;
             });
         } else if (options.getEgfrSort() != SortDirection.NONE) {
+            Log.d(TAG, "Sorting by eGFR: " + options.getEgfrSort());
             result.sort((a, b) -> {
                 int cmp = Double.compare(a.getResult(), b.getResult());
                 return options.getEgfrSort() == SortDirection.ASCENDING ? cmp : -cmp;
@@ -331,8 +344,12 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
 
     @Override
     public void finish() {
+        Log.d(TAG, "finish: Activity finishing.");
         if (dataHasChanged) {
+            Log.d(TAG, "finish: Data has changed, setting result to RESULT_OK.");
             setResult(Activity.RESULT_OK);
+        } else {
+            Log.d(TAG, "finish: Data has not changed, result will be RESULT_CANCELED.");
         }
         super.finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -374,6 +391,7 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
     }
 
     private void loadCkdEpiAssessments(@NonNull String patientId) {
+        Log.d(TAG, "loadCkdEpiAssessments: Loading assessments for patientId: " + patientId);
         FirebaseFirestore.getInstance()
                 .collection("CkdEpiCalculations")
                 .whereEqualTo("patientId", patientId)
@@ -383,10 +401,12 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : query) {
                         list.add(doc.toObject(CkdEpiCalculation.class));
                     }
+                    Log.i(TAG, "loadCkdEpiAssessments: Found " + list.size() + " assessments.");
                     Collections.sort(list, (a, b) -> Long.compare(a.getCreatedAt(), b.getCreatedAt()));
                     unfilteredAssessments.clear();
                     unfilteredAssessments.addAll(list);
                     adapter.updateData(unfilteredAssessments);
-                });
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "loadCkdEpiAssessments: Error loading assessments.", e));
     }
 }

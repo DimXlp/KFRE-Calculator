@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,7 @@ import java.util.Map;
 
 public class PatientDetailsFragment extends Fragment {
 
+    private static final String TAG = "RAFI|PatientDetailsFragment";
     private FirebaseFirestore db;
     private String patientId;
 
@@ -62,8 +64,9 @@ public class PatientDetailsFragment extends Fragment {
     private final ActivityResultLauncher<Intent> fullscreenKfreLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                // Check if the activity is returning an "OK" result code.
+                Log.d(TAG, "Received result from FullscreenPatientKfreActivity.");
                 if (result.getResultCode() == Activity.RESULT_OK) {
+                    Log.d(TAG, "Data has changed, reloading KFRE assessments.");
                     loadKfreAssessments();
                 }
             }
@@ -72,8 +75,9 @@ public class PatientDetailsFragment extends Fragment {
     private final ActivityResultLauncher<Intent> fullscreenCkdEpiLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                // Check if the activity is returning an "OK" result code.
+                Log.d(TAG, "Received result from FullscreenPatientCkdEpiActivity.");
                 if (result.getResultCode() == Activity.RESULT_OK) {
+                    Log.d(TAG, "Data has changed, reloading CKD-EPI assessments.");
                     loadCkdEpiAssessments();
                 }
             }
@@ -83,16 +87,24 @@ public class PatientDetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreateView called.");
         getParentFragmentManager().setFragmentResultListener(
-                "reload_kfre_assessments", this, (key, bundle) -> loadKfreAssessments());
+                "reload_kfre_assessments", this, (key, bundle) -> {
+                    Log.d(TAG, "Received fragment result to reload KFRE assessments.");
+                    loadKfreAssessments();
+                });
         getParentFragmentManager().setFragmentResultListener(
-                "reload_ckd_epi_assessments", this, (key, bundle) -> loadCkdEpiAssessments());
+                "reload_ckd_epi_assessments", this, (key, bundle) -> {
+                    Log.d(TAG, "Received fragment result to reload CKD-EPI assessments.");
+                    loadCkdEpiAssessments();
+                });
         return inflater.inflate(R.layout.fragment_patient_details, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
+        Log.d(TAG, "onViewCreated called.");
 
         // Get patientId from arguments
         patientId = getArguments() != null ? getArguments().getString("patientId") : null;
@@ -138,12 +150,15 @@ public class PatientDetailsFragment extends Fragment {
         rvCkdEpiAssessments.setAdapter(ckdEpiAdapter);
 
         if (patientId != null) {
+            Log.i(TAG, "Displaying details for patientId: " + patientId);
             loadPatientDetails();
             loadMedications();
             loadKfreAssessments();
             loadCkdEpiAssessments();
             setupKfreCardExpansion(v);
             setupCkdEpiCardExpansion(v);
+        } else {
+            Log.e(TAG, "Patient ID is null. Cannot load details.");
         }
     }
 
@@ -173,20 +188,25 @@ public class PatientDetailsFragment extends Fragment {
     }
 
     private void confirmAndDeleteCkdEpiAssessment(CkdEpiCalculation calc) {
+        Log.d(TAG, "Showing delete confirmation for CKD-EPI assessment: " + calc.getCkdEpiCalculationId());
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete Assessment")
                 .setMessage("Are you sure you want to delete this CKD-EPI assessment?")
                 .setPositiveButton("Delete", (dialog, which) -> {
+                    Log.i(TAG, "Deleting CKD-EPI assessment: " + calc.getCkdEpiCalculationId());
                     FirebaseFirestore.getInstance()
                             .collection("CkdEpiCalculations")
                             .document(calc.getCkdEpiCalculationId())
                             .delete()
                             .addOnSuccessListener(unused -> {
+                                Log.d(TAG, "Successfully deleted CKD-EPI assessment.");
                                 Toast.makeText(getContext(), "Assessment deleted", Toast.LENGTH_SHORT).show();
                                 loadCkdEpiAssessments();
                             })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(getContext(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to delete CKD-EPI assessment: " + calc.getCkdEpiCalculationId(), e);
+                                Toast.makeText(getContext(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -220,30 +240,37 @@ public class PatientDetailsFragment extends Fragment {
     }
 
     private void confirmAndDeleteKfreAssessment(KfreCalculation calc) {
+        Log.d(TAG, "Showing delete confirmation for KFRE assessment: " + calc.getKfreCalculationId());
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete Assessment")
                 .setMessage("Are you sure you want to delete this KFRE assessment?")
                 .setPositiveButton("Delete", (dialog, which) -> {
+                    Log.i(TAG, "Deleting KFRE assessment: " + calc.getKfreCalculationId());
                     FirebaseFirestore.getInstance()
                             .collection("KfreCalculations")
                             .document(calc.getKfreCalculationId())
                             .delete()
                             .addOnSuccessListener(unused -> {
+                                Log.d(TAG, "Successfully deleted KFRE assessment.");
                                 Toast.makeText(getContext(), "Assessment deleted", Toast.LENGTH_SHORT).show();
                                 loadKfreAssessments();
                             })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(getContext(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to delete KFRE assessment: " + calc.getKfreCalculationId(), e);
+                                Toast.makeText(getContext(), "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
     private void loadPatientDetails() {
+        Log.d(TAG, "Loading patient details...");
         db.collection("Patients").document(patientId)
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
+                        Log.d(TAG, "Patient details found.");
                         String firstName = snapshot.getString("firstName");
                         String lastName = snapshot.getString("lastName");
                         String gender = snapshot.getString("gender");
@@ -257,8 +284,11 @@ public class PatientDetailsFragment extends Fragment {
                         dobView.setText("Date of Birth: " + dob);
 //                        lastUpdatedView.setText("Last updated: " + formatDate(updated));
                         notesView.setText(notes != null ? notes : "No notes available");
+                    } else {
+                        Log.w(TAG, "Patient document not found for id: " + patientId);
                     }
-                });
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error loading patient details.", e));
     }
 
     private void mapMedicalHistory(DocumentSnapshot snapshot) {
@@ -303,8 +333,8 @@ public class PatientDetailsFragment extends Fragment {
     }
 
     private void loadMedications() {
+        Log.d(TAG, "Loading medications...");
         medicationsContainer.removeAllViews();
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("MedicationAssignments")
@@ -339,6 +369,7 @@ public class PatientDetailsFragment extends Fragment {
     }
 
     private void loadKfreAssessments() {
+        Log.d(TAG, "Loading KFRE assessments...");
         db.collection("KfreCalculations")
                 .whereEqualTo("patientId", patientId)
                 .get()
@@ -348,15 +379,18 @@ public class PatientDetailsFragment extends Fragment {
                         KfreCalculation calc = doc.toObject(KfreCalculation.class);
                         list.add(calc);
                     }
+                    Log.d(TAG, "Found " + list.size() + " KFRE assessments.");
 
                     Collections.sort(list, (a, b) ->
                             Long.compare(a.getCreatedAt(), b.getCreatedAt()));
 
                     kfreAdapter.updateData(list);
-                });
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error loading KFRE assessments.", e));
     }
 
     private void loadCkdEpiAssessments() {
+        Log.d(TAG, "Loading CKD-EPI assessments...");
         db.collection("CkdEpiCalculations")
                 .whereEqualTo("patientId", patientId)
                 .get()
@@ -366,12 +400,14 @@ public class PatientDetailsFragment extends Fragment {
                         CkdEpiCalculation calc = doc.toObject(CkdEpiCalculation.class);
                         list.add(calc);
                     }
+                    Log.d(TAG, "Found " + list.size() + " CKD-EPI assessments.");
 
                     Collections.sort(list, (a, b) ->
                             Long.compare(a.getCreatedAt(), b.getCreatedAt()));
 
                     ckdEpiAdapter.updateData(list);
-                });
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error loading CKD-EPI assessments.", e));
     }
 
     private String getAgeFromDob(String dobString) {
@@ -395,6 +431,7 @@ public class PatientDetailsFragment extends Fragment {
 
             return String.valueOf(age);
         } catch (Exception e) {
+            Log.e(TAG, "Failed to parse DOB string: " + dobString, e);
             e.printStackTrace();
             return "-";
         }
@@ -405,6 +442,7 @@ public class PatientDetailsFragment extends Fragment {
         ImageView expandButton = kfreCard.findViewById(R.id.btnKfreExpandCollapse);
 
         expandButton.setOnClickListener(v -> {
+            Log.d(TAG, "KFRE card expand button clicked. Launching fullscreen activity.");
             Intent intent = new Intent(getContext(), FullscreenPatientKfreActivity.class);
             intent.putExtra("patientId", patientId);
             fullscreenKfreLauncher.launch(intent);
@@ -416,6 +454,7 @@ public class PatientDetailsFragment extends Fragment {
         ImageView expandButton = ckdEpiCard.findViewById(R.id.btnCkdEpiExpandCollapse);
 
         expandButton.setOnClickListener(v -> {
+            Log.d(TAG, "CKD-EPI card expand button clicked. Launching fullscreen activity.");
             Intent intent = new Intent(getContext(), FullscreenPatientCkdEpiActivity.class);
             intent.putExtra("patientId", patientId);
             fullscreenCkdEpiLauncher.launch(intent);

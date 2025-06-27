@@ -1,6 +1,7 @@
 package com.dimxlp.kfrecalculator.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +18,12 @@ public class QuickKfreCalculatorFragment extends BaseKfreCalculatorFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: Creating quick KFRE calculator view.");
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
         // Do not show Save button in quick calculator
         if (view != null) {
+            Log.d(TAG, "onCreateView: Hiding save button.");
             view.findViewById(R.id.btnSave).setVisibility(View.GONE);
         }
 

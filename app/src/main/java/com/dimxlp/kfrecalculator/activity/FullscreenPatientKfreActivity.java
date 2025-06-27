@@ -110,11 +110,11 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_patient_assessment);
+        Log.d(TAG, "onCreate: Activity created.");
 
         String patientId = getIntent().getStringExtra("patientId");
-        Log.d(TAG, "patientId = " + patientId);
         if (patientId == null) {
-            Log.e(TAG, "No patient ID passed. Exiting.");
+            Log.e(TAG, "onCreate: Patient ID is null. Finishing activity.");
             finish();
             return;
         }
@@ -146,6 +146,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         ImageView btnFilter = findViewById(R.id.btnFilter);
         btnFilter.setVisibility(View.VISIBLE);
         btnFilter.setOnClickListener(v -> {
+            Log.d(TAG, "Filter button clicked.");
             showFilterDialog();
         });
 
@@ -153,6 +154,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     }
 
     private void showAssessmentDetails(KfreCalculation calc) {
+        Log.d(TAG, "showAssessmentDetails: Displaying details for KFRE assessmentId: " + calc.getKfreCalculationId());
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_kfre_assessment_details, null);
 
@@ -180,27 +182,33 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     }
 
     private void confirmAndDeleteAssessment(KfreCalculation calc) {
+        Log.d(TAG, "confirmAndDeleteAssessment: Showing confirmation for assessmentId: " + calc.getKfreCalculationId());
         new AlertDialog.Builder(this)
                 .setTitle("Delete Assessment")
                 .setMessage("Are you sure you want to delete this KFRE assessment?")
                 .setPositiveButton("Delete", (dialog, which) -> {
+                    Log.i(TAG, "User confirmed deletion for assessmentId: " + calc.getKfreCalculationId());
                     FirebaseFirestore.getInstance()
                             .collection("KfreCalculations")
                             .document(calc.getKfreCalculationId())
                             .delete()
                             .addOnSuccessListener(unused -> {
+                                Log.d(TAG, "Successfully deleted assessment: " + calc.getKfreCalculationId());
                                 Toast.makeText(this, "Assessment deleted", Toast.LENGTH_SHORT).show();
                                 dataHasChanged = true;
                                 loadKfreAssessments(calc.getPatientId());
                             })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to delete assessment: " + calc.getKfreCalculationId(), e);
+                                Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
     private void showFilterDialog() {
+        Log.d(TAG, "showFilterDialog: Displaying filter dialog.");
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_filter_kfre, null);
         dialog.setContentView(view);
@@ -359,6 +367,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     }
 
     private void applyFilters(FilterOptionsKfre options) {
+        Log.d(TAG, "applyFilters: Applying filters. Unfiltered item count: " + unfilteredAssessments.size());
         List<KfreCalculation> result = new ArrayList<>();
 
         for (KfreCalculation calc : unfilteredAssessments) {
@@ -389,23 +398,26 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
 
         // Sorting
         if (options.getDateSort() != SortDirection.NONE) {
+            Log.d(TAG, "Sorting by date: " + options.getDateSort());
             result.sort((a, b) -> {
                 int cmp = Long.compare(a.getCreatedAt(), b.getCreatedAt());
                 return options.getDateSort() == SortDirection.ASCENDING ? cmp : -cmp;
             });
         } else if (options.getRisk2YrSort() != SortDirection.NONE) {
+            Log.d(TAG, "Sorting by 2-Year Risk: " + options.getRisk2YrSort());
             result.sort((a, b) -> {
                 int cmp = Double.compare(a.getRisk2Yr(), b.getRisk2Yr());
                 return options.getRisk2YrSort() == SortDirection.ASCENDING ? cmp : -cmp;
             });
         } else if (options.getRisk5YrSort() != SortDirection.NONE) {
+            Log.d(TAG, "Sorting by 5-Year Risk: " + options.getRisk5YrSort());
             result.sort((a, b) -> {
                 int cmp = Double.compare(a.getRisk5Yr(), b.getRisk5Yr());
                 return options.getRisk5YrSort() == SortDirection.ASCENDING ? cmp : -cmp;
             });
         }
 
-        // Update RecyclerView
+        Log.d(TAG, "Filtering complete. Filtered item count: " + result.size());
         adapter.updateData(result);
     }
 
@@ -440,6 +452,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         try {
             return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(text);
         } catch (ParseException e) {
+            Log.e(TAG, "parseDate: Failed to parse date string: " + text, e);
             return null;
         }
     }
@@ -488,9 +501,12 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
 
     @Override
     public void finish() {
-        // Before finishing, check if data has changed and set a result if it has.
+        Log.d(TAG, "finish: Activity finishing.");
         if (dataHasChanged) {
+            Log.d(TAG, "finish: Data has changed, setting result to RESULT_OK.");
             setResult(Activity.RESULT_OK);
+        } else {
+            Log.d(TAG, "finish: Data has not changed, result will be RESULT_CANCELED.");
         }
         super.finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -553,6 +569,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
     }
 
     private void loadKfreAssessments(@NonNull String patientId) {
+        Log.d(TAG, "loadKfreAssessments: Loading assessments for patientId: " + patientId);
         FirebaseFirestore.getInstance()
                 .collection("KfreCalculations")
                 .whereEqualTo("patientId", patientId)
@@ -563,6 +580,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
                         KfreCalculation calc = doc.toObject(KfreCalculation.class);
                         list.add(calc);
                     }
+                    Log.i(TAG, "loadKfreAssessments: Found " + list.size() + " assessments.");
 
                     // Sort the list by date ascending (oldest to newest)
                     Collections.sort(list, (a, b) ->
@@ -574,6 +592,7 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
 
                     // Update the adapter with the sorted, complete list
                     adapter.updateData(unfilteredAssessments);
-                });
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "loadKfreAssessments: Error loading assessments.", e));
     }
 }
