@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/white_gradient_background"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".PatientDetailsFragment">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="32dp"
-        android:divider="?android:attr/dividerHorizontal"
-        android:showDividers="middle"
-        android:dividerPadding="16dp">
+        android:paddingBottom="32dp">
 
-        <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +22,6 @@
             android:textColor="@color/colorPrimary"
             android:layout_marginBottom="12dp" />
 
-        <!-- Patient Info Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,18 +61,34 @@
                     style="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="@color/textSecondary" />
 
-                <TextView
-                    android:id="@+id/patientDetailLastUpdated"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Last updated: May 2025"
-                    style="@style/TextAppearance.Material3.LabelSmall"
-                    android:textColor="@color/textSecondary"
-                    android:layout_marginTop="4dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp">
+
+                    <ImageView
+                        android:id="@+id/patientDetailRiskIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_risk"
+                        android:background="@color/colorHighRiskStat"
+                        android:contentDescription="Patient Risk Level" />
+
+                    <TextView
+                        android:id="@+id/patientDetailRiskText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="High Risk"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorHighRiskStat"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Medical History -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -88,7 +101,8 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp">
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -98,7 +112,7 @@
                     android:layout_marginHorizontal="16dp">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Medical History"
@@ -111,7 +125,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#DDDDDD"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"/>
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/historyChips"
@@ -119,7 +134,6 @@
                     android:layout_height="wrap_content"
                     app:singleLine="false"
                     app:chipSpacing="8dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginHorizontal="16dp"/>
 
                 <TextView
@@ -129,12 +143,11 @@
                     android:text="No significant notes"
                     style="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="@color/textSecondary"
-                    android:layout_marginVertical="8dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginHorizontal="16dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Medications -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -147,7 +160,8 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp">
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -176,15 +190,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginVertical="8dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginHorizontal="16dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- KFRE Assessments -->
         <include layout="@layout/kfre_assessments_card"/>
 
-        <!-- CKD-EPI Assessments -->
         <include layout="@layout/ckd_epi_assessments_card"/>
 
     </LinearLayout>

@@ -3,6 +3,7 @@ package com.dimxlp.kfrecalculator.fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,6 +55,8 @@ public class PatientDetailsFragment extends Fragment {
 
     // Views
     private TextView nameView, ageGenderView, dobView, lastUpdatedView, notesView;
+    private ImageView riskIconView;
+    private TextView riskTextView;
     private ChipGroup historyChips;
     private LinearLayout medicationsContainer;
     private RecyclerView rvKfreAssessments;
@@ -114,8 +117,9 @@ public class PatientDetailsFragment extends Fragment {
         nameView = v.findViewById(R.id.patientDetailName);
         ageGenderView = v.findViewById(R.id.patientDetailAgeGender);
         dobView = v.findViewById(R.id.patientDetailDob);
-        lastUpdatedView = v.findViewById(R.id.patientDetailLastUpdated);
         notesView = v.findViewById(R.id.patientNotes);
+        riskIconView = v.findViewById(R.id.patientDetailRiskIcon);
+        riskTextView = v.findViewById(R.id.patientDetailRiskText);
         historyChips = v.findViewById(R.id.historyChips);
         medicationsContainer = v.findViewById(R.id.medicationsContainer);
         rvKfreAssessments = v.findViewById(R.id.rvKfreAssessments);
@@ -381,12 +385,66 @@ public class PatientDetailsFragment extends Fragment {
                     }
                     Log.d(TAG, "Found " + list.size() + " KFRE assessments.");
 
-                    Collections.sort(list, (a, b) ->
-                            Long.compare(a.getCreatedAt(), b.getCreatedAt()));
+                    if (!list.isEmpty()) {
+                        Collections.sort(list, (a, b) ->
+                                Long.compare(b.getCreatedAt(), a.getCreatedAt()));
 
-                    kfreAdapter.updateData(list);
+                        kfreAdapter.updateData(list);
+
+                        KfreCalculation latestAssessment = list.get(0);
+                        updateRiskIndicator(latestAssessment.getRisk2Yr());
+                    } else {
+                        setNoRiskDataState();
+                        kfreAdapter.updateData(new ArrayList<>());
+                    }
                 })
-                .addOnFailureListener(e -> Log.e(TAG, "Error loading KFRE assessments.", e));
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error loading KFRE assessments.", e);
+                    setNoRiskDataState();
+                });
+    }
+
+    private void updateRiskIndicator(double risk2Yr) {
+        if (getContext() == null) return; // Ensure fragment is still attached
+
+        int riskColor;
+        String riskText;
+        int iconResId;
+
+        if (risk2Yr >= 40) {
+            riskText = "High Risk";
+            riskColor = ContextCompat.getColor(getContext(), R.color.colorHighRiskStat);
+            iconResId = R.drawable.ic_risk;
+        } else if (risk2Yr >= 10) {
+            riskText = "Medium Risk";
+            riskColor = ContextCompat.getColor(getContext(), R.color.colorMediumRiskStat);
+            iconResId = R.drawable.ic_medium;
+        } else {
+            riskText = "Low Risk";
+            riskColor = ContextCompat.getColor(getContext(), R.color.colorLowRiskStat);
+            iconResId = R.drawable.ic_tick;
+        }
+
+        riskTextView.setText(riskText);
+        riskTextView.setTextColor(riskColor);
+        riskIconView.setImageResource(iconResId);
+        riskIconView.setBackgroundTintList(ColorStateList.valueOf(riskColor));
+
+        riskIconView.setVisibility(View.VISIBLE);
+        riskTextView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Sets the risk indicator to a default "No Data" state.
+     */
+    private void setNoRiskDataState() {
+        if (getContext() == null) return; // Ensure fragment is still attached
+
+        int defaultColor = ContextCompat.getColor(getContext(), R.color.colorRecentLast);
+        riskTextView.setText("N/A");
+        riskTextView.setTextColor(defaultColor);
+        riskIconView.setImageResource(R.drawable.ic_question);
+        riskIconView.setBackgroundTintList(ColorStateList.valueOf(defaultColor));
     }
 
     private void loadCkdEpiAssessments() {
