@@ -228,16 +228,41 @@ public class DashboardActivity extends AppCompatActivity {
                         }
 
                         setVisibilityBasedOnRole(role);
-                        setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
 
                         if (role == Role.DOCTOR) {
-                            setupDoctorQuickStats(generateDummyRecentPatients());
+                            loadPatientData();
+                            setupRecyclerViews();
+                            setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
                         } else {
                             setupIndividualQuickStats(generateDummyCalculations());
+                            setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
                         }
                     }
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to load user info", e));
+    }
+
+    private void loadPatientData() {
+        if (currentUser == null) return;
+
+        db.collection("Patients")
+                .whereEqualTo("userId", currentUser.getUid())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int totalPatientCount = queryDocumentSnapshots.size();
+                    totalDoctor.setText(String.valueOf(totalPatientCount));
+                    Log.d(TAG, "Successfully loaded patient count: " + totalPatientCount);
+
+                    if (totalPatientCount == 0) {
+                        highRiskDoctor.setText("0");
+                        return;
+                    }
+
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error loading patient data", e);
+                    totalDoctor.setText("0");
+                });
     }
 
     private void setupDoctorQuickStats(List<Patient> patients) {
