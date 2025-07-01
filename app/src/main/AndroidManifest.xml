@@ -31,7 +31,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".activity.QuickCalculationActivity"
+            android:name=".activity.MainQuickCalculationActivity"
             android:exported="false" />
 
         <activity
@@ -61,6 +61,10 @@
         <activity
             android:name=".activity.FullscreenPatientCkdEpiActivity"
             android:theme="@style/Theme.KfreCalculator.Fullscreen" />
+
+        <activity
+            android:name=".activity.DashboardQuickCalculationActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

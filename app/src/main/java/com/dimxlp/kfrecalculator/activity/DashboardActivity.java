@@ -148,7 +148,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         quickCalcBtn.setOnClickListener(v -> {
             Log.d(TAG, "Quick Calc clicked");
-            Toast.makeText(this, "Quick Calculator coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardActivity.this, DashboardQuickCalculationActivity.class);
+            startActivity(intent);
         });
 
         viewAllPatientsBtn.setOnClickListener(v -> {

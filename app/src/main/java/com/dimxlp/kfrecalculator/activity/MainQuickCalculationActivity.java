@@ -13,7 +13,7 @@ import com.dimxlp.kfrecalculator.fragment.QuickKfreCalculatorFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class QuickCalculationActivity extends AppCompatActivity {
+public class MainQuickCalculationActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
