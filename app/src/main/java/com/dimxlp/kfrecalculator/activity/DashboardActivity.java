@@ -10,6 +10,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -25,6 +26,7 @@ import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -37,12 +39,15 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -249,20 +254,61 @@ public class DashboardActivity extends AppCompatActivity {
                 .whereEqualTo("userId", currentUser.getUid())
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int totalPatientCount = queryDocumentSnapshots.size();
-                    totalDoctor.setText(String.valueOf(totalPatientCount));
-                    Log.d(TAG, "Successfully loaded patient count: " + totalPatientCount);
+                    Integer totalPatientCount = calculateTotalPatients(queryDocumentSnapshots);
+                    if (totalPatientCount == null) return;
 
-                    if (totalPatientCount == 0) {
-                        highRiskDoctor.setText("0");
-                        return;
-                    }
-
+                    calculateHighRiskPatients(queryDocumentSnapshots, totalPatientCount);
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error loading patient data", e);
                     totalDoctor.setText("0");
                 });
+    }
+
+    private void calculateHighRiskPatients(QuerySnapshot queryDocumentSnapshots, Integer totalPatientCount) {
+        final AtomicInteger highRiskCount = new AtomicInteger(0);
+        final AtomicInteger patientsProcessed = new AtomicInteger(0);
+
+        for (DocumentSnapshot patientDoc : queryDocumentSnapshots.getDocuments()) {
+            String patientId = patientDoc.getId();
+            db.collection("KfreCalculations")
+                    .whereEqualTo("patientId", patientId)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(calcSnapshots -> {
+                        if (!calcSnapshots.isEmpty()) {
+                            KfreCalculation latestCalc = calcSnapshots.getDocuments().get(0).toObject(KfreCalculation.class);
+
+                            if (latestCalc != null && latestCalc.getRisk2Yr() >= 40) {
+                                highRiskCount.incrementAndGet();
+                            }
+                        }
+                        if (patientsProcessed.incrementAndGet() == totalPatientCount) {
+                            Log.d(TAG, "High-risk patient count: " + highRiskCount.get());
+                            highRiskDoctor.setText(String.valueOf(highRiskCount.get()));
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error fetching calculation for patient: " + patientId, e);
+                        if (patientsProcessed.incrementAndGet() == totalPatientCount) {
+                            highRiskDoctor.setText(String.valueOf(highRiskCount.get()));
+                        }
+                    });
+        }
+    }
+
+    @Nullable
+    private Integer calculateTotalPatients(QuerySnapshot queryDocumentSnapshots) {
+        int totalPatientCount = queryDocumentSnapshots.size();
+        totalDoctor.setText(String.valueOf(totalPatientCount));
+        Log.d(TAG, "Successfully loaded patient count: " + totalPatientCount);
+
+        if (totalPatientCount == 0) {
+            highRiskDoctor.setText("0");
+            return null;
+        }
+        return totalPatientCount;
     }
 
     private void setupDoctorQuickStats(List<Patient> patients) {
