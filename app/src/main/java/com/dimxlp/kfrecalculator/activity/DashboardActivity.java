@@ -257,12 +257,32 @@ public class DashboardActivity extends AppCompatActivity {
                     Integer totalPatientCount = calculateTotalPatients(queryDocumentSnapshots);
                     if (totalPatientCount == null) return;
 
+                    calculateRecentPatients(queryDocumentSnapshots);
+
                     calculateHighRiskPatients(queryDocumentSnapshots, totalPatientCount);
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error loading patient data", e);
                     totalDoctor.setText("0");
                 });
+    }
+
+    private void calculateRecentPatients(QuerySnapshot patientSnapshots) {
+        // Define "recent" as within the last 30 days
+        long thirtyDaysInMillis = 30L * 24 * 60 * 60 * 1000;
+        long recentThreshold = System.currentTimeMillis() - thirtyDaysInMillis;
+
+        long recentCount = 0;
+        for (DocumentSnapshot doc : patientSnapshots.getDocuments()) {
+            com.google.firebase.Timestamp createdAtTimestamp = doc.getTimestamp("createdAt");
+            if (createdAtTimestamp != null) {
+                if (createdAtTimestamp.toDate().getTime() >= recentThreshold) {
+                    recentCount++;
+                }
+            }
+        }
+        recentDoctor.setText(String.valueOf(recentCount));
+        Log.d(TAG, "Recent patient count: " + recentCount);
     }
 
     private void calculateHighRiskPatients(QuerySnapshot queryDocumentSnapshots, Integer totalPatientCount) {
@@ -306,6 +326,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (totalPatientCount == 0) {
             highRiskDoctor.setText("0");
+            recentDoctor.setText("0");
             return null;
         }
         return totalPatientCount;

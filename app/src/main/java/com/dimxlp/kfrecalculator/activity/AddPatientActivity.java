@@ -27,6 +27,7 @@ import com.dimxlp.kfrecalculator.model.MedicationAssignment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -272,6 +273,7 @@ public class AddPatientActivity extends AppCompatActivity implements MedicationP
         patient.put("active", true);
         patient.put("userId", auth.getCurrentUser().getUid());
         patient.put("history", historyMap);
+        patient.put("createdAt", FieldValue.serverTimestamp());
 
         db.collection("Patients")
                 .add(patient)
