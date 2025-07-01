@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.adapter.PatientAdapter;
 import com.dimxlp.kfrecalculator.enumeration.Risk;
+import com.dimxlp.kfrecalculator.enumeration.SortDirection;
 import com.dimxlp.kfrecalculator.model.FilterOptionsPatient;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
@@ -181,6 +182,16 @@ public class PatientListActivity extends AppCompatActivity {
                 .filter(this::matchesSearchQuery)
                 .collect(Collectors.toList());
 
+        SortDirection sort = currentFilterOptions.getDateSort();
+
+        if (sort != SortDirection.NONE) {
+            newlyFilteredList.sort((p1, p2) -> {
+                int comparison = p1.getCreatedAt().compareTo(p2.getCreatedAt());
+                // if ascending, return original comparison. if descending, reverse it.
+                return sort == SortDirection.ASCENDING ? comparison : -comparison;
+            });
+        }
+
         filteredPatients.clear();
         filteredPatients.addAll(newlyFilteredList);
 
@@ -249,6 +260,7 @@ public class PatientListActivity extends AppCompatActivity {
 
         final DialogViewHolder holder = new DialogViewHolder(view);
 
+        AnimationUtils.setupExpandableGroup(holder.headerDateSort, holder.contentDateSort, "Sort by Date");
         AnimationUtils.setupExpandableGroup(holder.headerStatus, holder.contentStatus, "Status");
         AnimationUtils.setupExpandableGroup(holder.headerRisk, holder.contentRisk, "Risk Category");
         AnimationUtils.setupExpandableGroup(holder.headerGender, holder.contentGender, "Gender");
@@ -272,6 +284,21 @@ public class PatientListActivity extends AppCompatActivity {
     }
 
     private void populateDialogFromOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatient options) {
+        // Date Sort
+        if (options.getDateSort() != SortDirection.NONE) {
+            holder.rgDateSort.check(options.getDateSort() == SortDirection.DESCENDING ? R.id.rbDateNewest : R.id.rbDateOldest);
+            expandSection(holder.contentDateSort, holder.ivChevronDateSort);
+            holder.ivClearDateSort.setVisibility(View.VISIBLE);
+            holder.ivClearDateSort.setOnClickListener(v -> {
+                options.setDateSort(SortDirection.NONE);
+                holder.rgDateSort.clearCheck();
+                v.setVisibility(View.GONE);
+            });
+        } else {
+            holder.rgDateSort.clearCheck();
+            holder.ivClearDateSort.setVisibility(View.GONE);
+        }
+
         // Status
         if (options.getStatusIsActive() != null) {
             holder.rgStatus.check(options.getStatusIsActive() ? R.id.rbStatusActive : R.id.rbStatusInactive);
@@ -344,6 +371,12 @@ public class PatientListActivity extends AppCompatActivity {
     }
 
     private void readOptionsFromDialog(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatient options) {
+        // Date Sort
+        int dateSortId = holder.rgDateSort.getCheckedRadioButtonId();
+        if (dateSortId == R.id.rbDateNewest) options.setDateSort(SortDirection.DESCENDING);
+        else if (dateSortId == R.id.rbDateOldest) options.setDateSort(SortDirection.ASCENDING);
+        else options.setDateSort(SortDirection.NONE);
+
         // Status
         int statusId = holder.rgStatus.getCheckedRadioButtonId();
         if (statusId == R.id.rbStatusActive) options.setStatusIsActive(true);
@@ -384,6 +417,8 @@ public class PatientListActivity extends AppCompatActivity {
                     this.allPatients = patientSnapshot.getDocuments().stream()
                             .map(doc -> doc.toObject(Patient.class))
                             .collect(Collectors.toList());
+
+                    this.allPatients.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
 
                     Log.i(TAG, "Step 1 complete: Found " + this.allPatients.size() + " patients.");
 
@@ -454,35 +489,40 @@ public class PatientListActivity extends AppCompatActivity {
     }
 
     private static class DialogViewHolder {
-        final View headerStatus, headerRisk, headerGender, headerAge;
-        final LinearLayout contentStatus, contentRisk, contentGender, contentAge;
-        final ImageView ivChevronStatus, ivChevronRisk, ivChevronGender, ivChevronAge;
-        final ImageView ivClearStatus, ivClearRisk, ivClearGender, ivClearAge;
-        final RadioGroup rgStatus, rgRisk, rgGender;
+        final View headerDateSort, headerStatus, headerRisk, headerGender, headerAge;
+        final LinearLayout contentDateSort, contentStatus, contentRisk, contentGender, contentAge;
+        final ImageView ivChevronDateSort, ivChevronStatus, ivChevronRisk, ivChevronGender, ivChevronAge;
+        final ImageView ivClearDateSort, ivClearStatus, ivClearRisk, ivClearGender, ivClearAge;
+        final RadioGroup rgDateSort, rgStatus, rgRisk, rgGender;
         final RangeSlider ageSlider;
         final Button btnApply, btnClear;
 
         DialogViewHolder(View view) {
+            headerDateSort = view.findViewById(R.id.headerDateSort);
             headerStatus = view.findViewById(R.id.headerStatus);
             headerRisk = view.findViewById(R.id.headerRiskCategory);
             headerGender = view.findViewById(R.id.headerGender);
             headerAge = view.findViewById(R.id.headerAgeRange);
 
+            contentDateSort = view.findViewById(R.id.contentDateSort);
             contentStatus = view.findViewById(R.id.contentStatus);
             contentRisk = view.findViewById(R.id.contentRiskCategory);
             contentGender = view.findViewById(R.id.contentGender);
             contentAge = view.findViewById(R.id.contentAgeRange);
 
+            ivChevronDateSort = headerDateSort.findViewById(R.id.ivChevron);
             ivChevronStatus = headerStatus.findViewById(R.id.ivChevron);
             ivChevronRisk = headerRisk.findViewById(R.id.ivChevron);
             ivChevronGender = headerGender.findViewById(R.id.ivChevron);
             ivChevronAge = headerAge.findViewById(R.id.ivChevron);
 
+            ivClearDateSort = headerDateSort.findViewById(R.id.ivClearCategory);
             ivClearStatus = headerStatus.findViewById(R.id.ivClearCategory);
             ivClearRisk = headerRisk.findViewById(R.id.ivClearCategory);
             ivClearGender = headerGender.findViewById(R.id.ivClearCategory);
             ivClearAge = headerAge.findViewById(R.id.ivClearCategory);
 
+            rgDateSort = view.findViewById(R.id.rgDateSort);
             rgStatus = view.findViewById(R.id.rgStatus);
             rgRisk = view.findViewById(R.id.rgRiskCategory);
             rgGender = view.findViewById(R.id.rgGender);

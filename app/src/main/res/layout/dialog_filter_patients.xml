@@ -12,6 +12,33 @@
         android:orientation="vertical">
 
         <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerDateSort" />
+        <LinearLayout
+            android:id="@+id/contentDateSort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+            <RadioGroup
+                android:id="@+id/rgDateSort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/rbDateNewest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Newest to Oldest" />
+                <RadioButton
+                    android:id="@+id/rbDateOldest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Oldest to Newest" />
+            </RadioGroup>
+        </LinearLayout>
+
+
+        <include layout="@layout/item_filter_group_header"
             android:id="@+id/headerStatus" />
         <LinearLayout
             android:id="@+id/contentStatus"

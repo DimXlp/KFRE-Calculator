@@ -1,9 +1,11 @@
 package com.dimxlp.kfrecalculator.model;
 
 import com.dimxlp.kfrecalculator.enumeration.Risk;
+import com.dimxlp.kfrecalculator.enumeration.SortDirection;
 
 public class FilterOptionsPatient {
 
+    private SortDirection dateSort = SortDirection.NONE;
     private Boolean statusIsActive = null;
     private Risk riskCategory = null;
     private String gender = null;
@@ -11,6 +13,14 @@ public class FilterOptionsPatient {
     private int maxAge = 120;
 
     public FilterOptionsPatient() {}
+
+    public SortDirection getDateSort() {
+        return dateSort;
+    }
+
+    public void setDateSort(SortDirection dateSort) {
+        this.dateSort = dateSort;
+    }
 
     public Boolean getStatusIsActive() {
         return statusIsActive;
