@@ -33,6 +33,7 @@ import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.model.FilterOptionsPatient;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
+import com.dimxlp.kfrecalculator.utils.AnimationUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -248,11 +249,10 @@ public class PatientListActivity extends AppCompatActivity {
 
         final DialogViewHolder holder = new DialogViewHolder(view);
 
-        // This is a temporary setup before moving to AnimationUtils
-        setupExpandableGroup(holder.headerStatus, holder.contentStatus, "Status");
-        setupExpandableGroup(holder.headerRisk, holder.contentRisk, "Risk Category");
-        setupExpandableGroup(holder.headerGender, holder.contentGender, "Gender");
-        setupExpandableGroup(holder.headerAge, holder.contentAge, "Age Range");
+        AnimationUtils.setupExpandableGroup(holder.headerStatus, holder.contentStatus, "Status");
+        AnimationUtils.setupExpandableGroup(holder.headerRisk, holder.contentRisk, "Risk Category");
+        AnimationUtils.setupExpandableGroup(holder.headerGender, holder.contentGender, "Gender");
+        AnimationUtils.setupExpandableGroup(holder.headerAge, holder.contentAge, "Age Range");
 
         // Populate the dialog with current filter selections and expand active sections
         populateDialogFromOptions(holder, currentFilterOptions);
@@ -451,61 +451,6 @@ public class PatientListActivity extends AppCompatActivity {
 
         Log.i(TAG, "Step 2 complete: Dispatched " + kfreTasks.size() + " assessment lookups.");
         return kfreTasks;
-    }
-
-    private void setupExpandableGroup(View headerView, LinearLayout contentView, String title) {
-        TextView tvTitle = headerView.findViewById(R.id.tvGroupTitle);
-        ImageView ivChevron = headerView.findViewById(R.id.ivChevron);
-        tvTitle.setText(title);
-        headerView.setOnClickListener(v -> {
-            boolean isVisible = contentView.getVisibility() == View.VISIBLE;
-            long DURATION = 250;
-
-            // Animate Chevron
-            ObjectAnimator chevronAnimator = ObjectAnimator.ofFloat(ivChevron, "rotation", isVisible ? 180f : 0f, isVisible ? 0f : 180f);
-            chevronAnimator.setDuration(DURATION);
-
-            // Animate Height
-            if (isVisible) {
-                // Collapse
-                int initialHeight = contentView.getHeight();
-                ValueAnimator heightAnimator = ValueAnimator.ofInt(initialHeight, 0);
-                heightAnimator.setDuration(DURATION);
-                heightAnimator.addUpdateListener(animation -> {
-                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
-                    contentView.requestLayout();
-                });
-                heightAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        contentView.setVisibility(View.GONE);
-                    }
-                });
-                chevronAnimator.start();
-                heightAnimator.start();
-            } else {
-                // Expand
-                contentView.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                int targetHeight = contentView.getMeasuredHeight();
-                contentView.getLayoutParams().height = 0;
-                contentView.setVisibility(View.VISIBLE);
-
-                ValueAnimator heightAnimator = ValueAnimator.ofInt(0, targetHeight);
-                heightAnimator.setDuration(DURATION);
-                heightAnimator.addUpdateListener(animation -> {
-                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
-                    contentView.requestLayout();
-                });
-                heightAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        contentView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    }
-                });
-                chevronAnimator.start();
-                heightAnimator.start();
-            }
-        });
     }
 
     private static class DialogViewHolder {

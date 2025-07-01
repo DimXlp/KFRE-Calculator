@@ -31,6 +31,7 @@ import com.dimxlp.kfrecalculator.adapter.CkdEpiAssessmentAdapter;
 import com.dimxlp.kfrecalculator.enumeration.SortDirection;
 import com.dimxlp.kfrecalculator.model.CkdEpiCalculation;
 import com.dimxlp.kfrecalculator.model.FilterOptionsCkdEpi;
+import com.dimxlp.kfrecalculator.utils.AnimationUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -186,10 +187,10 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
 
         final FilterDialogViewHolder holder = new FilterDialogViewHolder(view);
 
-        setupExpandableGroup(holder.headerDateSort, holder.contentDateSort, "Sort by Date");
-        setupExpandableGroup(holder.headerEgfrSort, holder.contentEgfrSort, "Sort by eGFR");
-        setupExpandableGroup(holder.headerHasNote, holder.contentHasNote, "Has Note");
-        setupExpandableGroup(holder.headerDateRange, holder.contentDateRange, "Date Range");
+        AnimationUtils.setupExpandableGroup(holder.headerDateSort, holder.contentDateSort, "Sort by Date");
+        AnimationUtils.setupExpandableGroup(holder.headerEgfrSort, holder.contentEgfrSort, "Sort by eGFR");
+        AnimationUtils.setupExpandableGroup(holder.headerHasNote, holder.contentHasNote, "Has Note");
+        AnimationUtils.setupExpandableGroup(holder.headerDateRange, holder.contentDateRange, "Date Range");
 
         populateFilterDialog(holder, currentFilterOptions);
         setupDatePicker(holder.etStartDate);
@@ -353,41 +354,6 @@ public class FullscreenPatientCkdEpiActivity extends AppCompatActivity {
         }
         super.finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-
-    private void setupExpandableGroup(View headerView, LinearLayout contentView, String title) {
-        ((TextView) headerView.findViewById(R.id.tvGroupTitle)).setText(title);
-        ImageView ivChevron = headerView.findViewById(R.id.ivChevron);
-        headerView.setOnClickListener(v -> {
-            boolean isVisible = contentView.getVisibility() == View.VISIBLE;
-            ObjectAnimator.ofFloat(ivChevron, "rotation", isVisible ? 180f : 0f, isVisible ? 0f : 180f).setDuration(250).start();
-            if (isVisible) {
-                // Collapse
-                ValueAnimator anim = ValueAnimator.ofInt(contentView.getHeight(), 0);
-                anim.addUpdateListener(animation -> {
-                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
-                    contentView.requestLayout();
-                });
-                anim.addListener(new AnimatorListenerAdapter() {
-                    @Override public void onAnimationEnd(Animator animation) { contentView.setVisibility(View.GONE); }
-                });
-                anim.setDuration(250).start();
-            } else {
-                // Expand
-                contentView.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                contentView.getLayoutParams().height = 0;
-                contentView.setVisibility(View.VISIBLE);
-                ValueAnimator anim = ValueAnimator.ofInt(0, contentView.getMeasuredHeight());
-                anim.addUpdateListener(animation -> {
-                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
-                    contentView.requestLayout();
-                });
-                anim.addListener(new AnimatorListenerAdapter() {
-                    @Override public void onAnimationEnd(Animator animation) { contentView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT; }
-                });
-                anim.setDuration(250).start();
-            }
-        });
     }
 
     private void loadCkdEpiAssessments(@NonNull String patientId) {

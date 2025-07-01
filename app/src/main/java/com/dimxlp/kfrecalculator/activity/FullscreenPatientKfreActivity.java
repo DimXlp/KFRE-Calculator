@@ -32,6 +32,7 @@ import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.enumeration.SortDirection;
 import com.dimxlp.kfrecalculator.model.FilterOptionsKfre;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
+import com.dimxlp.kfrecalculator.utils.AnimationUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -215,12 +216,13 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
 
         final FilterDialogViewHolder holder = new FilterDialogViewHolder(view);
 
-        setupExpandableGroup(holder.headerDateSort, holder.contentDateSort, "Sort by Date");
-        setupExpandableGroup(holder.headerRisk2Sort, holder.contentRisk2Sort, "Sort by 2-Year Risk");
-        setupExpandableGroup(holder.headerRisk5Sort, holder.contentRisk5Sort, "Sort by 5-Year Risk");
-        setupExpandableGroup(holder.headerRiskCategory, holder.contentRiskCategory, "Risk Category");
-        setupExpandableGroup(holder.headerHasNote, holder.contentHasNote, "Has Note");
-        setupExpandableGroup(holder.headerDateRange, holder.contentDateRange, "Date Range");
+        AnimationUtils.setupExpandableGroup(holder.headerDateSort, holder.contentDateSort, "Sort by Date");
+        AnimationUtils.setupExpandableGroup(holder.headerRisk2Sort, holder.contentRisk2Sort, "Sort by 2-Year Risk");
+        AnimationUtils.setupExpandableGroup(holder.headerRisk5Sort, holder.contentRisk5Sort, "Sort by 5-Year Risk");
+        AnimationUtils.setupExpandableGroup(holder.headerRiskCategory, holder.contentRiskCategory, "Risk Category");
+        AnimationUtils.setupExpandableGroup(holder.headerHasNote, holder.contentHasNote, "Has Note");
+        AnimationUtils.setupExpandableGroup(holder.headerDateRange, holder.contentDateRange, "Date Range");
+
 
         populateFilterDialog(holder, currentFilterOptions);
 
@@ -510,62 +512,6 @@ public class FullscreenPatientKfreActivity  extends AppCompatActivity {
         }
         super.finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-
-    private void setupExpandableGroup(View headerView, LinearLayout contentView, String title) {
-        TextView tvTitle = headerView.findViewById(R.id.tvGroupTitle);
-        ImageView ivChevron = headerView.findViewById(R.id.ivChevron);
-        tvTitle.setText(title);
-
-        headerView.setOnClickListener(v -> {
-            boolean isVisible = contentView.getVisibility() == View.VISIBLE;
-            long DURATION = 250;
-
-            // Animate Chevron
-            ObjectAnimator chevronAnimator = ObjectAnimator.ofFloat(ivChevron, "rotation", isVisible ? 180f : 0f, isVisible ? 0f : 180f);
-            chevronAnimator.setDuration(DURATION);
-
-            // Animate Height
-            if (isVisible) {
-                // Collapse
-                int initialHeight = contentView.getHeight();
-                ValueAnimator heightAnimator = ValueAnimator.ofInt(initialHeight, 0);
-                heightAnimator.setDuration(DURATION);
-                heightAnimator.addUpdateListener(animation -> {
-                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
-                    contentView.requestLayout();
-                });
-                heightAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        contentView.setVisibility(View.GONE);
-                    }
-                });
-                chevronAnimator.start();
-                heightAnimator.start();
-            } else {
-                // Expand
-                contentView.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                int targetHeight = contentView.getMeasuredHeight();
-                contentView.getLayoutParams().height = 0;
-                contentView.setVisibility(View.VISIBLE);
-
-                ValueAnimator heightAnimator = ValueAnimator.ofInt(0, targetHeight);
-                heightAnimator.setDuration(DURATION);
-                heightAnimator.addUpdateListener(animation -> {
-                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
-                    contentView.requestLayout();
-                });
-                heightAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        contentView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    }
-                });
-                chevronAnimator.start();
-                heightAnimator.start();
-            }
-        });
     }
 
     private void loadKfreAssessments(@NonNull String patientId) {
