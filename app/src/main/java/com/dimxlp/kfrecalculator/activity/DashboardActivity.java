@@ -332,19 +332,6 @@ public class DashboardActivity extends AppCompatActivity {
         return totalPatientCount;
     }
 
-    private void setupDoctorQuickStats(List<Patient> patients) {
-        long now = System.currentTimeMillis();
-        long oneMonthAgo = now - (30L * 24 * 60 * 60 * 1000);
-
-        long total = patients.size();
-        long highRisk = patients.stream().filter(p -> p.getRisk() == Risk.HIGH).count();
-        long recent = patients.stream().filter(p -> p.getCreatedAt() >= oneMonthAgo).count();
-
-        totalDoctor.setText(String.valueOf(total));
-        highRiskDoctor.setText(String.valueOf(highRisk));
-        recentDoctor.setText(String.valueOf(recent));
-    }
-
     private void setupIndividualQuickStats(List<KfreCalculation> kfreCalculations) {
         long now = System.currentTimeMillis();
 

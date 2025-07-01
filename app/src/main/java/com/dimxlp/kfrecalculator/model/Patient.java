@@ -2,6 +2,7 @@ package com.dimxlp.kfrecalculator.model;
 
 import com.dimxlp.kfrecalculator.enumeration.Risk;
 
+import java.util.Date;
 import java.util.Map;
 
 public class Patient {
@@ -15,7 +16,7 @@ public class Patient {
     private boolean active;
     private Map<String, Disease> history;
     private String generalHistoryNote;
-    private long createdAt;
+    private Date createdAt;
     private long lastUpdated;
     private double risk2Yr;
     private double risk5Yr;
@@ -23,7 +24,7 @@ public class Patient {
 
     public Patient() {}
 
-    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, long createdAt, long lastUpdated, double risk2Yr, double risk5Yr, Risk risk) {
+    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, Date createdAt, long lastUpdated, double risk2Yr, double risk5Yr, Risk risk) {
         this.patientId = patientId;
         this.userId = userId;
         this.firstName = firstName;
@@ -128,11 +129,11 @@ public class Patient {
         this.generalHistoryNote = generalHistoryNote;
     }
 
-    public long getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
