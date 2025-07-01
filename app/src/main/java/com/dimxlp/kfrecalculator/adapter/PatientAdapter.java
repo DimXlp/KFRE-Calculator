@@ -1,6 +1,10 @@
 package com.dimxlp.kfrecalculator.adapter;
 
 import android.content.Context;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,18 +61,19 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.PatientV
         Patient patient = patients.get(position);
         Context context = holder.itemView.getContext();
 
-        holder.txtName.setText(patient.getFullName());
+        String name = patient.getFullName();
+        String birthDateStr = patient.getBirthDate();
+        SpannableStringBuilder styledName = new SpannableStringBuilder();
+
+        styledName.append(name);
 
         // Calculate age
-        String birthDateStr = patient.getBirthDate();
         if (birthDateStr != null && !birthDateStr.isEmpty()) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date birthDate = sdf.parse(birthDateStr);
-
                 Calendar dob = Calendar.getInstance();
                 dob.setTime(birthDate);
-
                 Calendar today = Calendar.getInstance();
 
                 int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
@@ -76,14 +81,22 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.PatientV
                     age--;
                 }
 
-                holder.txtAge.setText(String.format(Locale.getDefault(), "Age: %d", age));
+                String ageText = String.format(Locale.getDefault(), " (%d)", age);
+                styledName.append(ageText);
+
+                int start = name.length();
+                int end = styledName.length();
+                int secondaryColor = ContextCompat.getColor(context, R.color.textSecondary);
+
+                styledName.setSpan(new ForegroundColorSpan(secondaryColor), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                styledName.setSpan(new RelativeSizeSpan(0.8f), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
             } catch (ParseException e) {
                 Log.e("RAFI|PatientAdapter", "Invalid birthDate format: " + birthDateStr, e);
-                holder.txtAge.setText("Age: Unknown");
+                // If parsing fails, the spannable already has just the name, so nothing more to do.
             }
-        } else {
-            holder.txtAge.setText("Age: Unknown");
         }
+        holder.txtName.setText(styledName);
 
         // Risk level color
         Risk risk = patient.getRisk();
@@ -133,14 +146,13 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.PatientV
 
     static class PatientViewHolder extends RecyclerView.ViewHolder {
         CardView patientCard;
-        TextView txtName, txtAge, txtLastAssessment;
+        TextView txtName, txtLastAssessment;
         ImageView imgRiskLevel;
 
         public PatientViewHolder(@NonNull View itemView) {
             super(itemView);
             patientCard = itemView.findViewById(R.id.patientCard);
             txtName = itemView.findViewById(R.id.txtPatientName);
-            txtAge = itemView.findViewById(R.id.txtPatientAge);
             txtLastAssessment = itemView.findViewById(R.id.txtPatientLastAssessment);
             imgRiskLevel = itemView.findViewById(R.id.imgRiskLevel);
         }

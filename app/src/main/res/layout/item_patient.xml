@@ -21,7 +21,7 @@
             android:id="@+id/txtPatientName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="John Doe"
+            android:text="John Doe (38)"
             android:textStyle="bold"
             android:textColor="@color/textPrimary"
             android:textSize="16sp"
@@ -42,17 +42,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="8dp" />
 
-        <!-- Age -->
-        <TextView
-            android:id="@+id/txtPatientAge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Age: 65"
-            android:textColor="@color/textSecondary"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txtPatientName" />
-
         <!-- Last Assessment -->
         <TextView
             android:id="@+id/txtPatientLastAssessment"
@@ -62,7 +51,7 @@
             android:textColor="@color/textSecondary"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txtPatientAge"
+            app:layout_constraintTop_toBottomOf="@id/txtPatientName"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
