@@ -100,7 +100,9 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.PatientV
 
         // Risk level color
         Risk risk = patient.getRisk();
-        int riskColor, riskImage;
+        int riskColor;
+        int riskImage;
+
         switch (risk) {
             case HIGH:
                 riskColor = R.color.colorHighRiskStat;
@@ -115,7 +117,7 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.PatientV
                 riskImage = R.drawable.ic_tick;
                 break;
             default:
-                riskColor =R.color.colorRecentLast;
+                riskColor = R.color.colorRecentLast;
                 riskImage = R.drawable.ic_question;
         }
         holder.imgRiskLevel.setBackgroundColor(ContextCompat.getColor(context, riskColor));

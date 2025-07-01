@@ -18,15 +18,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.adapter.PatientAdapter;
+import com.dimxlp.kfrecalculator.enumeration.Risk;
+import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PatientListActivity extends AppCompatActivity {
 
@@ -56,7 +64,7 @@ public class PatientListActivity extends AppCompatActivity {
         setTopBarFunctionalities();
         setupRecyclerView();
         setupListeners();
-        fetchPatients();
+        fetchPatientsAndAssessments();
     }
 
     private void initViews() {
@@ -177,23 +185,87 @@ public class PatientListActivity extends AppCompatActivity {
         Log.d(TAG, "Filtered patients: " + filteredPatients.size());
     }
 
-    private void fetchPatients() {
-        Log.d(TAG, "Fetching patients from Firestore...");
+    private void fetchPatientsAndAssessments() {
+        long startTime = System.currentTimeMillis();
+        Log.i(TAG, "Starting data fetch process...");
         String userId = FirebaseAuth.getInstance().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        FirebaseFirestore.getInstance().collection("Patients")
+        // Step 1: Fetch all patients for the current user
+        db.collection("Patients")
                 .whereEqualTo("userId", userId)
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    allPatients.clear();
-                    for (QueryDocumentSnapshot doc : querySnapshot) {
-                        Patient patient = doc.toObject(Patient.class);
-                        allPatients.add(patient);
+                .onSuccessTask(patientSnapshot -> {
+                    // Step 2: Once patients are fetched, map them to a list and create tasks to get their assessments.
+                    this.allPatients = patientSnapshot.getDocuments().stream()
+                            .map(doc -> doc.toObject(Patient.class))
+                            .collect(Collectors.toList());
+
+                    Log.i(TAG, "Step 1 complete: Found " + this.allPatients.size() + " patients.");
+
+                    if (this.allPatients.isEmpty()) {
+                        return Tasks.forResult(new ArrayList<QuerySnapshot>()); // Return an empty task if no patients
                     }
-                    Log.d(TAG, "Fetched " + allPatients.size() + " patients");
-                    applyCombinedFilters();
+
+                    List<Task<QuerySnapshot>> kfreTasks = fetchKfreAssessments(db);
+                    // Return a single Task that completes when all individual assessment tasks are done.
+                    return Tasks.whenAllSuccess(kfreTasks);
                 })
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to fetch patients", e));
+                .addOnSuccessListener(kfreResults -> {
+                    // Step 3: All assessments have been fetched. Now process the results.
+                    processKfreAssessments(kfreResults);
+
+                    // Step 4: All data is processed. Refresh the UI.
+                    applyCombinedFilters();
+                    long duration = System.currentTimeMillis() - startTime;
+                    Log.i(TAG, "Data fetch and processing finished in " + duration + " ms.");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Data fetch process failed.", e);
+                    Toast.makeText(this, "Failed to load patient data: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 
+    private void processKfreAssessments(List<QuerySnapshot> kfreResults) {
+        Log.i(TAG, "Step 3 complete: Received all assessment results. Calculating risks...");
+
+        IntStream.range(0, this.allPatients.size()).forEach(i -> {
+            Patient patient = this.allPatients.get(i);
+            QuerySnapshot kfreSnapshot = (QuerySnapshot) kfreResults.get(i);
+
+            if (kfreSnapshot != null && !kfreSnapshot.isEmpty()) {
+                KfreCalculation latestAssessment = kfreSnapshot.getDocuments().get(0).toObject(KfreCalculation.class);
+                if (latestAssessment != null) {
+                    double risk2Yr = latestAssessment.getRisk2Yr();
+                    // Apply risk logic
+                    if (risk2Yr >= 40) {
+                        patient.setRisk(Risk.HIGH);
+                    } else if (risk2Yr >= 10) {
+                        patient.setRisk(Risk.MEDIUM);
+                    } else {
+                        patient.setRisk(Risk.LOW);
+                    }
+                    Log.d(TAG, "Risk for " + patient.getFullName() + " is " + patient.getRisk());
+                }
+            } else {
+                patient.setRisk(Risk.UNKNOWN);
+                Log.d(TAG, "No assessment found for " + patient.getFullName() + ". Risk set to NONE.");
+            }
+        });
+    }
+
+    @NonNull
+    private List<Task<QuerySnapshot>> fetchKfreAssessments(FirebaseFirestore db) {
+        // Using a stream to create a list of database tasks for each patient.
+        List<Task<QuerySnapshot>> kfreTasks = this.allPatients.stream()
+                .map(patient -> db.collection("KfreCalculations")
+                        .whereEqualTo("patientId", patient.getPatientId())
+                        .orderBy("createdAt", Query.Direction.DESCENDING)
+                        .limit(1)
+                        .get())
+                .collect(Collectors.toList());
+
+        Log.i(TAG, "Step 2 complete: Dispatched " + kfreTasks.size() + " assessment lookups.");
+        return kfreTasks;
+    }
 }
