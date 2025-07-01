@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerStatus" />
+        <LinearLayout
+            android:id="@+id/contentStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+            <RadioGroup
+                android:id="@+id/rgStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/rbStatusActive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Active" />
+                <RadioButton
+                    android:id="@+id/rbStatusInactive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Inactive" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerRiskCategory"/>
+        <LinearLayout
+            android:id="@+id/contentRiskCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+            <RadioGroup
+                android:id="@+id/rgRiskCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/rbRiskLow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Low" />
+                <RadioButton
+                    android:id="@+id/rbRiskMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Medium" />
+                <RadioButton
+                    android:id="@+id/rbRiskHigh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="High" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerGender"/>
+        <LinearLayout
+            android:id="@+id/contentGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp">
+            <RadioGroup
+                android:id="@+id/rgGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/rbGenderMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Male" />
+                <RadioButton
+                    android:id="@+id/rbGenderFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Female" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerAgeRange"/>
+        <LinearLayout
+            android:id="@+id/contentAgeRange"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="8dp">
+
+            <com.google.android.material.slider.RangeSlider
+                android:id="@+id/sliderAgeRange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="0"
+                android:valueTo="120"
+                android:stepSize="1"
+                app:values="@array/initial_age_range" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnApplyFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Apply Filters"
+            android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/btnClearFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear Filters"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/colorSecondary"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</ScrollView>

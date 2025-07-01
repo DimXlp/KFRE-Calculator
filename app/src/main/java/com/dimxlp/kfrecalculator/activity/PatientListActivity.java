@@ -1,14 +1,25 @@
 package com.dimxlp.kfrecalculator.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,18 +30,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.adapter.PatientAdapter;
 import com.dimxlp.kfrecalculator.enumeration.Risk;
+import com.dimxlp.kfrecalculator.model.FilterOptionsPatient;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.slider.RangeSlider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -42,16 +60,15 @@ public class PatientListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private EditText searchEditText;
-    private RadioGroup filterRadioGroup;
+    private ImageButton btnShowFilters;
     private FloatingActionButton fabAddPatient;
     private ImageView appLogo, profileImage;
 
     private List<Patient> allPatients = new ArrayList<>();
-    private List<Patient> filteredPatients = new ArrayList<>();
+    private final List<Patient> filteredPatients = new ArrayList<>();
     private PatientAdapter adapter;
     private String currentSearchQuery = "";
-    private int currentStatusFilter = R.id.patientListFilterAllRadio;
-
+    private FilterOptionsPatient currentFilterOptions = new FilterOptionsPatient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +84,16 @@ public class PatientListActivity extends AppCompatActivity {
         fetchPatientsAndAssessments();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchPatientsAndAssessments();
+    }
+
     private void initViews() {
         recyclerView = findViewById(R.id.patientListRecyclerView);
         searchEditText = findViewById(R.id.searchPatientEditText);
-        filterRadioGroup = findViewById(R.id.patientListFilterRadioGroup);
+        btnShowFilters = findViewById(R.id.btnShowFilters);
         fabAddPatient = findViewById(R.id.patientListFabAddPatient);
         appLogo = findViewById(R.id.patientListLogo);
         profileImage = findViewById(R.id.patientListProfileImg);
@@ -137,6 +160,8 @@ public class PatientListActivity extends AppCompatActivity {
             startActivity(new Intent(this, AddPatientActivity.class));
         });
 
+        btnShowFilters.setOnClickListener(v -> showFilterDialog());
+
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -147,42 +172,201 @@ public class PatientListActivity extends AppCompatActivity {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
         });
-
-
-        filterRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            currentStatusFilter = checkedId;
-            applyCombinedFilters();
-        });
-
     }
 
     private void applyCombinedFilters() {
+        List<Patient> newlyFilteredList = allPatients.stream()
+                .filter(this::matchesAdvancedFilters)
+                .filter(this::matchesSearchQuery)
+                .collect(Collectors.toList());
+
         filteredPatients.clear();
-
-        for (Patient p : allPatients) {
-            // Full name fallback logic
-            String fullName = p.getFullName();
-            if (fullName == null || fullName.isEmpty()) {
-                fullName = ((p.getFirstName() != null ? p.getFirstName() : "") + " " +
-                        (p.getLastName() != null ? p.getLastName() : "")).trim();
-            }
-            fullName = fullName.toLowerCase(Locale.getDefault());
-
-            // Apply search filter
-            boolean matchesSearch = fullName.contains(currentSearchQuery);
-
-            // Apply radio group filter
-            boolean matchesFilter = (currentStatusFilter == R.id.patientListFilterAllRadio) ||
-                    (currentStatusFilter == R.id.patientListFilterActiveRadio && p.isActive()) ||
-                    (currentStatusFilter == R.id.patientListFilterInactiveRadio && !p.isActive());
-
-            if (matchesSearch && matchesFilter) {
-                filteredPatients.add(p);
-            }
-        }
+        filteredPatients.addAll(newlyFilteredList);
 
         adapter.notifyDataSetChanged();
-        Log.d(TAG, "Filtered patients: " + filteredPatients.size());
+        Log.d(TAG, "Filter applied. Displaying " + filteredPatients.size() + " of " + allPatients.size() + " total patients.");
+    }
+
+    private boolean matchesSearchQuery(@NonNull Patient p) {
+        if (currentSearchQuery.isEmpty()) {
+            return true;
+        }
+        String fullName = p.getFullName() != null ? p.getFullName().toLowerCase(Locale.getDefault()) : "";
+        return fullName.contains(currentSearchQuery);
+    }
+
+    private boolean matchesAdvancedFilters(@NonNull Patient p) {
+        // Status Filter
+        if (currentFilterOptions.getStatusIsActive() != null &&
+                currentFilterOptions.getStatusIsActive() != p.isActive()) {
+            return false;
+        }
+
+        // Risk Filter
+        if (currentFilterOptions.getRiskCategory() != null &&
+                currentFilterOptions.getRiskCategory() != p.getRisk()) {
+            return false;
+        }
+
+        // Gender Filter
+        if (currentFilterOptions.getGender() != null &&
+                !currentFilterOptions.getGender().equalsIgnoreCase(p.getGender())) {
+            return false;
+        }
+
+        // Age Filter
+        int age = getAgeFromDob(p.getBirthDate());
+        if (age != -1 && (age < currentFilterOptions.getMinAge() || age > currentFilterOptions.getMaxAge())) {
+            return false;
+        }
+
+        return true; // Patient passed all filters
+    }
+
+    private int getAgeFromDob(String dobString) {
+        if (dobString == null || dobString.isEmpty()) return -1;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date dob = sdf.parse(dobString);
+            Calendar birthCal = Calendar.getInstance();
+            birthCal.setTime(dob);
+            Calendar today = Calendar.getInstance();
+            int age = today.get(Calendar.YEAR) - birthCal.get(Calendar.YEAR);
+            if (today.get(Calendar.DAY_OF_YEAR) < birthCal.get(Calendar.DAY_OF_YEAR)) {
+                age--;
+            }
+            return age;
+        } catch (ParseException e) {
+            return -1;
+        }
+    }
+
+    private void showFilterDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_filter_patients, null);
+        dialog.setContentView(view);
+
+        final DialogViewHolder holder = new DialogViewHolder(view);
+
+        // This is a temporary setup before moving to AnimationUtils
+        setupExpandableGroup(holder.headerStatus, holder.contentStatus, "Status");
+        setupExpandableGroup(holder.headerRisk, holder.contentRisk, "Risk Category");
+        setupExpandableGroup(holder.headerGender, holder.contentGender, "Gender");
+        setupExpandableGroup(holder.headerAge, holder.contentAge, "Age Range");
+
+        // Populate the dialog with current filter selections and expand active sections
+        populateDialogFromOptions(holder, currentFilterOptions);
+
+        holder.btnApply.setOnClickListener(v -> {
+            readOptionsFromDialog(holder, this.currentFilterOptions);
+            dialog.dismiss();
+            applyCombinedFilters();
+        });
+
+        holder.btnClear.setOnClickListener(v -> {
+            this.currentFilterOptions = new FilterOptionsPatient();
+            populateDialogFromOptions(holder, this.currentFilterOptions);
+        });
+
+        dialog.show();
+    }
+
+    private void populateDialogFromOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatient options) {
+        // Status
+        if (options.getStatusIsActive() != null) {
+            holder.rgStatus.check(options.getStatusIsActive() ? R.id.rbStatusActive : R.id.rbStatusInactive);
+            expandSection(holder.contentStatus, holder.ivChevronStatus);
+            holder.ivClearStatus.setVisibility(View.VISIBLE);
+            holder.ivClearStatus.setOnClickListener(v -> {
+                options.setStatusIsActive(null);
+                holder.rgStatus.clearCheck();
+                v.setVisibility(View.GONE);
+            });
+        } else {
+            holder.rgStatus.clearCheck();
+            holder.ivClearStatus.setVisibility(View.GONE);
+        }
+
+        // Risk Category
+        if (options.getRiskCategory() != null) {
+            switch (options.getRiskCategory()) {
+                case LOW: holder.rgRisk.check(R.id.rbRiskLow); break;
+                case MEDIUM: holder.rgRisk.check(R.id.rbRiskMedium); break;
+                case HIGH: holder.rgRisk.check(R.id.rbRiskHigh); break;
+            }
+            expandSection(holder.contentRisk, holder.ivChevronRisk);
+            holder.ivClearRisk.setVisibility(View.VISIBLE);
+            holder.ivClearRisk.setOnClickListener(v -> {
+                options.setRiskCategory(null);
+                holder.rgRisk.clearCheck();
+                v.setVisibility(View.GONE);
+            });
+        } else {
+            holder.rgRisk.clearCheck();
+            holder.ivClearRisk.setVisibility(View.GONE);
+        }
+
+        // Gender
+        if (options.getGender() != null) {
+            if ("Male".equalsIgnoreCase(options.getGender())) holder.rgGender.check(R.id.rbGenderMale);
+            else if ("Female".equalsIgnoreCase(options.getGender())) holder.rgGender.check(R.id.rbGenderFemale);
+            expandSection(holder.contentGender, holder.ivChevronGender);
+            holder.ivClearGender.setVisibility(View.VISIBLE);
+            holder.ivClearGender.setOnClickListener(v -> {
+                options.setGender(null);
+                holder.rgGender.clearCheck();
+                v.setVisibility(View.GONE);
+            });
+        } else {
+            holder.rgGender.clearCheck();
+            holder.ivClearGender.setVisibility(View.GONE);
+        }
+
+        // Age Range
+        holder.ageSlider.setValues((float) options.getMinAge(), (float) options.getMaxAge());
+        if (options.getMinAge() > 0 || options.getMaxAge() < 120) {
+            expandSection(holder.contentAge, holder.ivChevronAge);
+            holder.ivClearAge.setVisibility(View.VISIBLE);
+            holder.ivClearAge.setOnClickListener(v -> {
+                options.setMinAge(0);
+                options.setMaxAge(120);
+                holder.ageSlider.setValues(0f, 120f);
+                v.setVisibility(View.GONE);
+            });
+        } else {
+            holder.ivClearAge.setVisibility(View.GONE);
+        }
+    }
+
+    private void expandSection(LinearLayout contentView, ImageView chevron) {
+        contentView.setVisibility(View.VISIBLE);
+        chevron.setRotation(180f);
+    }
+
+    private void readOptionsFromDialog(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatient options) {
+        // Status
+        int statusId = holder.rgStatus.getCheckedRadioButtonId();
+        if (statusId == R.id.rbStatusActive) options.setStatusIsActive(true);
+        else if (statusId == R.id.rbStatusInactive) options.setStatusIsActive(false);
+        else options.setStatusIsActive(null);
+
+        // Risk
+        int riskId = holder.rgRisk.getCheckedRadioButtonId();
+        if (riskId == R.id.rbRiskLow) options.setRiskCategory(Risk.LOW);
+        else if (riskId == R.id.rbRiskMedium) options.setRiskCategory(Risk.MEDIUM);
+        else if (riskId == R.id.rbRiskHigh) options.setRiskCategory(Risk.HIGH);
+        else options.setRiskCategory(null);
+
+        // Gender
+        int genderId = holder.rgGender.getCheckedRadioButtonId();
+        if (genderId == R.id.rbGenderMale) options.setGender("Male");
+        else if (genderId == R.id.rbGenderFemale) options.setGender("Female");
+        else options.setGender(null);
+
+        // Age
+        List<Float> values = holder.ageSlider.getValues();
+        options.setMinAge(values.get(0).intValue());
+        options.setMaxAge(values.get(1).intValue());
     }
 
     private void fetchPatientsAndAssessments() {
@@ -267,5 +451,100 @@ public class PatientListActivity extends AppCompatActivity {
 
         Log.i(TAG, "Step 2 complete: Dispatched " + kfreTasks.size() + " assessment lookups.");
         return kfreTasks;
+    }
+
+    private void setupExpandableGroup(View headerView, LinearLayout contentView, String title) {
+        TextView tvTitle = headerView.findViewById(R.id.tvGroupTitle);
+        ImageView ivChevron = headerView.findViewById(R.id.ivChevron);
+        tvTitle.setText(title);
+        headerView.setOnClickListener(v -> {
+            boolean isVisible = contentView.getVisibility() == View.VISIBLE;
+            long DURATION = 250;
+
+            // Animate Chevron
+            ObjectAnimator chevronAnimator = ObjectAnimator.ofFloat(ivChevron, "rotation", isVisible ? 180f : 0f, isVisible ? 0f : 180f);
+            chevronAnimator.setDuration(DURATION);
+
+            // Animate Height
+            if (isVisible) {
+                // Collapse
+                int initialHeight = contentView.getHeight();
+                ValueAnimator heightAnimator = ValueAnimator.ofInt(initialHeight, 0);
+                heightAnimator.setDuration(DURATION);
+                heightAnimator.addUpdateListener(animation -> {
+                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
+                    contentView.requestLayout();
+                });
+                heightAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        contentView.setVisibility(View.GONE);
+                    }
+                });
+                chevronAnimator.start();
+                heightAnimator.start();
+            } else {
+                // Expand
+                contentView.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                int targetHeight = contentView.getMeasuredHeight();
+                contentView.getLayoutParams().height = 0;
+                contentView.setVisibility(View.VISIBLE);
+
+                ValueAnimator heightAnimator = ValueAnimator.ofInt(0, targetHeight);
+                heightAnimator.setDuration(DURATION);
+                heightAnimator.addUpdateListener(animation -> {
+                    contentView.getLayoutParams().height = (int) animation.getAnimatedValue();
+                    contentView.requestLayout();
+                });
+                heightAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        contentView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    }
+                });
+                chevronAnimator.start();
+                heightAnimator.start();
+            }
+        });
+    }
+
+    private static class DialogViewHolder {
+        final View headerStatus, headerRisk, headerGender, headerAge;
+        final LinearLayout contentStatus, contentRisk, contentGender, contentAge;
+        final ImageView ivChevronStatus, ivChevronRisk, ivChevronGender, ivChevronAge;
+        final ImageView ivClearStatus, ivClearRisk, ivClearGender, ivClearAge;
+        final RadioGroup rgStatus, rgRisk, rgGender;
+        final RangeSlider ageSlider;
+        final Button btnApply, btnClear;
+
+        DialogViewHolder(View view) {
+            headerStatus = view.findViewById(R.id.headerStatus);
+            headerRisk = view.findViewById(R.id.headerRiskCategory);
+            headerGender = view.findViewById(R.id.headerGender);
+            headerAge = view.findViewById(R.id.headerAgeRange);
+
+            contentStatus = view.findViewById(R.id.contentStatus);
+            contentRisk = view.findViewById(R.id.contentRiskCategory);
+            contentGender = view.findViewById(R.id.contentGender);
+            contentAge = view.findViewById(R.id.contentAgeRange);
+
+            ivChevronStatus = headerStatus.findViewById(R.id.ivChevron);
+            ivChevronRisk = headerRisk.findViewById(R.id.ivChevron);
+            ivChevronGender = headerGender.findViewById(R.id.ivChevron);
+            ivChevronAge = headerAge.findViewById(R.id.ivChevron);
+
+            ivClearStatus = headerStatus.findViewById(R.id.ivClearCategory);
+            ivClearRisk = headerRisk.findViewById(R.id.ivClearCategory);
+            ivClearGender = headerGender.findViewById(R.id.ivClearCategory);
+            ivClearAge = headerAge.findViewById(R.id.ivClearCategory);
+
+            rgStatus = view.findViewById(R.id.rgStatus);
+            rgRisk = view.findViewById(R.id.rgRiskCategory);
+            rgGender = view.findViewById(R.id.rgGender);
+            ageSlider = view.findViewById(R.id.sliderAgeRange);
+
+            btnApply = view.findViewById(R.id.btnApplyFilters);
+            btnClear = view.findViewById(R.id.btnClearFilters);
+        }
     }
 }

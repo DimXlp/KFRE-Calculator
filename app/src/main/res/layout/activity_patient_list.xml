@@ -57,23 +57,39 @@
         android:layout_marginTop="100dp"
         android:padding="16dp">
 
-        <!-- Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="My Patients"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorPrimary"
-            android:layout_marginBottom="12dp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- Search Bar -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="My Patients"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnShowFilters"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Show Filters"
+                android:src="@drawable/ic_filter" />
+
+        </RelativeLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/searchPatientInputLayout"
+            style="@style/CustomTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Search patients"
-            style="@style/CustomTextInputLayout">
+            android:layout_marginTop="8dp"
+            android:hint="Search patients">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/searchPatientEditText"
@@ -82,48 +98,16 @@
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Filter Toggle -->
-        <RadioGroup
-            android:id="@+id/patientListFilterRadioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="8dp">
-
-            <RadioButton
-                android:id="@+id/patientListFilterAllRadio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All" />
-
-            <RadioButton
-                android:id="@+id/patientListFilterActiveRadio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Active"
-                android:layout_marginStart="16dp" />
-
-            <RadioButton
-                android:id="@+id/patientListFilterInactiveRadio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Inactive"
-                android:layout_marginStart="16dp" />
-        </RadioGroup>
-
-        <!-- RecyclerView for patient list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/patientListRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:overScrollMode="ifContentScrolls"
-            android:scrollbars="vertical" />
+            tools:listitem="@layout/item_patient"/>
 
     </LinearLayout>
 
-    <!-- Add Patient Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/patientListFabAddPatient"
         android:layout_width="wrap_content"
