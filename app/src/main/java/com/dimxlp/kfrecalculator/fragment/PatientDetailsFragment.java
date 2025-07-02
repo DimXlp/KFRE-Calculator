@@ -292,12 +292,10 @@ public class PatientDetailsFragment extends Fragment {
                         String dob = snapshot.getString("birthDate");
                         String notes = snapshot.getString("notes");
                         mapMedicalHistory(snapshot);
-//                        Date updated = snapshot.getDate("lastUpdated");
 
                         nameView.setText(firstName + " " + lastName);
                         ageGenderView.setText(getAgeFromDob(dob) + " • " + gender);
                         dobView.setText("Date of Birth: " + dob);
-//                        lastUpdatedView.setText("Last updated: " + formatDate(updated));
                         notesView.setText(notes != null ? notes : "No notes available");
                     } else {
                         Log.w(TAG, "Patient document not found for id: " + patientId);
@@ -418,20 +416,23 @@ public class PatientDetailsFragment extends Fragment {
     private void updateRiskIndicator(double risk2Yr) {
         if (getContext() == null) return; // Ensure fragment is still attached
 
-        int riskColor;
+        int riskColorId, riskColor;
         String riskText;
         int iconResId;
 
         if (risk2Yr >= 40) {
             riskText = "High Risk";
+            riskColorId = R.color.colorHighRiskStat;
             riskColor = ContextCompat.getColor(getContext(), R.color.colorHighRiskStat);
             iconResId = R.drawable.ic_risk;
         } else if (risk2Yr >= 10) {
             riskText = "Medium Risk";
+            riskColorId = R.color.colorMediumRiskStat;
             riskColor = ContextCompat.getColor(getContext(), R.color.colorMediumRiskStat);
             iconResId = R.drawable.ic_medium;
         } else {
             riskText = "Low Risk";
+            riskColorId = R.color.colorLowRiskStat;
             riskColor = ContextCompat.getColor(getContext(), R.color.colorLowRiskStat);
             iconResId = R.drawable.ic_tick;
         }
@@ -439,7 +440,7 @@ public class PatientDetailsFragment extends Fragment {
         riskTextView.setText(riskText);
         riskTextView.setTextColor(riskColor);
         riskIconView.setImageResource(iconResId);
-        riskIconView.setBackgroundTintList(ColorStateList.valueOf(riskColor));
+        riskIconView.setBackgroundColor(ContextCompat.getColor(requireContext(), riskColorId));
 
         riskIconView.setVisibility(View.VISIBLE);
         riskTextView.setVisibility(View.VISIBLE);

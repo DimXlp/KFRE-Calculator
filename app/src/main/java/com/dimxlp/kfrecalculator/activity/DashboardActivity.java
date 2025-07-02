@@ -24,6 +24,7 @@ import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.enumeration.Role;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -237,7 +238,6 @@ public class DashboardActivity extends AppCompatActivity {
                         if (role == Role.DOCTOR) {
                             loadPatientData();
                             setupRecyclerViews();
-                            setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
                         } else {
                             setupIndividualQuickStats(generateDummyCalculations());
                             setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
@@ -254,12 +254,8 @@ public class DashboardActivity extends AppCompatActivity {
                 .whereEqualTo("userId", currentUser.getUid())
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Integer totalPatientCount = calculateTotalPatients(queryDocumentSnapshots);
+                    Integer totalPatientCount = calculatePatientStats(queryDocumentSnapshots);
                     if (totalPatientCount == null) return;
-
-                    calculateRecentPatients(queryDocumentSnapshots);
-
-                    calculateHighRiskPatients(queryDocumentSnapshots, totalPatientCount);
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error loading patient data", e);
@@ -285,11 +281,16 @@ public class DashboardActivity extends AppCompatActivity {
         Log.d(TAG, "Recent patient count: " + recentCount);
     }
 
-    private void calculateHighRiskPatients(QuerySnapshot queryDocumentSnapshots, Integer totalPatientCount) {
-        final AtomicInteger highRiskCount = new AtomicInteger(0);
-        final AtomicInteger patientsProcessed = new AtomicInteger(0);
+    private void calculatePatientRiskDistribution(QuerySnapshot patientSnapshots) {
+        int totalPatientCount = patientSnapshots.size();
+        if (totalPatientCount == 0) return;
 
-        for (DocumentSnapshot patientDoc : queryDocumentSnapshots.getDocuments()) {
+        final AtomicInteger patientsProcessed = new AtomicInteger(0);
+        final AtomicInteger lowRiskCount = new AtomicInteger(0);
+        final AtomicInteger mediumRiskCount = new AtomicInteger(0);
+        final AtomicInteger highRiskCount = new AtomicInteger(0);
+
+        for (DocumentSnapshot patientDoc : patientSnapshots.getDocuments()) {
             String patientId = patientDoc.getId();
             db.collection("KfreCalculations")
                     .whereEqualTo("patientId", patientId)
@@ -299,36 +300,54 @@ public class DashboardActivity extends AppCompatActivity {
                     .addOnSuccessListener(calcSnapshots -> {
                         if (!calcSnapshots.isEmpty()) {
                             KfreCalculation latestCalc = calcSnapshots.getDocuments().get(0).toObject(KfreCalculation.class);
-
-                            if (latestCalc != null && latestCalc.getRisk2Yr() >= 40) {
-                                highRiskCount.incrementAndGet();
+                            if (latestCalc != null) {
+                                double risk2Yr = latestCalc.getRisk2Yr();
+                                // Categorize based on risk
+                                if (risk2Yr >= 40.0) {
+                                    highRiskCount.incrementAndGet();
+                                } else if (risk2Yr >= 10.0) {
+                                    mediumRiskCount.incrementAndGet();
+                                } else {
+                                    lowRiskCount.incrementAndGet();
+                                }
                             }
                         }
+                        // When the last patient is processed, update the UI
                         if (patientsProcessed.incrementAndGet() == totalPatientCount) {
-                            Log.d(TAG, "High-risk patient count: " + highRiskCount.get());
                             highRiskDoctor.setText(String.valueOf(highRiskCount.get()));
+                            setupDoctorPieChart(lowRiskCount.get(), mediumRiskCount.get(), highRiskCount.get());
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "Error fetching calculation for patient: " + patientId, e);
+                        // Still need to count this as processed to not block the UI update forever
                         if (patientsProcessed.incrementAndGet() == totalPatientCount) {
                             highRiskDoctor.setText(String.valueOf(highRiskCount.get()));
+                            setupDoctorPieChart(lowRiskCount.get(), mediumRiskCount.get(), highRiskCount.get());
                         }
                     });
         }
     }
 
     @Nullable
-    private Integer calculateTotalPatients(QuerySnapshot queryDocumentSnapshots) {
+    private Integer calculatePatientStats(QuerySnapshot queryDocumentSnapshots) {
+        // Calculating total patients
         int totalPatientCount = queryDocumentSnapshots.size();
         totalDoctor.setText(String.valueOf(totalPatientCount));
         Log.d(TAG, "Successfully loaded patient count: " + totalPatientCount);
 
-        if (totalPatientCount == 0) {
+        if (totalPatientCount > 0) {
+            // Calculating risk distribution
+            calculatePatientRiskDistribution(queryDocumentSnapshots);
+            // Calculating recent patients
+            calculateRecentPatients(queryDocumentSnapshots);
+        } else {
+            // If there are no patients, set stats to 0 and clear the chart
             highRiskDoctor.setText("0");
             recentDoctor.setText("0");
-            return null;
+            setupDoctorPieChart(0, 0, 0);
         }
+
         return totalPatientCount;
     }
 
@@ -364,45 +383,52 @@ public class DashboardActivity extends AppCompatActivity {
 
 
     private void setupCharts(List<Patient> patients, List<KfreCalculation> kfreCalculations, Role role) {
-        if (role == Role.DOCTOR) {
-            setupDoctorPieChart(patients);
-        } else {
-            setupIndividualLineChart(kfreCalculations);
-        }
+        setupIndividualLineChart(kfreCalculations);
     }
 
-    private void setupDoctorPieChart(List<Patient> patients) {
-        int low = 0, medium = 0, high = 0;
-        for (Patient p : patients) {
-            switch (p.getRisk()) {
-                case LOW: low++; break;
-                case MEDIUM: medium++; break;
-                case HIGH: high++; break;
-            }
-        }
-
+    private void setupDoctorPieChart(int low, int medium, int high) {
         List<PieEntry> entries = new ArrayList<>();
         if (low > 0) entries.add(new PieEntry(low, "Low"));
         if (medium > 0) entries.add(new PieEntry(medium, "Medium"));
         if (high > 0) entries.add(new PieEntry(high, "High"));
 
+        // If there is no data, clear the chart
+        if (entries.isEmpty()) {
+            pieChartDoctor.clear();
+            pieChartDoctor.invalidate();
+            return;
+        }
+
         PieDataSet dataSet = new PieDataSet(entries, "Risk Distribution");
 
-        List<Integer> pieColors = Arrays.asList(
-                ContextCompat.getColor(getApplicationContext(), R.color.colorAccentDark),
-                ContextCompat.getColor(this, R.color.colorMediumRisk),
-                ContextCompat.getColor(this, R.color.colorHighRisk)
-        );
+        List<Integer> pieColors = new ArrayList<>();
+        if (low > 0) pieColors.add(ContextCompat.getColor(this, R.color.colorAccentDark));
+        if (medium > 0) pieColors.add(ContextCompat.getColor(this, R.color.colorMediumRisk));
+        if (high > 0) pieColors.add(ContextCompat.getColor(this, R.color.colorHighRisk));
+
         dataSet.setColors(pieColors);
+
         PieData pieData = new PieData(dataSet);
+
+        pieData.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value);
+            }
+        });
+
+        pieData.setValueTextSize(12f);
+        pieData.setValueTextColor(ContextCompat.getColor(this, R.color.colorOnPrimary));
 
         pieChartDoctor.setData(pieData);
         pieChartDoctor.setUsePercentValues(false);
+        pieChartDoctor.setEntryLabelColor(ContextCompat.getColor(this, R.color.colorOnPrimary));
         pieChartDoctor.setEntryLabelTextSize(12f);
         pieChartDoctor.setCenterText("Patients");
         pieChartDoctor.setCenterTextSize(16f);
         pieChartDoctor.getDescription().setEnabled(false);
-        pieChartDoctor.invalidate();
+        pieChartDoctor.getLegend().setEnabled(false); // Disabling legend for a cleaner look
+        pieChartDoctor.invalidate(); // Refresh the chart
     }
 
     private void setupIndividualLineChart(List<KfreCalculation> kfreCalculations) {

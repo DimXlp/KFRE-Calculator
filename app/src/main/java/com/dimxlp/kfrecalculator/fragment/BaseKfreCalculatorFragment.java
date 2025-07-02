@@ -93,7 +93,7 @@ public abstract class BaseKfreCalculatorFragment extends Fragment {
         String level, message;
         int levelColor;
 
-        if (risk2Yr >= 20.0) {
+        if (risk2Yr >= 40.0) {
             level = "High";
             levelColor = ContextCompat.getColor(requireContext(), R.color.colorHighRiskStat);
             message = "Your risk of kidney failure is high. Please consult a specialist.";
