@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".activity.AddPatientActivity">
+    tools:context=".activity.AddOrEditPatientActivity">
 
     <!-- Top bar with logo and profile picture -->
     <LinearLayout

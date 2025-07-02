@@ -142,7 +142,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void setupListeners() {
         addPatientBtn.setOnClickListener(v -> {
             Log.d(TAG, "Add Patient clicked");
-            Intent intent = new Intent(DashboardActivity.this, AddPatientActivity.class);
+            Intent intent = new Intent(DashboardActivity.this, AddOrEditPatientActivity.class);
             startActivity(intent);
         });
 

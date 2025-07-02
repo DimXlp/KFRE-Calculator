@@ -14,13 +14,32 @@
         android:layout_height="wrap_content"
         android:paddingBottom="32dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Patient Details"
-            style="@style/TextAppearance.Material3.TitleLarge"
-            android:textColor="@color/colorPrimary"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Patient Details"
+                style="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="@color/colorPrimary"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"/>
+
+            <ImageButton
+                android:id="@+id/btnEditPatient"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_edit"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Edit Patient"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:tint="@color/colorPrimary" />
+
+        </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

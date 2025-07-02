@@ -152,7 +152,7 @@ public class PatientListActivity extends AppCompatActivity {
     private void setupListeners() {
         fabAddPatient.setOnClickListener(v -> {
             Log.d(TAG, "Navigating to AddPatientActivity");
-            startActivity(new Intent(this, AddPatientActivity.class));
+            startActivity(new Intent(this, AddOrEditPatientActivity.class));
         });
 
         btnShowFilters.setOnClickListener(v -> showFilterDialog());

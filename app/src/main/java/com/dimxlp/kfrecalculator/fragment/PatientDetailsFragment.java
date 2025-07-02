@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.activity.AddOrEditPatientActivity;
 import com.dimxlp.kfrecalculator.activity.FullscreenPatientCkdEpiActivity;
 import com.dimxlp.kfrecalculator.activity.FullscreenPatientKfreActivity;
 import com.dimxlp.kfrecalculator.adapter.CkdEpiAssessmentAdapter;
@@ -55,6 +57,7 @@ public class PatientDetailsFragment extends Fragment {
 
     // Views
     private TextView nameView, ageGenderView, dobView, lastUpdatedView, notesView;
+    private ImageButton editPatientButton;
     private ImageView riskIconView;
     private TextView riskTextView;
     private ChipGroup historyChips;
@@ -114,6 +117,7 @@ public class PatientDetailsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Init views
+        editPatientButton = v.findViewById(R.id.btnEditPatient);
         nameView = v.findViewById(R.id.patientDetailName);
         ageGenderView = v.findViewById(R.id.patientDetailAgeGender);
         dobView = v.findViewById(R.id.patientDetailDob);
@@ -152,6 +156,13 @@ public class PatientDetailsFragment extends Fragment {
         });
         rvCkdEpiAssessments.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCkdEpiAssessments.setAdapter(ckdEpiAdapter);
+
+        editPatientButton.setOnClickListener(view -> {
+            Log.d(TAG, "Edit patient button clicked for patientId: " + patientId);
+            Intent intent = new Intent(getContext(), AddOrEditPatientActivity.class);
+            intent.putExtra("patientId", patientId);
+            startActivity(intent);
+        });
 
         if (patientId != null) {
             Log.i(TAG, "Displaying details for patientId: " + patientId);
