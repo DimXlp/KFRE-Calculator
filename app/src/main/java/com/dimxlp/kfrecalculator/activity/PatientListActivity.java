@@ -1,9 +1,5 @@
 package com.dimxlp.kfrecalculator.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,7 +7,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -19,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,7 +25,7 @@ import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.adapter.PatientAdapter;
 import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.enumeration.SortDirection;
-import com.dimxlp.kfrecalculator.model.FilterOptionsPatient;
+import com.dimxlp.kfrecalculator.model.FilterOptionsPatientList;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.dimxlp.kfrecalculator.utils.AnimationUtils;
@@ -43,7 +37,6 @@ import com.google.android.material.slider.RangeSlider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
@@ -70,7 +63,7 @@ public class PatientListActivity extends AppCompatActivity {
     private final List<Patient> filteredPatients = new ArrayList<>();
     private PatientAdapter adapter;
     private String currentSearchQuery = "";
-    private FilterOptionsPatient currentFilterOptions = new FilterOptionsPatient();
+    private FilterOptionsPatientList currentFilterOptions = new FilterOptionsPatientList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,12 +176,21 @@ public class PatientListActivity extends AppCompatActivity {
                 .collect(Collectors.toList());
 
         SortDirection sort = currentFilterOptions.getDateSort();
+        SortDirection ageSort = currentFilterOptions.getAgeSort();
 
         if (sort != SortDirection.NONE) {
             newlyFilteredList.sort((p1, p2) -> {
                 int comparison = p1.getCreatedAt().compareTo(p2.getCreatedAt());
                 // if ascending, return original comparison. if descending, reverse it.
                 return sort == SortDirection.ASCENDING ? comparison : -comparison;
+            });
+        } else if (ageSort != SortDirection.NONE) {
+            // If date sort is not active, apply age sort
+            newlyFilteredList.sort((p1, p2) -> {
+                int age1 = getAgeFromDob(p1.getBirthDate());
+                int age2 = getAgeFromDob(p2.getBirthDate());
+                int comparison = Integer.compare(age1, age2);
+                return ageSort == SortDirection.ASCENDING ? comparison : -comparison;
             });
         }
 
@@ -261,10 +263,24 @@ public class PatientListActivity extends AppCompatActivity {
         final DialogViewHolder holder = new DialogViewHolder(view);
 
         AnimationUtils.setupExpandableGroup(holder.headerDateSort, holder.contentDateSort, "Sort by Date");
+        AnimationUtils.setupExpandableGroup(holder.headerAgeSort, holder.contentAgeSort, "Sort by Age");
         AnimationUtils.setupExpandableGroup(holder.headerStatus, holder.contentStatus, "Status");
         AnimationUtils.setupExpandableGroup(holder.headerRisk, holder.contentRisk, "Risk Category");
         AnimationUtils.setupExpandableGroup(holder.headerGender, holder.contentGender, "Gender");
         AnimationUtils.setupExpandableGroup(holder.headerAge, holder.contentAge, "Age Range");
+
+        // These listeners make sort options mutually exclusive
+        holder.rgDateSort.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId != -1) {
+                holder.rgAgeSort.clearCheck();
+            }
+        });
+
+        holder.rgAgeSort.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId != -1) {
+                holder.rgDateSort.clearCheck();
+            }
+        });
 
         // Populate the dialog with current filter selections and expand active sections
         populateDialogFromOptions(holder, currentFilterOptions);
@@ -276,45 +292,56 @@ public class PatientListActivity extends AppCompatActivity {
         });
 
         holder.btnClear.setOnClickListener(v -> {
-            this.currentFilterOptions = new FilterOptionsPatient();
+            this.currentFilterOptions = new FilterOptionsPatientList();
             populateDialogFromOptions(holder, this.currentFilterOptions);
         });
 
         dialog.show();
     }
 
-    private void populateDialogFromOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatient options) {
-        // Date Sort
-        if (options.getDateSort() != SortDirection.NONE) {
-            holder.rgDateSort.check(options.getDateSort() == SortDirection.DESCENDING ? R.id.rbDateNewest : R.id.rbDateOldest);
-            expandSection(holder.contentDateSort, holder.ivChevronDateSort);
-            holder.ivClearDateSort.setVisibility(View.VISIBLE);
-            holder.ivClearDateSort.setOnClickListener(v -> {
-                options.setDateSort(SortDirection.NONE);
-                holder.rgDateSort.clearCheck();
+    private void populateDialogFromOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        setupDateSortingOptions(holder, options);
+        setupAgeSortingOptions(holder, options);
+        setupStatusFilterOptions(holder, options);
+        setupRiskFilterOptions(holder, options);
+        setupGenderFilterOptions(holder, options);
+        setupAgeRangeFilterOptions(holder, options);
+    }
+
+    private void setupAgeRangeFilterOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        holder.ageSlider.setValues((float) options.getMinAge(), (float) options.getMaxAge());
+        if (options.getMinAge() > 0 || options.getMaxAge() < 120) {
+            expandSection(holder.contentAge, holder.ivChevronAge);
+            holder.ivClearAge.setVisibility(View.VISIBLE);
+            holder.ivClearAge.setOnClickListener(v -> {
+                options.setMinAge(0);
+                options.setMaxAge(120);
+                holder.ageSlider.setValues(0f, 120f);
                 v.setVisibility(View.GONE);
             });
         } else {
-            holder.rgDateSort.clearCheck();
-            holder.ivClearDateSort.setVisibility(View.GONE);
+            holder.ivClearAge.setVisibility(View.GONE);
         }
+    }
 
-        // Status
-        if (options.getStatusIsActive() != null) {
-            holder.rgStatus.check(options.getStatusIsActive() ? R.id.rbStatusActive : R.id.rbStatusInactive);
-            expandSection(holder.contentStatus, holder.ivChevronStatus);
-            holder.ivClearStatus.setVisibility(View.VISIBLE);
-            holder.ivClearStatus.setOnClickListener(v -> {
-                options.setStatusIsActive(null);
-                holder.rgStatus.clearCheck();
+    private void setupGenderFilterOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        if (options.getGender() != null) {
+            if ("Male".equalsIgnoreCase(options.getGender())) holder.rgGender.check(R.id.rbGenderMale);
+            else if ("Female".equalsIgnoreCase(options.getGender())) holder.rgGender.check(R.id.rbGenderFemale);
+            expandSection(holder.contentGender, holder.ivChevronGender);
+            holder.ivClearGender.setVisibility(View.VISIBLE);
+            holder.ivClearGender.setOnClickListener(v -> {
+                options.setGender(null);
+                holder.rgGender.clearCheck();
                 v.setVisibility(View.GONE);
             });
         } else {
-            holder.rgStatus.clearCheck();
-            holder.ivClearStatus.setVisibility(View.GONE);
+            holder.rgGender.clearCheck();
+            holder.ivClearGender.setVisibility(View.GONE);
         }
+    }
 
-        // Risk Category
+    private void setupRiskFilterOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
         if (options.getRiskCategory() != null) {
             switch (options.getRiskCategory()) {
                 case LOW: holder.rgRisk.check(R.id.rbRiskLow); break;
@@ -332,36 +359,53 @@ public class PatientListActivity extends AppCompatActivity {
             holder.rgRisk.clearCheck();
             holder.ivClearRisk.setVisibility(View.GONE);
         }
+    }
 
-        // Gender
-        if (options.getGender() != null) {
-            if ("Male".equalsIgnoreCase(options.getGender())) holder.rgGender.check(R.id.rbGenderMale);
-            else if ("Female".equalsIgnoreCase(options.getGender())) holder.rgGender.check(R.id.rbGenderFemale);
-            expandSection(holder.contentGender, holder.ivChevronGender);
-            holder.ivClearGender.setVisibility(View.VISIBLE);
-            holder.ivClearGender.setOnClickListener(v -> {
-                options.setGender(null);
-                holder.rgGender.clearCheck();
+    private void setupStatusFilterOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        if (options.getStatusIsActive() != null) {
+            holder.rgStatus.check(options.getStatusIsActive() ? R.id.rbStatusActive : R.id.rbStatusInactive);
+            expandSection(holder.contentStatus, holder.ivChevronStatus);
+            holder.ivClearStatus.setVisibility(View.VISIBLE);
+            holder.ivClearStatus.setOnClickListener(v -> {
+                options.setStatusIsActive(null);
+                holder.rgStatus.clearCheck();
                 v.setVisibility(View.GONE);
             });
         } else {
-            holder.rgGender.clearCheck();
-            holder.ivClearGender.setVisibility(View.GONE);
+            holder.rgStatus.clearCheck();
+            holder.ivClearStatus.setVisibility(View.GONE);
         }
+    }
 
-        // Age Range
-        holder.ageSlider.setValues((float) options.getMinAge(), (float) options.getMaxAge());
-        if (options.getMinAge() > 0 || options.getMaxAge() < 120) {
-            expandSection(holder.contentAge, holder.ivChevronAge);
-            holder.ivClearAge.setVisibility(View.VISIBLE);
-            holder.ivClearAge.setOnClickListener(v -> {
-                options.setMinAge(0);
-                options.setMaxAge(120);
-                holder.ageSlider.setValues(0f, 120f);
+    private void setupAgeSortingOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        if (options.getAgeSort() != SortDirection.NONE) {
+            holder.rgAgeSort.check(options.getAgeSort() == SortDirection.ASCENDING ? R.id.rbAgeYoungest : R.id.rbAgeOldest);
+            expandSection(holder.contentAgeSort, holder.ivChevronAgeSort);
+            holder.ivClearAgeSort.setVisibility(View.VISIBLE);
+            holder.ivClearAgeSort.setOnClickListener(v -> {
+                options.setAgeSort(SortDirection.NONE);
+                holder.rgAgeSort.clearCheck();
                 v.setVisibility(View.GONE);
             });
         } else {
-            holder.ivClearAge.setVisibility(View.GONE);
+            holder.rgAgeSort.clearCheck();
+            holder.ivClearAgeSort.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupDateSortingOptions(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        if (options.getDateSort() != SortDirection.NONE) {
+            holder.rgDateSort.check(options.getDateSort() == SortDirection.DESCENDING ? R.id.rbDateNewest : R.id.rbDateOldest);
+            expandSection(holder.contentDateSort, holder.ivChevronDateSort);
+            holder.ivClearDateSort.setVisibility(View.VISIBLE);
+            holder.ivClearDateSort.setOnClickListener(v -> {
+                options.setDateSort(SortDirection.NONE);
+                holder.rgDateSort.clearCheck();
+                v.setVisibility(View.GONE);
+            });
+        } else {
+            holder.rgDateSort.clearCheck();
+            holder.ivClearDateSort.setVisibility(View.GONE);
         }
     }
 
@@ -370,36 +414,55 @@ public class PatientListActivity extends AppCompatActivity {
         chevron.setRotation(180f);
     }
 
-    private void readOptionsFromDialog(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatient options) {
-        // Date Sort
-        int dateSortId = holder.rgDateSort.getCheckedRadioButtonId();
-        if (dateSortId == R.id.rbDateNewest) options.setDateSort(SortDirection.DESCENDING);
-        else if (dateSortId == R.id.rbDateOldest) options.setDateSort(SortDirection.ASCENDING);
-        else options.setDateSort(SortDirection.NONE);
+    private void readOptionsFromDialog(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        applyDateSorting(holder, options);
+        applyAgeSorting(holder, options);
+        applyStatusFilter(holder, options);
+        applyRiskFilter(holder, options);
+        applyGenderFilter(holder, options);
+        applyAgeRangeFilter(holder, options);
+    }
 
-        // Status
-        int statusId = holder.rgStatus.getCheckedRadioButtonId();
-        if (statusId == R.id.rbStatusActive) options.setStatusIsActive(true);
-        else if (statusId == R.id.rbStatusInactive) options.setStatusIsActive(false);
-        else options.setStatusIsActive(null);
+    private static void applyAgeRangeFilter(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        List<Float> values = holder.ageSlider.getValues();
+        options.setMinAge(values.get(0).intValue());
+        options.setMaxAge(values.get(1).intValue());
+    }
 
-        // Risk
+    private static void applyGenderFilter(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        int genderId = holder.rgGender.getCheckedRadioButtonId();
+        if (genderId == R.id.rbGenderMale) options.setGender("Male");
+        else if (genderId == R.id.rbGenderFemale) options.setGender("Female");
+        else options.setGender(null);
+    }
+
+    private static void applyRiskFilter(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
         int riskId = holder.rgRisk.getCheckedRadioButtonId();
         if (riskId == R.id.rbRiskLow) options.setRiskCategory(Risk.LOW);
         else if (riskId == R.id.rbRiskMedium) options.setRiskCategory(Risk.MEDIUM);
         else if (riskId == R.id.rbRiskHigh) options.setRiskCategory(Risk.HIGH);
         else options.setRiskCategory(null);
+    }
 
-        // Gender
-        int genderId = holder.rgGender.getCheckedRadioButtonId();
-        if (genderId == R.id.rbGenderMale) options.setGender("Male");
-        else if (genderId == R.id.rbGenderFemale) options.setGender("Female");
-        else options.setGender(null);
+    private static void applyStatusFilter(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        int statusId = holder.rgStatus.getCheckedRadioButtonId();
+        if (statusId == R.id.rbStatusActive) options.setStatusIsActive(true);
+        else if (statusId == R.id.rbStatusInactive) options.setStatusIsActive(false);
+        else options.setStatusIsActive(null);
+    }
 
-        // Age
-        List<Float> values = holder.ageSlider.getValues();
-        options.setMinAge(values.get(0).intValue());
-        options.setMaxAge(values.get(1).intValue());
+    private static void applyAgeSorting(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        int ageSortId = holder.rgAgeSort.getCheckedRadioButtonId();
+        if (ageSortId == R.id.rbAgeYoungest) options.setAgeSort(SortDirection.ASCENDING);
+        else if (ageSortId == R.id.rbAgeOldest) options.setAgeSort(SortDirection.DESCENDING);
+        else options.setAgeSort(SortDirection.NONE);
+    }
+
+    private static void applyDateSorting(@NonNull DialogViewHolder holder, @NonNull FilterOptionsPatientList options) {
+        int dateSortId = holder.rgDateSort.getCheckedRadioButtonId();
+        if (dateSortId == R.id.rbDateNewest) options.setDateSort(SortDirection.DESCENDING);
+        else if (dateSortId == R.id.rbDateOldest) options.setDateSort(SortDirection.ASCENDING);
+        else options.setDateSort(SortDirection.NONE);
     }
 
     private void fetchPatientsAndAssessments() {
@@ -491,40 +554,45 @@ public class PatientListActivity extends AppCompatActivity {
     }
 
     private static class DialogViewHolder {
-        final View headerDateSort, headerStatus, headerRisk, headerGender, headerAge;
-        final LinearLayout contentDateSort, contentStatus, contentRisk, contentGender, contentAge;
-        final ImageView ivChevronDateSort, ivChevronStatus, ivChevronRisk, ivChevronGender, ivChevronAge;
-        final ImageView ivClearDateSort, ivClearStatus, ivClearRisk, ivClearGender, ivClearAge;
-        final RadioGroup rgDateSort, rgStatus, rgRisk, rgGender;
+        final View headerDateSort, headerAgeSort, headerStatus, headerRisk, headerGender, headerAge;
+        final LinearLayout contentDateSort, contentAgeSort, contentStatus, contentRisk, contentGender, contentAge;
+        final ImageView ivChevronDateSort, ivChevronAgeSort, ivChevronStatus, ivChevronRisk, ivChevronGender, ivChevronAge;
+        final ImageView ivClearDateSort, ivClearAgeSort, ivClearStatus, ivClearRisk, ivClearGender, ivClearAge;
+        final RadioGroup rgDateSort, rgAgeSort, rgStatus, rgRisk, rgGender;
         final RangeSlider ageSlider;
         final Button btnApply, btnClear;
 
         DialogViewHolder(View view) {
             headerDateSort = view.findViewById(R.id.headerDateSort);
+            headerAgeSort = view.findViewById(R.id.headerAgeSort);
             headerStatus = view.findViewById(R.id.headerStatus);
             headerRisk = view.findViewById(R.id.headerRiskCategory);
             headerGender = view.findViewById(R.id.headerGender);
             headerAge = view.findViewById(R.id.headerAgeRange);
 
             contentDateSort = view.findViewById(R.id.contentDateSort);
+            contentAgeSort = view.findViewById(R.id.contentAgeSort);
             contentStatus = view.findViewById(R.id.contentStatus);
             contentRisk = view.findViewById(R.id.contentRiskCategory);
             contentGender = view.findViewById(R.id.contentGender);
             contentAge = view.findViewById(R.id.contentAgeRange);
 
             ivChevronDateSort = headerDateSort.findViewById(R.id.ivChevron);
+            ivChevronAgeSort = headerAgeSort.findViewById(R.id.ivChevron);
             ivChevronStatus = headerStatus.findViewById(R.id.ivChevron);
             ivChevronRisk = headerRisk.findViewById(R.id.ivChevron);
             ivChevronGender = headerGender.findViewById(R.id.ivChevron);
             ivChevronAge = headerAge.findViewById(R.id.ivChevron);
 
             ivClearDateSort = headerDateSort.findViewById(R.id.ivClearCategory);
+            ivClearAgeSort = headerAgeSort.findViewById(R.id.ivClearCategory);
             ivClearStatus = headerStatus.findViewById(R.id.ivClearCategory);
             ivClearRisk = headerRisk.findViewById(R.id.ivClearCategory);
             ivClearGender = headerGender.findViewById(R.id.ivClearCategory);
             ivClearAge = headerAge.findViewById(R.id.ivClearCategory);
 
             rgDateSort = view.findViewById(R.id.rgDateSort);
+            rgAgeSort = view.findViewById(R.id.rgAgeSort);
             rgStatus = view.findViewById(R.id.rgStatus);
             rgRisk = view.findViewById(R.id.rgRiskCategory);
             rgGender = view.findViewById(R.id.rgGender);

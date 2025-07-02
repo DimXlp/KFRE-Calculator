@@ -37,6 +37,33 @@
             </RadioGroup>
         </LinearLayout>
 
+        <include layout="@layout/item_filter_group_header"
+            android:id="@+id/headerAgeSort" />
+        <LinearLayout
+            android:id="@+id/contentAgeSort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <RadioGroup
+                android:id="@+id/rgAgeSort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/rbAgeYoungest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Youngest to Oldest" />
+                <RadioButton
+                    android:id="@+id/rbAgeOldest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Oldest to Youngest" />
+            </RadioGroup>
+        </LinearLayout>
 
         <include layout="@layout/item_filter_group_header"
             android:id="@+id/headerStatus" />
