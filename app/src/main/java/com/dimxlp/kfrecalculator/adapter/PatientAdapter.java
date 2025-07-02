@@ -124,12 +124,14 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.PatientV
         holder.imgRiskLevel.setImageResource(riskImage);
 
         // Format last assessment timestamp
-        long lastUpdated = patient.getLastUpdated();
-        if (lastUpdated > 0) {
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-            String formattedDate = outputFormat.format(new Date(lastUpdated));
-            holder.txtLastAssessment.setText("Last Assessment: " + formattedDate);
+        Date lastAssessmentDate = patient.getLastAssessment();
+
+        if (lastAssessmentDate != null) {
+            // Format the date to a readable string like "22 Mar 2025"
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+            holder.txtLastAssessment.setText("Last Assessment: " + sdf.format(lastAssessmentDate));
         } else {
+            // If there's no assessment, show a default message
             holder.txtLastAssessment.setText("Last Assessment: N/A");
         }
 

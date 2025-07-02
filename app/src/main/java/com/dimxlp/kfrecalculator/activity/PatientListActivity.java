@@ -455,8 +455,9 @@ public class PatientListActivity extends AppCompatActivity {
             if (kfreSnapshot != null && !kfreSnapshot.isEmpty()) {
                 KfreCalculation latestAssessment = kfreSnapshot.getDocuments().get(0).toObject(KfreCalculation.class);
                 if (latestAssessment != null) {
+                    patient.setLastAssessment(new Date(latestAssessment.getCreatedAt()));
+
                     double risk2Yr = latestAssessment.getRisk2Yr();
-                    // Apply risk logic
                     if (risk2Yr >= 40) {
                         patient.setRisk(Risk.HIGH);
                     } else if (risk2Yr >= 10) {
@@ -468,6 +469,7 @@ public class PatientListActivity extends AppCompatActivity {
                 }
             } else {
                 patient.setRisk(Risk.UNKNOWN);
+                patient.setLastAssessment(null);
                 Log.d(TAG, "No assessment found for " + patient.getFullName() + ". Risk set to NONE.");
             }
         });

@@ -21,10 +21,11 @@ public class Patient {
     private double risk2Yr;
     private double risk5Yr;
     private Risk risk;
+    private Date lastAssessment;
 
     public Patient() {}
 
-    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, Date createdAt, long lastUpdated, double risk2Yr, double risk5Yr, Risk risk) {
+    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, Date createdAt, long lastUpdated, double risk2Yr, double risk5Yr, Risk risk, Date lastAssessment) {
         this.patientId = patientId;
         this.userId = userId;
         this.firstName = firstName;
@@ -40,6 +41,7 @@ public class Patient {
         this.risk2Yr = risk2Yr;
         this.risk5Yr = risk5Yr;
         this.risk = risk;
+        this.lastAssessment = lastAssessment;
     }
 
     public Patient(String fullName, String birthDate, long lastUpdated, Risk risk) {
@@ -167,5 +169,13 @@ public class Patient {
 
     public void setRisk(Risk risk) {
         this.risk = risk;
+    }
+
+    public Date getLastAssessment() {
+        return lastAssessment;
+    }
+
+    public void setLastAssessment(Date lastAssessment) {
+        this.lastAssessment = lastAssessment;
     }
 }
