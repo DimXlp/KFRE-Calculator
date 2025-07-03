@@ -13,12 +13,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class PatientKfreCalculatorFragment extends BaseKfreCalculatorFragment {
@@ -130,6 +134,15 @@ public class PatientKfreCalculatorFragment extends BaseKfreCalculatorFragment {
                     notes
             );
 
+            Risk riskCategory;
+            if (risk2Yr >= 40.0) {
+                riskCategory = Risk.HIGH;
+            } else if (risk2Yr >= 10.0) {
+                riskCategory = Risk.MEDIUM;
+            } else {
+                riskCategory = Risk.LOW;
+            }
+
             Log.i(TAG, "saveCalculation: Saving KFRE calculation with ID: " + calcId + " for patientId: " + patientId);
             Log.d(TAG, "saveCalculation: Values - Age: " + age + ", eGFR: " + egfr + ", ACR: " + acr + ", 2-Yr: " + risk2Yr + ", 5-Yr: " + risk5Yr);
 
@@ -140,20 +153,46 @@ public class PatientKfreCalculatorFragment extends BaseKfreCalculatorFragment {
                     .addOnSuccessListener(unused -> {
                         Log.d(TAG, "saveCalculation: Successfully saved calculation to Firestore.");
                         Toast.makeText(getContext(), "Calculation saved", Toast.LENGTH_SHORT).show();
+
+                        updatePatientWithNewRisk(riskCategory, risk2Yr, risk5Yr);
+
+                        Log.d(TAG, "saveCalculation: Setting fragment result to reload assessments.");
+                        requireActivity()
+                                .getSupportFragmentManager()
+                                .setFragmentResult("reload_kfre_assessments", new Bundle());
                     })
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "saveCalculation: Failed to save calculation to Firestore.", e);
                         Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
 
-            Log.d(TAG, "saveCalculation: Setting fragment result to reload assessments.");
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .setFragmentResult("reload_kfre_assessments", new Bundle());
-
         } catch (NumberFormatException e) {
             Log.e(TAG, "saveCalculation: Invalid number format in input fields.", e);
             Toast.makeText(getContext(), "Invalid input fields", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void updatePatientWithNewRisk(Risk riskCategory, double risk2Yr, double risk5Yr) {
+        if (patientId == null || patientId.isEmpty()) {
+            Log.e(TAG, "updatePatientWithNewRisk: patientId is null, cannot update patient record.");
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Log.d(TAG, "Attempting to update patient: " + patientId);
+
+        // Prepare the data to update
+        Map<String, Object> patientUpdates = new HashMap<>();
+        patientUpdates.put("risk", riskCategory.name());
+        patientUpdates.put("risk2Yr", risk2Yr);
+        patientUpdates.put("risk5Yr", risk5Yr);
+        patientUpdates.put("lastAssessment", new Date());
+        patientUpdates.put("lastUpdated", System.currentTimeMillis());
+
+        // Update the specific fields in the Patient document
+        db.collection("Patients").document(patientId)
+                .update(patientUpdates)
+                .addOnSuccessListener(aVoid -> Log.i(TAG, "Successfully updated patient record for patientId: " + patientId))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to update patient record for patientId: " + patientId, e));
     }
 }
