@@ -39,6 +39,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -109,13 +111,13 @@ public class PatientListActivity extends AppCompatActivity {
 
             // Force icons to show using reflection
             try {
-                java.lang.reflect.Field[] fields = popup.getClass().getDeclaredFields();
-                for (java.lang.reflect.Field field : fields) {
+                Field[] fields = popup.getClass().getDeclaredFields();
+                for (Field field : fields) {
                     if ("mPopup".equals(field.getName())) {
                         field.setAccessible(true);
                         Object menuPopupHelper = field.get(popup);
                         Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
-                        java.lang.reflect.Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                        Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
                         setForceIcons.invoke(menuPopupHelper, true);
                         break;
                     }

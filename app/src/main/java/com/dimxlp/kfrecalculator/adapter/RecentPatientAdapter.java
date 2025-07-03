@@ -30,9 +30,18 @@ import java.util.Locale;
 public class RecentPatientAdapter extends RecyclerView.Adapter<RecentPatientAdapter.RecentPatientViewHolder> {
 
     private final List<Patient> patientList;
+    private RecentPatientAdapter.OnPatientClickListener listener;
+
+    public interface OnPatientClickListener {
+        void onPatientClick(Patient patient);
+    }
 
     public RecentPatientAdapter(List<Patient> patientList) {
         this.patientList = patientList;
+    }
+
+    public void setOnPatientClickListener(RecentPatientAdapter.OnPatientClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -51,6 +60,15 @@ public class RecentPatientAdapter extends RecyclerView.Adapter<RecentPatientAdap
         adjustNameAndAge(holder, patient, context);
         adjustRiskBadge(holder, patient, context);
         adjustLastAssessment(holder, patient);
+        adjustPatientClickListener(holder, patient);
+    }
+
+    private void adjustPatientClickListener(@NonNull RecentPatientViewHolder holder, Patient patient) {
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onPatientClick(patient);
+            }
+        });
     }
 
     private static void adjustLastAssessment(@NonNull RecentPatientViewHolder holder, Patient patient) {

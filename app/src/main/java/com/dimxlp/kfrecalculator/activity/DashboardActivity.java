@@ -98,8 +98,14 @@ public class DashboardActivity extends AppCompatActivity {
 
         initViews();
         setupListeners();
-        loadUserData();
         setupRecyclerViews();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: Loading user data.");
+        loadUserData();
     }
 
     private void initViews() {
@@ -512,6 +518,11 @@ public class DashboardActivity extends AppCompatActivity {
         recentPatientsRecView.setLayoutManager(new LinearLayoutManager(this));
         RecentPatientAdapter adapter = new RecentPatientAdapter(recentPatients);
         recentPatientsRecView.setAdapter(adapter);
+        adapter.setOnPatientClickListener(patient -> {
+            Intent intent = new Intent(this, PatientDetailsActivity.class);
+            intent.putExtra("patientId", patient.getPatientId());
+            startActivity(intent);
+        });
     }
 
     private void setupRecyclerViews() {
