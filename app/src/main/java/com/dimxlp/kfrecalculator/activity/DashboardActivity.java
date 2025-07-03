@@ -44,8 +44,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -268,17 +268,63 @@ public class DashboardActivity extends AppCompatActivity {
         long thirtyDaysInMillis = 30L * 24 * 60 * 60 * 1000;
         long recentThreshold = System.currentTimeMillis() - thirtyDaysInMillis;
 
-        long recentCount = 0;
+        List<Patient> recentPatientsList = new ArrayList<>();
         for (DocumentSnapshot doc : patientSnapshots.getDocuments()) {
             com.google.firebase.Timestamp createdAtTimestamp = doc.getTimestamp("createdAt");
-            if (createdAtTimestamp != null) {
-                if (createdAtTimestamp.toDate().getTime() >= recentThreshold) {
-                    recentCount++;
+            if (createdAtTimestamp != null && createdAtTimestamp.toDate().getTime() >= recentThreshold) {
+                Patient patient = doc.toObject(Patient.class);
+                if(patient != null){
+                    patient.setPatientId(doc.getId());
+                    recentPatientsList.add(patient);
                 }
             }
         }
-        recentDoctor.setText(String.valueOf(recentCount));
-        Log.d(TAG, "Recent patient count: " + recentCount);
+
+        // Update the quick stat TextView
+        recentDoctor.setText(String.valueOf(recentPatientsList.size()));
+        Log.d(TAG, "Recent patient count: " + recentPatientsList.size());
+
+        // If there are recent patients, fetch their risk levels and populate the list
+        if (!recentPatientsList.isEmpty()) {
+            populateRecentPatientsWithRisk(recentPatientsList);
+        } else {
+            // If no recent patients, clear the RecyclerView
+            setupRecentPatientsRecyclerView(new ArrayList<>());
+        }
+    }
+
+    private void populateRecentPatientsWithRisk(List<Patient> recentPatients) {
+        final AtomicInteger patientsProcessed = new AtomicInteger(0);
+        final int totalRecent = recentPatients.size();
+
+        for (Patient patient : recentPatients) {
+            db.collection("KfreCalculations")
+                    .whereEqualTo("patientId", patient.getPatientId())
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .limit(1)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            KfreCalculation latestCalc = task.getResult().getDocuments().get(0).toObject(KfreCalculation.class);
+                            if (latestCalc != null) {
+                                patient.setLastAssessment(new Date(latestCalc.getCreatedAt()));
+                                double risk2Yr = latestCalc.getRisk2Yr();
+                                if (risk2Yr >= 15) patient.setRisk(Risk.HIGH);
+                                else if (risk2Yr >= 5) patient.setRisk(Risk.MEDIUM);
+                                else patient.setRisk(Risk.LOW);
+                            }
+                        } else {
+                            patient.setRisk(Risk.UNKNOWN); // Default risk
+                        }
+
+                        // When all recent patients have been processed, update the RecyclerView
+                        if (patientsProcessed.incrementAndGet() == totalRecent) {
+                            // Sort by creation date to show newest first
+                            recentPatients.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
+                            setupRecentPatientsRecyclerView(recentPatients);
+                        }
+                    });
+        }
     }
 
     private void calculatePatientRiskDistribution(QuerySnapshot patientSnapshots) {
@@ -297,9 +343,9 @@ public class DashboardActivity extends AppCompatActivity {
                     .orderBy("createdAt", Query.Direction.DESCENDING)
                     .limit(1)
                     .get()
-                    .addOnSuccessListener(calcSnapshots -> {
-                        if (!calcSnapshots.isEmpty()) {
-                            KfreCalculation latestCalc = calcSnapshots.getDocuments().get(0).toObject(KfreCalculation.class);
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            KfreCalculation latestCalc = task.getResult().getDocuments().get(0).toObject(KfreCalculation.class);
                             if (latestCalc != null) {
                                 double risk2Yr = latestCalc.getRisk2Yr();
                                 // Categorize based on risk
@@ -311,16 +357,11 @@ public class DashboardActivity extends AppCompatActivity {
                                     lowRiskCount.incrementAndGet();
                                 }
                             }
+                        } else {
+                            Log.e(TAG, "Could not fetch calculation for risk distribution: " + patientId, task.getException());
                         }
+
                         // When the last patient is processed, update the UI
-                        if (patientsProcessed.incrementAndGet() == totalPatientCount) {
-                            highRiskDoctor.setText(String.valueOf(highRiskCount.get()));
-                            setupDoctorPieChart(lowRiskCount.get(), mediumRiskCount.get(), highRiskCount.get());
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "Error fetching calculation for patient: " + patientId, e);
-                        // Still need to count this as processed to not block the UI update forever
                         if (patientsProcessed.incrementAndGet() == totalPatientCount) {
                             highRiskDoctor.setText(String.valueOf(highRiskCount.get()));
                             setupDoctorPieChart(lowRiskCount.get(), mediumRiskCount.get(), highRiskCount.get());
@@ -502,17 +543,14 @@ public class DashboardActivity extends AppCompatActivity {
         lineChartIndividualCard.setVisibility(isDoctor ? View.GONE : View.VISIBLE);
     }
 
-    private void setupRecyclerViews() {
-        List<Patient> dummyPatients = generateDummyRecentPatients();
-
-        // Doctor view
+    private void setupRecentPatientsRecyclerView(List<Patient> recentPatients) {
         recentPatientsRecView.setLayoutManager(new LinearLayoutManager(this));
-        RecentPatientAdapter recentPatientAdapter = new RecentPatientAdapter(dummyPatients);
-        recentPatientsRecView.setAdapter(recentPatientAdapter);
+        RecentPatientAdapter adapter = new RecentPatientAdapter(recentPatients);
+        recentPatientsRecView.setAdapter(adapter);
+    }
 
+    private void setupRecyclerViews() {
         List<KfreCalculation> dummyKfreCalculations = generateDummyCalculations();
-
-        // Individual view
         recentCalculationsRecView.setLayoutManager(new LinearLayoutManager(this));
         RecentCalculationAdapter recentCalculationAdapter = new RecentCalculationAdapter(dummyKfreCalculations);
         recentCalculationsRecView.setAdapter(recentCalculationAdapter);
