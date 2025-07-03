@@ -13,12 +13,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dimxlp.kfrecalculator.R;
+import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.model.CkdEpiCalculation;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class PatientCkdEpiCalculatorFragment extends BaseCkdEpiCalculatorFragment {
@@ -133,18 +137,39 @@ public class PatientCkdEpiCalculatorFragment extends BaseCkdEpiCalculatorFragmen
                     .addOnSuccessListener(unused -> {
                         Log.d(TAG, "saveCalculation: Successfully saved calculation to Firestore.");
                         Toast.makeText(getContext(), "Calculation saved", Toast.LENGTH_SHORT).show();
-                    })
+
+                        updatePatientWithNewEgfrResult(egfrResult);
+                        Log.d(TAG, "saveCalculation: Setting fragment result to reload assessments.");
+                        requireActivity().getSupportFragmentManager().setFragmentResult("reload_ckd_epi_assessments", new Bundle());})
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "saveCalculation: Failed to save calculation to Firestore.", e);
                         Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
 
-            Log.d(TAG, "saveCalculation: Setting fragment result to reload assessments.");
-            requireActivity().getSupportFragmentManager().setFragmentResult("reload_ckd_epi_assessments", new Bundle());
-
         } catch (NumberFormatException e) {
             Log.e(TAG, "saveCalculation: Invalid number format in input fields.", e);
             Toast.makeText(getContext(), "Invalid input fields", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void updatePatientWithNewEgfrResult(double egfrResult) {
+        if (patientId == null || patientId.isEmpty()) {
+            Log.e(TAG, "updatePatientWithNewRisk: patientId is null, cannot update patient record.");
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Log.d(TAG, "Attempting to update patient: " + patientId);
+
+        // Prepare the data to update
+        Map<String, Object> patientUpdates = new HashMap<>();
+        patientUpdates.put("egfrResult", egfrResult);
+        patientUpdates.put("lastUpdated", System.currentTimeMillis());
+
+        // Update the specific fields in the Patient document
+        db.collection("Patients").document(patientId)
+                .update(patientUpdates)
+                .addOnSuccessListener(aVoid -> Log.i(TAG, "Successfully updated patient record for patientId: " + patientId))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to update patient record for patientId: " + patientId, e));
     }
 }

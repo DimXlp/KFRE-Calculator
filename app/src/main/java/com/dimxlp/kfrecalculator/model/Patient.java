@@ -22,10 +22,11 @@ public class Patient {
     private double risk5Yr;
     private Risk risk;
     private Date lastAssessment;
+    private double egfrResult;
 
     public Patient() {}
 
-    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, Date createdAt, long lastUpdated, double risk2Yr, double risk5Yr, Risk risk, Date lastAssessment) {
+    public Patient(String patientId, String userId, String firstName, String lastName, String birthDate, String gender, boolean active, Map<String, Disease> history, String generalHistoryNote, Date createdAt, long lastUpdated, double risk2Yr, double risk5Yr, Risk risk, Date lastAssessment, double egfrResult) {
         this.patientId = patientId;
         this.userId = userId;
         this.firstName = firstName;
@@ -42,6 +43,7 @@ public class Patient {
         this.risk5Yr = risk5Yr;
         this.risk = risk;
         this.lastAssessment = lastAssessment;
+        this.egfrResult = egfrResult;
     }
 
     public Patient(String fullName, String birthDate, long lastUpdated, Risk risk) {
@@ -177,5 +179,13 @@ public class Patient {
 
     public void setLastAssessment(Date lastAssessment) {
         this.lastAssessment = lastAssessment;
+    }
+
+    public double getEgfrResult() {
+        return egfrResult;
+    }
+
+    public void setEgfrResult(double egfrResult) {
+        this.egfrResult = egfrResult;
     }
 }
