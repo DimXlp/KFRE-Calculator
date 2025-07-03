@@ -25,6 +25,7 @@ import com.dimxlp.kfrecalculator.enumeration.Role;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -270,7 +271,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         List<Patient> recentPatientsList = new ArrayList<>();
         for (DocumentSnapshot doc : patientSnapshots.getDocuments()) {
-            com.google.firebase.Timestamp createdAtTimestamp = doc.getTimestamp("createdAt");
+            Timestamp createdAtTimestamp = doc.getTimestamp("createdAt");
             if (createdAtTimestamp != null && createdAtTimestamp.toDate().getTime() >= recentThreshold) {
                 Patient patient = doc.toObject(Patient.class);
                 if(patient != null){
@@ -284,47 +285,11 @@ public class DashboardActivity extends AppCompatActivity {
         recentDoctor.setText(String.valueOf(recentPatientsList.size()));
         Log.d(TAG, "Recent patient count: " + recentPatientsList.size());
 
-        // If there are recent patients, fetch their risk levels and populate the list
-        if (!recentPatientsList.isEmpty()) {
-            populateRecentPatientsWithRisk(recentPatientsList);
-        } else {
-            // If no recent patients, clear the RecyclerView
-            setupRecentPatientsRecyclerView(new ArrayList<>());
-        }
-    }
+        // Sort by creation date to show newest first
+        recentPatientsList.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
 
-    private void populateRecentPatientsWithRisk(List<Patient> recentPatients) {
-        final AtomicInteger patientsProcessed = new AtomicInteger(0);
-        final int totalRecent = recentPatients.size();
-
-        for (Patient patient : recentPatients) {
-            db.collection("KfreCalculations")
-                    .whereEqualTo("patientId", patient.getPatientId())
-                    .orderBy("createdAt", Query.Direction.DESCENDING)
-                    .limit(1)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            KfreCalculation latestCalc = task.getResult().getDocuments().get(0).toObject(KfreCalculation.class);
-                            if (latestCalc != null) {
-                                patient.setLastAssessment(new Date(latestCalc.getCreatedAt()));
-                                double risk2Yr = latestCalc.getRisk2Yr();
-                                if (risk2Yr >= 15) patient.setRisk(Risk.HIGH);
-                                else if (risk2Yr >= 5) patient.setRisk(Risk.MEDIUM);
-                                else patient.setRisk(Risk.LOW);
-                            }
-                        } else {
-                            patient.setRisk(Risk.UNKNOWN); // Default risk
-                        }
-
-                        // When all recent patients have been processed, update the RecyclerView
-                        if (patientsProcessed.incrementAndGet() == totalRecent) {
-                            // Sort by creation date to show newest first
-                            recentPatients.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
-                            setupRecentPatientsRecyclerView(recentPatients);
-                        }
-                    });
-        }
+        // Directly setup the RecyclerView with the fetched data
+        setupRecentPatientsRecyclerView(recentPatientsList);
     }
 
     private void calculatePatientRiskDistribution(QuerySnapshot patientSnapshots) {
