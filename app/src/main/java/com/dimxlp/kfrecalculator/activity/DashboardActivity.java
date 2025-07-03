@@ -241,7 +241,7 @@ public class DashboardActivity extends AppCompatActivity {
                             setupRecyclerViews();
                         } else {
                             setupIndividualQuickStats(generateDummyCalculations());
-                            setupCharts(generateDummyRecentPatients(), generateDummyCalculations(), role);
+                            setupCharts(generateDummyCalculations(), role);
                         }
                     }
                 })
@@ -388,7 +388,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
 
-    private void setupCharts(List<Patient> patients, List<KfreCalculation> kfreCalculations, Role role) {
+    private void setupCharts(List<KfreCalculation> kfreCalculations, Role role) {
         setupIndividualLineChart(kfreCalculations);
     }
 
@@ -519,14 +519,6 @@ public class DashboardActivity extends AppCompatActivity {
         recentCalculationsRecView.setLayoutManager(new LinearLayoutManager(this));
         RecentCalculationAdapter recentCalculationAdapter = new RecentCalculationAdapter(dummyKfreCalculations);
         recentCalculationsRecView.setAdapter(recentCalculationAdapter);
-    }
-
-    private List<Patient> generateDummyRecentPatients() {
-        List<Patient> list = new ArrayList<>();
-        list.add(new Patient("John Doe", "1959-03-22", System.currentTimeMillis(), Risk.HIGH));
-        list.add(new Patient("Maria Koutra", "1954-06-10", System.currentTimeMillis() - 86400000, Risk.MEDIUM));
-        list.add(new Patient("George Xlp", "1952-01-15", System.currentTimeMillis() - 172800000, Risk.LOW));
-        return list;
     }
 
     private List<KfreCalculation> generateDummyCalculations() {
