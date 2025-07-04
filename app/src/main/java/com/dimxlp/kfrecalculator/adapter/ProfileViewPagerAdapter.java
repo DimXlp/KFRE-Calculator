@@ -1,16 +1,24 @@
 // adapter/ProfileViewPagerAdapter.java
 package com.dimxlp.kfrecalculator.adapter;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.dimxlp.kfrecalculator.fragment.AccountInfoFragment;
-import com.dimxlp.kfrecalculator.fragment.ExportFragment;
-import com.dimxlp.kfrecalculator.fragment.PreferencesFragment;
+//import com.dimxlp.kfrecalculator.fragment.ExportFragment;
+//import com.dimxlp.kfrecalculator.fragment.PreferencesFragment;
 
 public class ProfileViewPagerAdapter extends FragmentStateAdapter {
+
+    private Bundle fragmentArguments;
+
+    public void setFragmentArguments(Bundle args) {
+        this.fragmentArguments = args;
+    }
 
     public ProfileViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
@@ -19,17 +27,23 @@ public class ProfileViewPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
+        Fragment fragment;
         switch (position) {
             case 0:
-                return new AccountInfoFragment();
-            case 1:
-                return new PreferencesFragment();
-            case 2:
-                return new ExportFragment();
+                fragment = new AccountInfoFragment();
+                break;
+//            case 1:
+//                fragment = new PreferencesFragment();
+//                break;
+//            case 2:
+//                fragment = new ExportFragment();
+//                break;
             default:
-                // Should never happen
-                return new AccountInfoFragment();
+                fragment = new AccountInfoFragment();
         }
+        // Set the arguments for the fragment
+        fragment.setArguments(this.fragmentArguments);
+        return fragment;
     }
 
     @Override

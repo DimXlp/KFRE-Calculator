@@ -65,6 +65,10 @@
         <activity
             android:name=".activity.DashboardQuickCalculationActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

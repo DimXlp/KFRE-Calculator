@@ -31,8 +31,10 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(binding.profileToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Setup ViewPager2 Adapter
-        binding.profileViewPager.setAdapter(new ProfileViewPagerAdapter(this));
+        // Pass intent extras to the adapter
+        ProfileViewPagerAdapter adapter = new ProfileViewPagerAdapter(this);
+        adapter.setFragmentArguments(getIntent().getExtras());
+        binding.profileViewPager.setAdapter(adapter);
 
         // Link TabLayout with ViewPager2
         new TabLayoutMediator(binding.profileTabLayout, binding.profileViewPager,
@@ -64,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
             return true;
         } else if (itemId == R.id.action_about) {
             Log.d(TAG, "About menu item selected.");
-            startActivity(new Intent(this, AboutActivity.class));
+//            startActivity(new Intent(this, AboutActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

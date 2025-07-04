@@ -88,6 +88,8 @@ public class DashboardActivity extends AppCompatActivity {
     private PieChart pieChartDoctor;
     private LineChart lineChartIndividual;
 
+    private String userFirstName, userLastName, userRoleStr, userClinic;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,9 +208,20 @@ public class DashboardActivity extends AppCompatActivity {
             popup.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_profile) {
-                    Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Profile menu item clicked. Starting ProfileActivity.");
+                    Intent intent = new Intent(DashboardActivity.this, ProfileActivity.class);
+                    // Pass the fetched user data to the next activity
+                    intent.putExtra("USER_FIRST_NAME", userFirstName);
+                    intent.putExtra("USER_LAST_NAME", userLastName);
+                    intent.putExtra("USER_EMAIL", currentUser.getEmail()); // Email from FirebaseAuth
+                    intent.putExtra("USER_ROLE", userRoleStr);
+                    intent.putExtra("USER_CLINIC", userClinic);
+                    startActivity(intent);
+                    return true; // Return true to indicate the click was handled
                 } else if (itemId == R.id.menu_logout) {
+                    // Your logout logic
                     Toast.makeText(this, "Logout feature coming soon", Toast.LENGTH_SHORT).show();
+                    return true;
                 }
                 return false;
             });
@@ -225,6 +238,11 @@ public class DashboardActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
+                        userFirstName = doc.getString("firstName");
+                        userLastName = doc.getString("lastName");
+                        userRoleStr = doc.getString("role");
+                        userClinic = doc.getString("clinic");
+
                         Role role = Role.fromString(doc.getString("role"));
                         String lastName = doc.getString("lastName");
                         String firstName = doc.getString("firstName");

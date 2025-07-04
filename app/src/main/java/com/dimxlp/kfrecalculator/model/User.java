@@ -8,12 +8,13 @@ public class User {
     private String fullName;
     private String profileImageUrl;
     private String role;
+    private String clinic;
     private long createdAt;
     private long lastLogin;
 
     public User() {}
 
-    public User(String userId, String email, String firstName, String lastName, String profileImageUrl, String role, long createdAt, long lastLogin) {
+    public User(String userId, String email, String firstName, String lastName, String profileImageUrl, String role, String clinic, long createdAt, long lastLogin) {
         this.userId = userId;
         this.email = email;
         this.firstName = firstName;
@@ -21,6 +22,7 @@ public class User {
         this.fullName = firstName + " " + lastName;
         this.profileImageUrl = profileImageUrl;
         this.role = role;
+        this.clinic = clinic;
         this.createdAt = createdAt;
         this.lastLogin = lastLogin;
     }
@@ -79,6 +81,14 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getClinic() {
+        return clinic;
+    }
+
+    public void setClinic(String clinic) {
+        this.clinic = clinic;
     }
 
     public long getCreatedAt() {
