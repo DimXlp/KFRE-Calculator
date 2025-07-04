@@ -9,8 +9,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.dimxlp.kfrecalculator.fragment.AccountInfoFragment;
+import com.dimxlp.kfrecalculator.fragment.PreferencesFragment;
 //import com.dimxlp.kfrecalculator.fragment.ExportFragment;
-//import com.dimxlp.kfrecalculator.fragment.PreferencesFragment;
 
 public class ProfileViewPagerAdapter extends FragmentStateAdapter {
 
@@ -32,9 +32,9 @@ public class ProfileViewPagerAdapter extends FragmentStateAdapter {
             case 0:
                 fragment = new AccountInfoFragment();
                 break;
-//            case 1:
-//                fragment = new PreferencesFragment();
-//                break;
+            case 1:
+                fragment = new PreferencesFragment();
+                break;
 //            case 2:
 //                fragment = new ExportFragment();
 //                break;

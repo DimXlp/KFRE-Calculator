@@ -213,7 +213,7 @@ public class DashboardActivity extends AppCompatActivity {
                     // Pass the fetched user data to the next activity
                     intent.putExtra("USER_FIRST_NAME", userFirstName);
                     intent.putExtra("USER_LAST_NAME", userLastName);
-                    intent.putExtra("USER_EMAIL", currentUser.getEmail()); // Email from FirebaseAuth
+                    intent.putExtra("USER_EMAIL", currentUser.getEmail());
                     intent.putExtra("USER_ROLE", userRoleStr);
                     intent.putExtra("USER_CLINIC", userClinic);
                     startActivity(intent);
