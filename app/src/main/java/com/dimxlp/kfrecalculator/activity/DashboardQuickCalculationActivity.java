@@ -103,11 +103,14 @@ public class DashboardQuickCalculationActivity extends AppCompatActivity {
                 if (itemId == R.id.menu_profile) {
                     Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
                 } else if (itemId == R.id.menu_logout) {
+                    Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();
-                    Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                    Intent intent = new Intent(DashboardQuickCalculationActivity.this, MainActivity.class);
+                    intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    return true;
                 }
                 return false;
             });

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -64,6 +65,21 @@ public class ProfileActivity extends AppCompatActivity {
             Log.d(TAG, "Back button pressed.");
             finish();
             return true;
+        } else if (itemId == R.id.menu_profile) {
+            Log.d(TAG, "Profile menu tapped while already on Profile.");
+            Toast.makeText(this, getString(R.string.already_in_profile), Toast.LENGTH_SHORT).show();
+            return true;
+
+        } else if (itemId == R.id.menu_logout) {
+            Log.d(TAG, "Logout clicked");
+            com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+
+            Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+            intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return true;
+
         } else if (itemId == R.id.action_about) {
             Log.d(TAG, "About menu item selected.");
 //            startActivity(new Intent(this, AboutActivity.class));

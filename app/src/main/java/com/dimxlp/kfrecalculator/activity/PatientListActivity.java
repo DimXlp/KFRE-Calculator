@@ -131,7 +131,14 @@ public class PatientListActivity extends AppCompatActivity {
                 if (itemId == R.id.menu_profile) {
                     Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
                 } else if (itemId == R.id.menu_logout) {
-                    Toast.makeText(this, "Logout feature coming soon", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Logout clicked");
+                    FirebaseAuth.getInstance().signOut();
+
+                    Intent intent = new Intent(PatientListActivity.this, MainActivity.class);
+                    intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    return true;
                 }
                 return false;
             });

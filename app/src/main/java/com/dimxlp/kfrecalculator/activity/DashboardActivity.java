@@ -219,10 +219,16 @@ public class DashboardActivity extends AppCompatActivity {
                     startActivity(intent);
                     return true; // Return true to indicate the click was handled
                 } else if (itemId == R.id.menu_logout) {
-                    // Your logout logic
-                    Toast.makeText(this, "Logout feature coming soon", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Logout clicked");
+                    FirebaseAuth.getInstance().signOut();
+
+                    Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
+                    intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                     return true;
                 }
+
                 return false;
             });
 
