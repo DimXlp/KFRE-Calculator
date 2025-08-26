@@ -7,19 +7,47 @@
     android:orientation="vertical"
     tools:context=".activity.ProfileActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- Top bar with logo and profile picture -->
+    <LinearLayout
+        android:id="@+id/profileHeader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/colorPrimary"
+        android:paddingTop="24dp"
+        android:paddingBottom="12dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/profileToolbar"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Profile &amp; Settings"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            style="@style/Widget.Material3.Toolbar.Surface" />
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
-    </com.google.android.material.appbar.AppBarLayout>
+            <ImageView
+                android:id="@+id/profileAppLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@mipmap/ic_logo"
+                android:contentDescription="App Logo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <ImageView
+                android:id="@+id/profileImg"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_profile"
+                android:background="@drawable/rounded_edittext"
+                android:scaleType="centerCrop"
+                android:contentDescription="Profile Picture"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/profileTabLayout"
