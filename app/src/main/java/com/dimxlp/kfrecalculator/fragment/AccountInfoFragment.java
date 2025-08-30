@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dimxlp.kfrecalculator.databinding.FragmentAccountInfoBinding;
+import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -100,6 +101,7 @@ public class AccountInfoFragment extends Fragment {
         Map<String, Object> updates = new HashMap<>();
         if (!firstName.isEmpty()) updates.put("firstName", firstName);
         if (!lastName.isEmpty()) updates.put("lastName", lastName);
+        if (!firstName.isEmpty() && !lastName.isEmpty()) updates.put("fullName", firstName + " " + lastName);
 
         // Only add the clinic field if the user is a doctor
         if ("Doctor".equalsIgnoreCase(userRole)) {
@@ -132,7 +134,7 @@ public class AccountInfoFragment extends Fragment {
                             ? Objects.requireNonNull(binding.accountClinic.getText()).toString().trim()
                             : null;
 
-                    com.dimxlp.kfrecalculator.util.UserPrefs.save(
+                    UserPrefs.save(
                             requireContext(),
                             firstName,
                             lastName,

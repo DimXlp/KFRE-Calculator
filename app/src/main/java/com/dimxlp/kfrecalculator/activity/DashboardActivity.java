@@ -142,7 +142,7 @@ public class DashboardActivity extends AppCompatActivity {
                     String roleLower = userRoleStr == null ? "individual" : userRoleStr.toLowerCase();
 
                     // save fresh snapshot for future instant reads
-                    com.dimxlp.kfrecalculator.util.UserPrefs.save(
+                    UserPrefs.save(
                             this,
                             userFirstName,
                             userLastName,
