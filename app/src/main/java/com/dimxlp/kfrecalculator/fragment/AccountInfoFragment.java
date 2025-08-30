@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -97,14 +98,19 @@ public class AccountInfoFragment extends Fragment {
 
         // Create a map to hold the data for updating
         Map<String, Object> updates = new HashMap<>();
-        updates.put("firstName", firstName);
-        updates.put("lastName", lastName);
+        if (!firstName.isEmpty()) updates.put("firstName", firstName);
+        if (!lastName.isEmpty()) updates.put("lastName", lastName);
 
         // Only add the clinic field if the user is a doctor
         if ("Doctor".equalsIgnoreCase(userRole)) {
             String clinic = Objects.requireNonNull(binding.accountClinic.getText()).toString().trim();
-            updates.put("clinic", clinic);
+            if (!clinic.isEmpty()) updates.put("clinic", clinic);
             Log.i(TAG, "Updating clinic: " + clinic);
+        }
+
+        if (updates.isEmpty()) {
+            Toast.makeText(getContext(), "Nothing to update.", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         Log.i(TAG, "Attempting to update user document: " + userId);
@@ -115,6 +121,25 @@ public class AccountInfoFragment extends Fragment {
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "User document successfully updated.");
                     Toast.makeText(getContext(), "Profile Updated!", Toast.LENGTH_SHORT).show();
+
+                    FirebaseUser u = FirebaseAuth.getInstance().getCurrentUser();
+                    String email = u != null ? u.getEmail() : null;
+
+                    String roleLower = userRole != null ? userRole.toLowerCase(Locale.ROOT) : "individual";
+
+                    // Only keep clinic for doctors
+                    String clinicToSave = "doctor".equals(roleLower)
+                            ? Objects.requireNonNull(binding.accountClinic.getText()).toString().trim()
+                            : null;
+
+                    com.dimxlp.kfrecalculator.util.UserPrefs.save(
+                            requireContext(),
+                            firstName,
+                            lastName,
+                            email,
+                            roleLower,
+                            clinicToSave
+                    );
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error updating user document", e);

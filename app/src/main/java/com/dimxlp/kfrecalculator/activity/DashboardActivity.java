@@ -44,12 +44,11 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -108,7 +107,83 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: Loading user data.");
-        loadUserData();
+        applyWelcomeFromCache();
+        refreshUserProfileFromServer();
+    }
+
+    private void applyWelcomeFromCache() {
+        String cachedRole = UserPrefs.role(this);
+        String cachedFirst = UserPrefs.first(this);
+        String cachedLast = UserPrefs.last(this);
+        setGreeting(cachedRole, cachedFirst, cachedLast);
+    }
+
+    private void refreshUserProfileFromServer() {
+        FirebaseUser u = FirebaseAuth.getInstance().getCurrentUser();
+        if (u == null) return;
+
+        db.collection("Users")
+                .document(u.getUid())
+                .get(Source.SERVER)
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        // still show something sensible
+                        setGreeting(null, null, null);
+                        return;
+                    }
+
+                    userFirstName = doc.getString("firstName");
+                    userLastName = doc.getString("lastName");
+                    userRoleStr = doc.getString("role");
+                    userClinic = doc.getString("clinic");
+                    String email = doc.getString("email");
+                    if (email == null) email = u.getEmail();
+
+                    String roleLower = userRoleStr == null ? "individual" : userRoleStr.toLowerCase();
+
+                    // save fresh snapshot for future instant reads
+                    com.dimxlp.kfrecalculator.util.UserPrefs.save(
+                            this,
+                            userFirstName,
+                            userLastName,
+                            email,
+                            roleLower,
+                            userClinic
+                    );
+
+                    // apply greeting/UI now
+                    setGreeting(roleLower, userFirstName, userLastName);
+
+                    // keep the rest of your role-based dashboard behavior
+                    Role roleEnum = Role.fromString(roleLower);
+                    setVisibilityBasedOnRole(roleEnum);
+
+                    if (roleEnum == Role.DOCTOR) {
+                        loadPatientData();
+                        setupRecyclerViews();
+                    } else {
+                        // keep whatever you already do for individuals
+                        setupIndividualQuickStats(generateDummyCalculations());
+                        setupCharts(generateDummyCalculations(), roleEnum);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to load user info from server", e);
+                    // fall back to cache if server read fails
+                    applyWelcomeFromCache();
+                });
+    }
+
+    private void setGreeting(String roleLower, String firstName, String lastName) {
+        boolean isDoctor = "doctor".equalsIgnoreCase(roleLower);
+
+        if (isDoctor) {
+            userRole.setText("Dr. ");
+            userName.setText(pickNameForDoctor(lastName));
+        } else {
+            userRole.setText("");
+            userName.setText(pickNameForIndividual(firstName));
+        }
     }
 
     private void initViews() {
@@ -242,7 +317,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         db.collection("Users")
                 .document(currentUser.getUid())
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         userFirstName = doc.getString("firstName");
@@ -254,8 +329,8 @@ public class DashboardActivity extends AppCompatActivity {
 
                         userRole.setText(role == Role.DOCTOR ? "Dr. " : "");
                         userName.setText(role == Role.DOCTOR ?
-                                Objects.requireNonNullElse(UserPrefs.last(this), "") :
-                                Objects.requireNonNullElse(UserPrefs.first(this), ""));
+                                pickNameForDoctor(UserPrefs.last(this)) :
+                                pickNameForIndividual(UserPrefs.first(this)));
 
                         setVisibilityBasedOnRole(role);
 
@@ -270,6 +345,34 @@ public class DashboardActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to load user info", e));
     }
+
+    private String pickNameForDoctor(String lastName) {
+        if (isNotNullOrBlank(lastName)) return lastName.trim();
+        return fallbackNameFromAuth();
+    }
+
+    private String pickNameForIndividual(String firstName) {
+        if (isNotNullOrBlank(firstName)) return firstName.trim();
+        return fallbackNameFromAuth();
+    }
+
+    private boolean isNotNullOrBlank(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
+
+    private String fallbackNameFromAuth() {
+        FirebaseUser u = currentUser != null ? currentUser : FirebaseAuth.getInstance().getCurrentUser();
+        if (u != null && u.getDisplayName() != null && !u.getDisplayName().trim().isEmpty()) {
+            return u.getDisplayName().trim();
+        }
+        if (u != null && u.getEmail() != null) {
+            String email = u.getEmail();
+            int at = email.indexOf('@');
+            return at > 0 ? email.substring(0, at) : email;
+        }
+        return "User";
+    }
+
 
     private void loadPatientData() {
         if (currentUser == null) return;
