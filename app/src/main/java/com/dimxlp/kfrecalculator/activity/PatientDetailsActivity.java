@@ -17,6 +17,7 @@ import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.fragment.PatientCkdEpiCalculatorFragment;
 import com.dimxlp.kfrecalculator.fragment.PatientKfreCalculatorFragment;
 import com.dimxlp.kfrecalculator.fragment.PatientDetailsFragment;
+import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -115,7 +116,7 @@ public class PatientDetailsActivity extends AppCompatActivity {
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();
-
+                    UserPrefs.clear(this);
                     Intent intent = new Intent(PatientDetailsActivity.this, MainActivity.class);
                     intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

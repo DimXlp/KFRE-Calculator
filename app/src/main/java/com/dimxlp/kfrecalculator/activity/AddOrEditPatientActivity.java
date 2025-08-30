@@ -25,6 +25,7 @@ import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.ui.MedicationPickerBottomSheet;
 import com.dimxlp.kfrecalculator.model.Disease;
 import com.dimxlp.kfrecalculator.model.MedicationAssignment;
+import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.textfield.TextInputEditText;
@@ -134,7 +135,7 @@ public class AddOrEditPatientActivity extends AppCompatActivity implements Medic
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();
-
+                    UserPrefs.clear(this);
                     Intent intent = new Intent(AddOrEditPatientActivity.this, MainActivity.class);
                     intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

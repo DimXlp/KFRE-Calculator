@@ -24,6 +24,7 @@ import com.dimxlp.kfrecalculator.enumeration.Risk;
 import com.dimxlp.kfrecalculator.enumeration.Role;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
+import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -221,7 +222,7 @@ public class DashboardActivity extends AppCompatActivity {
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();
-
+                    UserPrefs.clear(this);
                     Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
                     intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -250,19 +251,11 @@ public class DashboardActivity extends AppCompatActivity {
                         userClinic = doc.getString("clinic");
 
                         Role role = Role.fromString(doc.getString("role"));
-                        String lastName = doc.getString("lastName");
-                        String firstName = doc.getString("firstName");
 
                         userRole.setText(role == Role.DOCTOR ? "Dr. " : "");
                         userName.setText(role == Role.DOCTOR ?
-                                Objects.requireNonNullElse(lastName, "") :
-                                Objects.requireNonNullElse(firstName, ""));
-
-                        if (role == Role.DOCTOR) {
-                            userName.setText(Objects.requireNonNullElse(lastName, ""));
-                        } else {
-                            userName.setText(Objects.requireNonNullElse(firstName, ""));
-                        }
+                                Objects.requireNonNullElse(UserPrefs.last(this), "") :
+                                Objects.requireNonNullElse(UserPrefs.first(this), ""));
 
                         setVisibilityBasedOnRole(role);
 

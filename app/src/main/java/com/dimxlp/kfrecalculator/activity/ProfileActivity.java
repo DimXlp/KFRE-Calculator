@@ -129,7 +129,7 @@ public class ProfileActivity extends AppCompatActivity {
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();
-
+                    UserPrefs.clear(this);
                     Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
                     intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -29,6 +29,7 @@ import com.dimxlp.kfrecalculator.model.FilterOptionsPatientList;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.dimxlp.kfrecalculator.util.AnimationUtils;
+import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -136,7 +137,7 @@ public class PatientListActivity extends AppCompatActivity {
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();
-
+                    UserPrefs.clear(this);
                     Intent intent = new Intent(PatientListActivity.this, MainActivity.class);
                     intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

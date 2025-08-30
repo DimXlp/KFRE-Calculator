@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.fragment.QuickCkdEpiCalculatorFragment;
 import com.dimxlp.kfrecalculator.fragment.QuickKfreCalculatorFragment;
+import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -113,7 +114,7 @@ public class DashboardQuickCalculationActivity extends AppCompatActivity {
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();
-
+                    UserPrefs.clear(this);
                     Intent intent = new Intent(DashboardQuickCalculationActivity.this, MainActivity.class);
                     intent.putExtra("SHOW_LOGOUT_MESSAGE", true);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
