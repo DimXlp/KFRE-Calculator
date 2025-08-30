@@ -1,9 +1,5 @@
 package com.dimxlp.kfrecalculator.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -11,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -31,7 +26,7 @@ import com.dimxlp.kfrecalculator.adapter.CkdEpiAssessmentAdapter;
 import com.dimxlp.kfrecalculator.enumeration.SortDirection;
 import com.dimxlp.kfrecalculator.model.CkdEpiCalculation;
 import com.dimxlp.kfrecalculator.model.FilterOptionsCkdEpi;
-import com.dimxlp.kfrecalculator.utils.AnimationUtils;
+import com.dimxlp.kfrecalculator.util.AnimationUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;

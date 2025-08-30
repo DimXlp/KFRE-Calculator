@@ -28,7 +28,7 @@ import com.dimxlp.kfrecalculator.enumeration.SortDirection;
 import com.dimxlp.kfrecalculator.model.FilterOptionsPatientList;
 import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
-import com.dimxlp.kfrecalculator.utils.AnimationUtils;
+import com.dimxlp.kfrecalculator.util.AnimationUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -129,7 +129,10 @@ public class PatientListActivity extends AppCompatActivity {
             popup.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_profile) {
-                    Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Profile menu item clicked. Starting ProfileActivity.");
+                    Intent intent = new Intent(PatientListActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                    return true;
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();

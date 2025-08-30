@@ -11,17 +11,37 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.adapter.ProfileViewPagerAdapter;
 import com.dimxlp.kfrecalculator.databinding.ActivityProfileBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Locale;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private static final String TAG = "ProfileActivity";
+    private static final String TAG = "RAFI|ProfileActivity";
+
+    public static final String EXTRA_USER_FIRST_NAME = "USER_FIRST_NAME";
+    public static final String EXTRA_USER_LAST_NAME = "USER_LAST_NAME";
+    public static final String EXTRA_USER_EMAIL = "USER_EMAIL";
+    public static final String EXTRA_USER_ROLE = "USER_ROLE";
+    public static final String EXTRA_USER_CLINIC = "USER_CLINIC";
+
     private ActivityProfileBinding binding;
+    private ProfileViewPagerAdapter adapter;
+    private TabLayoutMediator tabMediator;
+
+    private FirebaseAuth auth;
+    private FirebaseFirestore db;
+
     private ImageView appLogo, profileImg;
 
     @Override
@@ -31,6 +51,9 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         Log.d(TAG, "Activity created.");
+
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         setTopBarFunctionalities();
 
@@ -43,6 +66,26 @@ public class ProfileActivity extends AppCompatActivity {
         new TabLayoutMediator(binding.profileTabLayout, binding.profileViewPager,
                 (tab, position) -> tab.setText(getTabTitle(position))
         ).attach();
+
+        // Prefill via existing extras (if any) to avoid blank UI flash
+        Bundle seed = getIntent() != null ? getIntent().getExtras() : null;
+        setupAdapterWith(seed);
+
+        // Always fetch the canonical user from Firestore and re-bind UI
+        fetchAndRebindUser();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Auth guard for safety
+        FirebaseUser current = FirebaseAuth.getInstance().getCurrentUser();
+        if (current == null) {
+            Log.w(TAG, "No authenticated user; redirecting to MainActivity.");
+            startActivity(new Intent(this, MainActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            finish();
+        }
     }
 
     private void setTopBarFunctionalities() {
@@ -143,5 +186,86 @@ public class ProfileActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setupAdapterWith(Bundle args) {
+        if (adapter != null && tabMediator != null) {
+            try {
+                tabMediator.detach();
+            } catch (Exception ignored) {}
+        }
+
+        adapter = new ProfileViewPagerAdapter(this);
+        if (args != null) {
+            adapter.setFragmentArguments(new Bundle(args)); // pass a copy
+        } else {
+            adapter.setFragmentArguments(new Bundle());
+        }
+        binding.profileViewPager.setAdapter(adapter);
+        // Optionally keep pages in memory if needed for quick tab switching
+        binding.profileViewPager.setOffscreenPageLimit(ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT);
+
+        tabMediator = new TabLayoutMediator(binding.profileTabLayout, binding.profileViewPager,
+                (tab, position) -> tab.setText(getTabTitle(position)));
+        tabMediator.attach();
+    }
+
+    private void fetchAndRebindUser() {
+        FirebaseUser current = auth.getCurrentUser();
+        if (current == null) {
+            Log.w(TAG, "fetchAndRebindUser: current user is null");
+            return;
+        }
+
+        final String uid = current.getUid();
+        Log.d(TAG, "Fetching user document for uid=" + uid);
+
+        db.collection("Users").document(uid).get()
+                .addOnSuccessListener(this::onUserDocLoaded)
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to load user profile", e));
+    }
+
+    private void onUserDocLoaded(DocumentSnapshot doc) {
+        FirebaseUser current = auth.getCurrentUser();
+        if (current == null) return;
+
+        // Start from whatever the Activity was launched with (optional prefill)
+        Bundle b = getIntent() != null && getIntent().getExtras() != null
+                ? new Bundle(getIntent().getExtras())
+                : new Bundle();
+
+        // Derive canonical values
+        String email  = safe(doc != null ? doc.getString("email") : null);
+        if (email == null || email.isEmpty()) email = safe(current.getEmail());
+
+        String first  = safe(doc != null ? doc.getString("firstName") : null);
+        String last   = safe(doc != null ? doc.getString("lastName") : null);
+        String role   = safe(doc != null ? doc.getString("role") : null);
+        String clinic = safe(doc != null ? doc.getString("clinic") : null);
+
+        if (role == null || role.isEmpty()) role = "individual";
+        role = role.toLowerCase(Locale.ROOT);
+
+        // Put canonical values using the same keys the fragments expect
+        b.putString(EXTRA_USER_EMAIL, email);
+        b.putString(EXTRA_USER_FIRST_NAME, first);
+        b.putString(EXTRA_USER_LAST_NAME, last);
+        b.putString(EXTRA_USER_ROLE, role);
+        b.putString(EXTRA_USER_CLINIC, clinic);
+
+        Log.d(TAG, "Canonical user loaded: first=" + first + ", last=" + last +
+                ", role=" + role + ", clinic=" + clinic + ", email=" + email);
+
+        UserPrefs.save(
+                this,
+                first, last, email, role, clinic
+        );
+
+        // Recreate adapter so fragments are re-instantiated with the canonical data
+        setupAdapterWith(b);
+    }
+
+    private static String safe(String s) {
+        return s == null ? null : s;
     }
 }

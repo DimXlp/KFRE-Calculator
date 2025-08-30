@@ -19,10 +19,15 @@ import com.dimxlp.kfrecalculator.fragment.QuickKfreCalculatorFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class DashboardQuickCalculationActivity extends AppCompatActivity {
 
     private static final String TAG = "RAFI|DashboardQuickCalculation";
+
+    private FirebaseUser currentUser;
+    private FirebaseFirestore db;
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
@@ -101,7 +106,10 @@ public class DashboardQuickCalculationActivity extends AppCompatActivity {
             popup.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_profile) {
-                    Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Profile menu item clicked. Starting ProfileActivity.");
+                    Intent intent = new Intent(DashboardQuickCalculationActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                    return true;
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();

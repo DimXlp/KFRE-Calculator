@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,6 +50,7 @@ public class AddOrEditPatientActivity extends AppCompatActivity implements Medic
 
     private static final String TAG = "RAFI|AddOrEditPatient";
 
+    private FirebaseUser currentUser;
     private boolean isEditMode = false;
     private String patientId;
 
@@ -125,7 +127,10 @@ public class AddOrEditPatientActivity extends AppCompatActivity implements Medic
             popup.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_profile) {
-                    Toast.makeText(this, "Profile Activity coming soon", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Profile menu item clicked. Starting ProfileActivity.");
+                    Intent intent = new Intent(AddOrEditPatientActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                    return true;
                 } else if (itemId == R.id.menu_logout) {
                     Log.d(TAG, "Logout clicked");
                     FirebaseAuth.getInstance().signOut();

@@ -1,4 +1,4 @@
-package com.dimxlp.kfrecalculator.utils;
+package com.dimxlp.kfrecalculator.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;

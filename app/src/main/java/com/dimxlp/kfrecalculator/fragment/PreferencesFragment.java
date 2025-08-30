@@ -1,13 +1,11 @@
 package com.dimxlp.kfrecalculator.fragment;
 
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,9 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dimxlp.kfrecalculator.R;
 import com.dimxlp.kfrecalculator.databinding.FragmentPreferencesBinding;
-import com.dimxlp.kfrecalculator.utils.AppSettings;
+import com.dimxlp.kfrecalculator.util.AppSettings;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Arrays;
