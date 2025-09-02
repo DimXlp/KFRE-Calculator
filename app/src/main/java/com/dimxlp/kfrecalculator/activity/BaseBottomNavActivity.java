@@ -16,6 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class BaseBottomNavActivity extends AppCompatActivity {
 
+    private final String LOG = "RAFI|BaseBottomNav";
+
     protected BottomNavigationView bottomNav;
     private final SparseArray<Class<?>> navRoutes = new SparseArray<>();
 
@@ -49,6 +51,7 @@ public class BaseBottomNavActivity extends AppCompatActivity {
     private void buildRoutes(boolean isDoctor) {
         navRoutes.clear();
         navRoutes.put(R.id.nav_dashboard, dashboardActivityClass());
+        navRoutes.put(R.id.nav_profile, profileActivityClass());
         if (isDoctor) {
             navRoutes.put(R.id.nav_patients, patientsActivityClass());
         } else {
@@ -76,15 +79,16 @@ public class BaseBottomNavActivity extends AppCompatActivity {
             startActivity(i);
             return true;
         } catch (Exception e) {
-            Log.e("RAFI|BaseBottomNav", "Failed to navigate to " + target, e);
+            Log.e(LOG, "Failed to navigate to " + target, e);
             return false;
         }
     }
 
     // Override these if your classes differ
-    protected Class<?> dashboardActivityClass() { return com.dimxlp.kfrecalculator.activity.DashboardActivity.class; }
-    protected Class<?> patientsActivityClass() { return com.dimxlp.kfrecalculator.activity.PatientListActivity.class; }
-    protected Class<?> calculationsActivityClass() { return com.dimxlp.kfrecalculator.activity.DashboardActivity.class; }
-    protected Class<?> quickCalcActivityClass() { return com.dimxlp.kfrecalculator.activity.DashboardQuickCalculationActivity.class; }
-    protected Class<?> exportActivityClass() { return com.dimxlp.kfrecalculator.activity.DashboardActivity.class; }
+    protected Class<?> dashboardActivityClass() { return DashboardActivity.class; }
+    protected Class<?> profileActivityClass() { return ProfileActivity.class; }
+    protected Class<?> patientsActivityClass() { return PatientListActivity.class; }
+    protected Class<?> calculationsActivityClass() { return DashboardActivity.class; }
+    protected Class<?> quickCalcActivityClass() { return DashboardQuickCalculationActivity.class; }
+    protected Class<?> exportActivityClass() { return DashboardActivity.class; }
 }

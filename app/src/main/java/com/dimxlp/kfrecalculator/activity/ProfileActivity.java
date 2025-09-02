@@ -25,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Locale;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends BaseBottomNavActivity {
 
     private static final String TAG = "RAFI|ProfileActivity";
 
@@ -43,6 +43,8 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private ImageView appLogo, profileImg;
+
+    @Override protected int getBottomNavSelectedItemId() { return R.id.nav_profile; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -2,6 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/nav_dashboard" android:title="Dashboard" android:icon="@drawable/ic_dashboard_solid" app:showAsAction="always"/>
+    <item android:id="@+id/nav_profile" android:title="Profile" android:icon="@drawable/ic_profile" app:showAsAction="always"/>
     <item android:id="@+id/nav_patients" android:title="Patients" android:icon="@drawable/ic_patient_solid" app:showAsAction="always"/>
     <item android:id="@+id/nav_quick_calc" android:title="Quick Calc" android:icon="@drawable/ic_quick_calculation_solid" app:showAsAction="always"/>
     <item android:id="@+id/nav_export" android:title="Export" android:icon="@drawable/ic_export_solid" app:showAsAction="always"/>
