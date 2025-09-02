@@ -119,4 +119,10 @@
         app:backgroundTint="@color/colorSecondary"
         app:tint="@color/colorOnSecondary" />
 
+    <include
+        layout="@layout/view_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

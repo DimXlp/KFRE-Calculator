@@ -47,7 +47,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class AddOrEditPatientActivity extends AppCompatActivity implements MedicationPickerBottomSheet.OnMedicationSelectedListener {
+public class AddOrEditPatientActivity extends BaseBottomNavActivity implements MedicationPickerBottomSheet.OnMedicationSelectedListener {
 
     private static final String TAG = "RAFI|AddOrEditPatient";
 
@@ -70,6 +70,8 @@ public class AddOrEditPatientActivity extends AppCompatActivity implements Medic
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+
+    @Override protected int getBottomNavSelectedItemId() { return R.id.nav_patients; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

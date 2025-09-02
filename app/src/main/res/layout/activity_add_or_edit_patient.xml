@@ -206,4 +206,7 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <include layout="@layout/view_bottom_nav"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

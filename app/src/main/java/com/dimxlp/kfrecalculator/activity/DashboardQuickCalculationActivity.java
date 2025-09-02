@@ -23,7 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class DashboardQuickCalculationActivity extends AppCompatActivity {
+public class DashboardQuickCalculationActivity extends BaseBottomNavActivity {
 
     private static final String TAG = "RAFI|DashboardQuickCalculation";
 
@@ -34,11 +34,14 @@ public class DashboardQuickCalculationActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private ImageView logoButton, profileImage;
 
+    @Override protected int getBottomNavSelectedItemId() { return R.id.nav_quick_calc; }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard_quick_calculation);
 
+        setupBottomNav();
         initViews();
         setTopBarFunctionalities();
         setupViewPager();

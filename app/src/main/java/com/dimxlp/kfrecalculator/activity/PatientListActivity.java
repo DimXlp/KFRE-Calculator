@@ -52,7 +52,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class PatientListActivity extends AppCompatActivity {
+public class PatientListActivity extends BaseBottomNavActivity {
 
     private static final String TAG = "RAFI|PatientList";
 
@@ -68,6 +68,8 @@ public class PatientListActivity extends AppCompatActivity {
     private String currentSearchQuery = "";
     private FilterOptionsPatientList currentFilterOptions = new FilterOptionsPatientList();
 
+    @Override protected int getBottomNavSelectedItemId() { return R.id.nav_patients; }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,7 @@ public class PatientListActivity extends AppCompatActivity {
 
         Log.d(TAG, "PatientListActivity initialized");
 
+        setupBottomNav();
         initViews();
         setTopBarFunctionalities();
         setupRecyclerView();

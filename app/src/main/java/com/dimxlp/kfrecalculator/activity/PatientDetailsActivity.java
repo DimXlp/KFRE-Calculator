@@ -21,16 +21,16 @@ import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-public class PatientDetailsActivity extends AppCompatActivity {
+public class PatientDetailsActivity extends BaseBottomNavActivity {
 
     private static final String TAG = "RAFI|PatientDetails";
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
     private ImageView logoButton, profileImage;
+
+    @Override protected int getBottomNavSelectedItemId() { return R.id.nav_patients; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

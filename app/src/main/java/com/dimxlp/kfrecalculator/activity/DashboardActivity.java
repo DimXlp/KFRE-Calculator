@@ -26,6 +26,7 @@ import com.dimxlp.kfrecalculator.model.KfreCalculation;
 import com.dimxlp.kfrecalculator.model.Patient;
 import com.dimxlp.kfrecalculator.util.UserPrefs;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,7 +54,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends BaseBottomNavActivity {
 
     private static final String TAG = "RAFI|Dashboard";
 
@@ -90,6 +91,8 @@ public class DashboardActivity extends AppCompatActivity {
 
     private String userFirstName, userLastName, userRoleStr, userClinic;
 
+    @Override protected int getBottomNavSelectedItemId() { return R.id.nav_dashboard; }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +101,7 @@ public class DashboardActivity extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
 
+        setupBottomNav();
         initViews();
         setupListeners();
         setupRecyclerViews();
@@ -312,40 +316,6 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void loadUserData() {
-        if (currentUser == null) return;
-
-        db.collection("Users")
-                .document(currentUser.getUid())
-                .get(Source.SERVER)
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        userFirstName = doc.getString("firstName");
-                        userLastName = doc.getString("lastName");
-                        userRoleStr = doc.getString("role");
-                        userClinic = doc.getString("clinic");
-
-                        Role role = Role.fromString(doc.getString("role"));
-
-                        userRole.setText(role == Role.DOCTOR ? "Dr. " : "");
-                        userName.setText(role == Role.DOCTOR ?
-                                pickNameForDoctor(UserPrefs.last(this)) :
-                                pickNameForIndividual(UserPrefs.first(this)));
-
-                        setVisibilityBasedOnRole(role);
-
-                        if (role == Role.DOCTOR) {
-                            loadPatientData();
-                            setupRecyclerViews();
-                        } else {
-                            setupIndividualQuickStats(generateDummyCalculations());
-                            setupCharts(generateDummyCalculations(), role);
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to load user info", e));
-    }
-
     private String pickNameForDoctor(String lastName) {
         if (isNotNullOrBlank(lastName)) return lastName.trim();
         return fallbackNameFromAuth();
@@ -372,7 +342,6 @@ public class DashboardActivity extends AppCompatActivity {
         }
         return "User";
     }
-
 
     private void loadPatientData() {
         if (currentUser == null) return;
@@ -484,8 +453,6 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void setupIndividualQuickStats(List<KfreCalculation> kfreCalculations) {
-        long now = System.currentTimeMillis();
-
         long totalCalcs = kfreCalculations.size();
 
         String lastCalc = totalCalcs > 0
