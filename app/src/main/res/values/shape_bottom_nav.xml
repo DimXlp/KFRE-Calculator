@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ShapeAppearanceOverlay.App.BottomNav.ActiveIndicator" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <!-- Size + color for the active indicator -->
+    <style name="App.BottomNav.ActiveIndicator" parent="">
+        <item name="android:width">64dp</item>
+        <item name="android:height">36dp</item>
+        <item name="android:insetLeft">10dp</item>
+        <item name="android:insetRight">10dp</item>
+        <item name="android:color">@color/bottom_nav_active_bg</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.App.BottomNav.ActiveIndicator</item>
+    </style>
+</resources>

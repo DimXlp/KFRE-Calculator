@@ -6,6 +6,7 @@
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="bottomNavigationStyle">@style/App.BottomNavigation</item>
 
         <!-- Font. -->
         <item name="android:fontFamily">@font/lato_regular</item>

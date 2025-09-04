@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- subtle surface background + teal accents -->
+    <color name="bottom_nav_active">@color/colorSecondary</color>        <!-- #3CE1AE -->
+    <color name="bottom_nav_inactive">@color/textSecondary</color>       <!-- #6D6D6D -->
+    <color name="bottom_nav_ripple">#1F3CE1AE</color>                    <!-- 12% teal -->
+    <color name="bottom_nav_bg">@color/colorSurface</color>              <!-- #F5F5F5 -->
+    <color name="bottom_nav_active_bg">#143CE1AE</color>                 <!-- 8% teal pill -->
+</resources>

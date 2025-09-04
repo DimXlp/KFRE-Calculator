@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="App.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <!-- background + elevation -->
+        <item name="android:background">@drawable/bg_bottom_nav</item>
+        <item name="elevation">10dp</item>
+
+        <!-- tints + ripple -->
+        <item name="itemIconTint">@color/bottom_nav_item_tint</item>
+        <item name="itemTextColor">@color/bottom_nav_item_tint</item>
+        <item name="itemRippleColor">@color/bottom_nav_ripple_state</item>
+
+        <!-- modern selected pill -->
+        <item name="itemActiveIndicatorStyle">@style/App.BottomNav.ActiveIndicator</item>
+
+        <!-- keep labels visible -->
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+</resources>
