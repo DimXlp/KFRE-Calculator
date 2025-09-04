@@ -58,6 +58,7 @@ public class ProfileActivity extends BaseBottomNavActivity {
         db = FirebaseFirestore.getInstance();
 
         setTopBarFunctionalities();
+        setupBottomNav();
 
         // Pass intent extras to the adapter
         ProfileViewPagerAdapter adapter = new ProfileViewPagerAdapter(this);

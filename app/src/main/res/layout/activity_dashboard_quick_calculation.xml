@@ -8,7 +8,7 @@
     android:background="@color/colorBackground"
     tools:context=".activity.DashboardQuickCalculationActivity">
 
-    <!-- Top bar with logo and profile picture -->
+    <!-- Top bar -->
     <LinearLayout
         android:id="@+id/patientDetailHeader"
         android:layout_width="match_parent"
@@ -50,20 +50,30 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabTextColor="@color/colorPrimary"
-        app:tabIndicatorColor="@color/colorPrimary"
-        app:tabMode="fixed"/>
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
+    <!-- Content area -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:orientation="vertical">
 
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabTextColor="@color/colorPrimary"
+            app:tabIndicatorColor="@color/colorPrimary"
+            app:tabMode="fixed"/>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"/>
+    </LinearLayout>
+
+    <!-- Bottom nav -->
     <include layout="@layout/view_bottom_nav"/>
 
 </LinearLayout>

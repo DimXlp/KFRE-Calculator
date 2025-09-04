@@ -49,17 +49,28 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/profileTabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/profileViewPager"
+    <!-- Tabs + pager live in a container that fills available space -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:orientation="vertical">
 
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/profileTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabIndicatorColor="@color/colorPrimary"
+            app:tabSelectedTextColor="@color/colorPrimary" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/profileViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false" />
+    </LinearLayout>
+
+    <!-- Bottom nav stays fixed at the very bottom -->
     <include layout="@layout/view_bottom_nav"/>
-
 </LinearLayout>

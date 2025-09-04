@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/colorBackground"
     tools:context=".activity.PatientDetailActivity">
 
-    <!-- Top bar with logo and profile picture -->
+    <!-- Top bar -->
     <LinearLayout
         android:id="@+id/patientDetailHeader"
         android:layout_width="match_parent"
@@ -49,30 +50,36 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-    <!-- Tabs and ViewPager2 -->
-    <LinearLayout
+    <!-- Content fills remaining space -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="100dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/patientDetailTabLayout"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorSurface"
-            app:tabTextColor="@color/textSecondary"
-            app:tabSelectedTextColor="@color/colorPrimary"
-            app:tabIndicatorColor="@color/colorPrimary" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/patientDetailViewPager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/patientDetailTabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorSurface"
+                app:tabTextColor="@color/textSecondary"
+                app:tabSelectedTextColor="@color/colorPrimary"
+                app:tabIndicatorColor="@color/colorPrimary" />
 
-    </LinearLayout>
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/patientDetailViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false" />
+        </LinearLayout>
+    </FrameLayout>
 
+    <!-- Bottom nav -->
     <include layout="@layout/view_bottom_nav"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

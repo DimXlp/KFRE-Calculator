@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@drawable/white_gradient_background"
     tools:context=".activity.DashboardActivity">
 
@@ -95,735 +96,716 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <!-- Content fills remaining space; always ends above bottom nav -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="160dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="match_parent"
+            android:clipToPadding="false">
 
-            <!-- Quick Stats Card for Doctors -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/dashboardQuickStatsDoctorCard"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <!-- Quick Stats Card for Doctors -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/dashboardQuickStatsDoctorCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="16dp">
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
 
-                    <!-- Header with Title -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_marginHorizontal="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Quick Stats"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DDDDDD"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <!-- Quick Stats Split -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="3">
+                        android:orientation="vertical"
+                        android:paddingVertical="16dp">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_total"
-                                android:background="@color/colorTotal" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_marginHorizontal="16dp">
 
                             <TextView
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:text="Total Patients"
-                                android:textColor="@color/textSecondary"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp" />
-
-                            <TextView
-                                android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:id="@+id/dashboardTotalStatDoctor"
-                                android:text="43"
+                                android:layout_weight="1"
+                                android:text="Quick Stats"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textColor="@color/colorPrimary"
-                                android:layout_marginTop="2dp" />
+                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
 
                         <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="#EEEEEE" />
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#DDDDDD"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
+                            android:orientation="horizontal"
+                            android:weightSum="3">
 
-                            <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_risk"
-                                android:background="@color/colorHighRiskStat" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:src="@drawable/ic_total"
+                                    android:background="@color/colorTotal" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Total Patients"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:id="@+id/dashboardTotalStatDoctor"
+                                    android:text="43"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/colorPrimary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="#EEEEEE" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:src="@drawable/ic_risk"
+                                    android:background="@color/colorHighRiskStat" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="High Risk"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:id="@+id/dashboardHighRiskStatDoctor"
+                                    android:text="16"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/colorPrimary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="#EEEEEE" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:src="@drawable/ic_recent"
+                                    android:background="@color/colorRecentLast"/>
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Recent Patients"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:id="@+id/dashboardRecentStatDoctor"
+                                    android:text="3"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/colorPrimary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Quick Stats Card for Individuals -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/dashboardQuickStatsIndividualCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingVertical="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_marginHorizontal="16dp">
 
                             <TextView
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:text="High Risk"
-                                android:textColor="@color/textSecondary"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp" />
-
-                            <TextView
-                                android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:id="@+id/dashboardHighRiskStatDoctor"
-                                android:text="16"
+                                android:layout_weight="1"
+                                android:text="Quick Stats"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textColor="@color/colorPrimary"
-                                android:layout_marginTop="2dp" />
+                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
 
                         <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#DDDDDD"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:src="@drawable/ic_calculator"
+                                    android:background="@color/colorTotal" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Total Calculations"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:id="@+id/dashboardTotalStatIndividual"
+                                    android:text="43"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/colorPrimary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="#EEEEEE" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:id="@+id/dashboardRiskImageIndividual"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:src="@drawable/ic_risk"
+                                    android:background="@color/colorHighRiskStat" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Risk"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:id="@+id/dashboardRiskStatIndividual"
+                                    android:text="High"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/colorPrimary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="#EEEEEE" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:src="@drawable/ic_recent"
+                                    android:background="@color/colorRecentLast" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:text="Last Calculation"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <TextView
+                                    android:layout_height="wrap_content"
+                                    android:layout_width="wrap_content"
+                                    android:id="@+id/dashboardLastCalculationIndividual"
+                                    android:text="13 Sep 2025"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/colorPrimary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Risk Distribution Pie Chart (Doctor) -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/dashboardRiskPieChartDoctorCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Risk Distribution"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:paddingBottom="8dp" />
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/pieChartRiskDistribution"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- KFRE Risk Over Time Chart (Individual) -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/dashboardRiskLineChartIndividualCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="KFRE Risk Over Time"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:paddingBottom="8dp" />
+
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/lineChartRiskOverTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Quick Actions Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingTop="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_marginHorizontal="16dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Quick Actions"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#DDDDDD"
+                            android:layout_marginTop="8dp" />
+
+                        <LinearLayout
+                            android:id="@+id/dashboardAddPatientAction"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_add"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="16dp"
+                                app:tint="@color/colorAccentDark" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Add New Patient"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary" />
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/dashboardAddPatientDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
                             android:background="#EEEEEE" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:id="@+id/dashboardNewCalculationAction"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_recent"
-                                android:background="@color/colorRecentLast"/>
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_add"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="16dp"
+                                app:tint="@color/colorAccentDark" />
 
                             <TextView
-                                android:layout_height="wrap_content"
                                 android:layout_width="wrap_content"
-                                android:text="Recent Patients"
-                                android:textColor="@color/textSecondary"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp" />
-
-                            <TextView
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:id="@+id/dashboardRecentStatDoctor"
-                                android:text="3"
+                                android:text="Add New Calculation"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textColor="@color/colorPrimary"
-                                android:layout_marginTop="2dp" />
+                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <!-- Quick Stats Card for Individuals -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/dashboardQuickStatsIndividualCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingVertical="16dp">
-
-                    <!-- Header with Title -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_marginHorizontal="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Quick Stats"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DDDDDD"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <!-- Quick Stats Split -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="3">
+                        <View
+                            android:id="@+id/dashboardNewCalculationDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:id="@+id/dashboardQuickCalculationAction"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:src="@drawable/ic_calculator"
-                                android:background="@color/colorTotal" />
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="16dp"
+                                app:tint="@color/colorAccentDark" />
 
                             <TextView
-                                android:layout_height="wrap_content"
                                 android:layout_width="wrap_content"
-                                android:text="Total Calculations"
-                                android:textColor="@color/textSecondary"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp" />
-
-                            <TextView
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:id="@+id/dashboardTotalStatIndividual"
-                                android:text="43"
+                                android:text="Quick Calculator"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textColor="@color/colorPrimary"
-                                android:layout_marginTop="2dp" />
+                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
 
                         <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
+                            android:id="@+id/dashboardQuickCalculationDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
                             android:background="#EEEEEE" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:id="@+id/dashboardViewAllPatientsAction"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
 
                             <ImageView
-                                android:id="@+id/dashboardRiskImageIndividual"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_risk"
-                                android:background="@color/colorHighRiskStat" />
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_view_all"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="16dp"
+                                app:tint="@color/colorAccentDark" />
 
                             <TextView
-                                android:layout_height="wrap_content"
                                 android:layout_width="wrap_content"
-                                android:text="Risk"
-                                android:textColor="@color/textSecondary"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp" />
-
-                            <TextView
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:id="@+id/dashboardRiskStatIndividual"
-                                android:text="High"
+                                android:text="View All Patients"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textColor="@color/colorPrimary"
-                                android:layout_marginTop="2dp" />
+                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
 
                         <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
+                            android:id="@+id/dashboardViewAllPatientsDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
                             android:background="#EEEEEE" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:id="@+id/dashboardViewAllCalcsAction"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_recent"
-                                android:background="@color/colorRecentLast" />
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_view_all"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="16dp"
+                                app:tint="@color/colorAccentDark" />
 
                             <TextView
-                                android:layout_height="wrap_content"
                                 android:layout_width="wrap_content"
-                                android:text="Last Calculation"
-                                android:textColor="@color/textSecondary"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp" />
-
-                            <TextView
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:id="@+id/dashboardLastCalculationIndividual"
-                                android:text="13 Sep 2025"
+                                android:text="View All Calculations"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textAlignment="center"
-                                android:textColor="@color/colorPrimary"
-                                android:layout_marginTop="2dp" />
+                                android:textColor="@color/colorPrimary" />
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/dashboardViewAllCalculationsDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE" />
+
+                        <LinearLayout
+                            android:id="@+id/dashboardExportAction"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="12dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_export"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="16dp"
+                                app:tint="@color/colorAccentDark" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Export Data"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
-            <!-- Risk Distribution Pie Chart (Doctor) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/dashboardRiskPieChartDoctorCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
+                <!-- Recently Accessed Patients Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/dashboardRecentPatientsDoctorCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Risk Distribution"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:paddingBottom="8dp" />
-
-                    <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/pieChartRiskDistribution"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="220dp" />
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingTop="16dp">
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_marginHorizontal="16dp">
 
-            <!-- KFRE Risk Over Time Chart (Individual) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/dashboardRiskLineChartIndividualCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Recent Patients"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary" />
+                        </LinearLayout>
 
-                <LinearLayout
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#DDDDDD"
+                            android:layout_marginTop="8dp" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/dashboardRecentPatientsRecView"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:overScrollMode="ifContentScrolls"
+                            android:nestedScrollingEnabled="true"
+                            android:scrollbars="vertical" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Recent Calculations Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/dashboardRecentCalcsIndividualCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="KFRE Risk Over Time"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:paddingBottom="8dp" />
-
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/lineChartRiskOverTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="220dp" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Quick Actions Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="16dp">
-
-                    <!-- Header with Title -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_marginHorizontal="16dp">
+                        android:orientation="vertical"
+                        android:paddingTop="16dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Quick Actions"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_marginHorizontal="16dp">
 
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Recent Calculations"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#DDDDDD"
+                            android:layout_marginTop="8dp" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/dashboardRecentCalcsRecView"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:overScrollMode="ifContentScrolls"
+                            android:nestedScrollingEnabled="true"
+                            android:scrollbars="vertical"
+                            android:layout_marginHorizontal="16dp" />
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DDDDDD"
-                        android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
 
-                    <!-- Add Patient -->
-                    <LinearLayout
-                        android:id="@+id/dashboardAddPatientAction"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="12dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_add"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginStart="16dp"
-                            app:tint="@color/colorAccentDark" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Add New Patient"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-                    </LinearLayout>
-
-                    <View
-                        android:id="@+id/dashboardAddPatientDivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EEEEEE" />
-
-                    <!-- Add Calculation -->
-                    <LinearLayout
-                        android:id="@+id/dashboardNewCalculationAction"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="12dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_add"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginStart="16dp"
-                            app:tint="@color/colorAccentDark" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Add New Calculation"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-                    </LinearLayout>
-
-                    <View
-                        android:id="@+id/dashboardNewCalculationDivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EEEEEE" />
-
-                    <!-- Quick Calculator -->
-                    <LinearLayout
-                        android:id="@+id/dashboardQuickCalculationAction"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="12dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_calculator"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginStart="16dp"
-                            app:tint="@color/colorAccentDark" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Quick Calculator"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-                    </LinearLayout>
-
-                    <View
-                        android:id="@+id/dashboardQuickCalculationDivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EEEEEE" />
-
-                    <!-- View All Patients -->
-                    <LinearLayout
-                        android:id="@+id/dashboardViewAllPatientsAction"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="12dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_view_all"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginStart="16dp"
-                            app:tint="@color/colorAccentDark" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="View All Patients"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-                    </LinearLayout>
-
-                    <View
-                        android:id="@+id/dashboardViewAllPatientsDivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EEEEEE" />
-
-                    <!-- View All Calculations -->
-                    <LinearLayout
-                        android:id="@+id/dashboardViewAllCalcsAction"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="12dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_view_all"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginStart="16dp"
-                            app:tint="@color/colorAccentDark" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="View All Calculations"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-                    </LinearLayout>
-
-                    <View
-                        android:id="@+id/dashboardViewAllCalculationsDivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EEEEEE" />
-
-                    <!-- Export Data -->
-                    <LinearLayout
-                        android:id="@+id/dashboardExportAction"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="12dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_export"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginStart="16dp"
-                            app:tint="@color/colorAccentDark" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Export Data"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Recently Accessed Patients Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/dashboardRecentPatientsDoctorCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="16dp">
-
-                    <!-- Header with Title -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_marginHorizontal="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Recent Patients"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DDDDDD"
-                        android:layout_marginTop="8dp" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/dashboardRecentPatientsRecView"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:overScrollMode="ifContentScrolls"
-                        android:nestedScrollingEnabled="true"
-                        android:scrollbars="vertical" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Recent Calculations Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/dashboardRecentCalcsIndividualCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="16dp">
-
-                    <!-- Header with Title -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_marginHorizontal="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Recent Calculations"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DDDDDD"
-                        android:layout_marginTop="8dp" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/dashboardRecentCalcsRecView"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:overScrollMode="ifContentScrolls"
-                        android:nestedScrollingEnabled="true"
-                        android:scrollbars="vertical"
-                        android:layout_marginHorizontal="16dp" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-    </ScrollView>
-
+    <!-- Bottom nav at the bottom -->
     <include layout="@layout/view_bottom_nav"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
