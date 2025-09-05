@@ -7,6 +7,62 @@
     <string name="already_in_profile">You’re already on your profile.</string>
     <string name="logged_out">You’ve been signed out.</string>
 
+    <!-- Export: Scope -->
+    <string name="export_scope_all">All patients</string>
+    <string name="export_scope_selected">Selected patients</string>
+    <string name="export_scope_date_range">By date range</string>
+    <string name="export_scope_current_patient">Current patient</string>
+    <string name="export_hint_patients">Enter patient IDs (comma-separated)</string>
+    <string name="export_hint_patients_example">e.g., p1, p2, p3</string>
+    <string name="export_pick_start">Pick start date</string>
+    <string name="export_pick_end">Pick end date</string>
+
+    <!-- Export: errors -->
+    <string name="export_err_patients_required">Please enter at least one patient ID.</string>
+    <string name="export_err_dates_required">Please pick both start and end dates.</string>
+    <string name="export_err_dates_order">Start date must be before end date.</string>
+
+    <!-- Export: Data -->
+    <string name="export_data_calculations">Calculations</string>
+    <string name="export_data_notes">Notes</string>
+    <string name="export_data_medications">Medications</string>
+    <string name="export_err_data_required">Select at least one data type to export.</string>
+
+    <!-- Export actions -->
+    <string name="export_action_back">Back</string>
+    <string name="export_action_next">Next</string>
+    <string name="export_action_export">Export</string>
+
+    <!-- Export: Options -->
+    <string name="export_options_format">Format</string>
+    <string name="export_format_pdf">PDF</string>
+    <string name="export_format_csv">CSV</string>
+    <string name="export_include_charts">Include charts</string>
+    <string name="export_anonymize">Anonymize patient details</string>
+    <string name="export_options_language">Language</string>
+    <string name="export_err_language_required">Please choose a language.</string>
+
+    <!-- Export: Destination -->
+    <string name="export_destination_title">Destination</string>
+    <string name="export_dest_save">Save</string>
+    <string name="export_dest_share">Share</string>
+    <string name="export_choose_folder">Choose folder</string>
+    <string name="export_folder_chosen">Folder chosen.</string>
+    <string name="export_err_folder_required">Please choose a folder for saving.</string>
+
+    <!-- Export: Summary -->
+    <string name="summary_scope_current">Scope: Current patient</string>
+    <string name="summary_scope_all">Scope: All patients</string>
+    <string name="summary_scope_selected">Scope: Selected patients (%1$s)</string>
+    <string name="summary_scope_range">Scope: %1$s → %2$s</string>
+    <string name="summary_data">Data: %1$s</string>
+    <string name="summary_options">Options: %1$s • Charts: %2$s • Anonymize: %3$s • Lang: %4$s</string>
+    <string name="summary_dest_save">Destination: Save</string>
+    <string name="summary_dest_share">Destination: Share</string>
+    <string name="summary_yes">Yes</string>
+    <string name="summary_no">No</string>
+    <string name="summary_hint_export">Review everything and press Export.</string>
+
     <string-array name="roles_array">
         <item>Select Role</item>
         <item>Doctor</item>

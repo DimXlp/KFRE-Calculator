@@ -90,5 +90,5 @@ public class BaseBottomNavActivity extends AppCompatActivity {
     protected Class<?> patientsActivityClass() { return PatientListActivity.class; }
     protected Class<?> calculationsActivityClass() { return DashboardActivity.class; }
     protected Class<?> quickCalcActivityClass() { return DashboardQuickCalculationActivity.class; }
-    protected Class<?> exportActivityClass() { return DashboardActivity.class; }
+    protected Class<?> exportActivityClass() { return DoctorExportActivity.class; }
 }

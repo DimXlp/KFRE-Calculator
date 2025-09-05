@@ -260,7 +260,8 @@ public class DashboardActivity extends BaseBottomNavActivity {
 
         exportBtn.setOnClickListener(v -> {
             Log.d(TAG, "Export Data clicked");
-            Toast.makeText(this, "Export feature coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardActivity.this, DoctorExportActivity.class);
+            startActivity(intent);
         });
 
         profileImg.setOnClickListener(v -> {

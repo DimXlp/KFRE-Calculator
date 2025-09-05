@@ -150,7 +150,6 @@ public class ProfileActivity extends BaseBottomNavActivity {
         switch (position) {
             case 0: return "Account";
             case 1: return "Preferences";
-            case 2: return "Export";
         }
         return null;
     }

@@ -35,9 +35,6 @@ public class ProfileViewPagerAdapter extends FragmentStateAdapter {
             case 1:
                 fragment = new PreferencesFragment();
                 break;
-//            case 2:
-//                fragment = new ExportFragment();
-//                break;
             default:
                 fragment = new AccountInfoFragment();
         }
@@ -48,6 +45,6 @@ public class ProfileViewPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 2;
     }
 }

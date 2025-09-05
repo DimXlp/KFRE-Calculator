@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <RadioGroup
+            android:id="@+id/scopeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rbAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_scope_all" />
+
+            <RadioButton
+                android:id="@+id/rbSelected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_scope_selected" />
+
+            <RadioButton
+                android:id="@+id/rbDateRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_scope_date_range" />
+
+            <RadioButton
+                android:id="@+id/rbCurrent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_scope_current_patient" />
+        </RadioGroup>
+
+        <!-- Selected patients -->
+        <LinearLayout
+            android:id="@+id/patientsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingTop="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_hint_patients" />
+
+            <EditText
+                android:id="@+id/inputPatients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/export_hint_patients_example" />
+        </LinearLayout>
+
+        <!-- Date range -->
+        <LinearLayout
+            android:id="@+id/rangeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:paddingTop="12dp">
+
+            <Button
+                android:id="@+id/btnPickStart"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/export_pick_start" />
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="0dp" />
+
+            <Button
+                android:id="@+id/btnPickEnd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/export_pick_end" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
